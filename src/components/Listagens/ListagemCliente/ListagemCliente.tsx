@@ -67,7 +67,7 @@ function ListagemCliente(): JSX.Element {
 
     return (
         <main className="flex-1 bg-gradient-to-br from-blue-50 via-white to-indigo-50 min-h-screen py-8 px-4">
-            <div className="max-w-7xl mx-auto">
+            <div className="container-center">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 animate-slide-up">
                     <div>
@@ -101,7 +101,7 @@ function ListagemCliente(): JSX.Element {
                 </div>
 
                 {/* Table Section */}
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden animate-slide-up" style={{ animationDelay: '0.2s' }}>
+                <div className="table-wrapper card animate-slide-up" style={{ animationDelay: '0.2s' }}>
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>

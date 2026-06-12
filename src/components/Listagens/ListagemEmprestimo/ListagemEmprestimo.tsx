@@ -93,7 +93,7 @@ function ListagemEmprestimo(): JSX.Element {
 
     return (
         <main className="flex-1 bg-gray-50 p-4 md:p-8">
-            <div className="max-w-7xl mx-auto">
+            <div className="container-center">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
                     <div>
@@ -123,7 +123,7 @@ function ListagemEmprestimo(): JSX.Element {
 
                 {/* Cards para Mobile, Table para Desktop */}
                 <div className="hidden lg:block">
-                    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div className="table-wrapper card">
                         <div className="overflow-x-auto">
                             <table className="w-full">
                                 <thead>

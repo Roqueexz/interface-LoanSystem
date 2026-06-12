@@ -69,7 +69,7 @@ function Navegacao({ onNavegar, paginaAtiva = "inicio" }: NavegacaoProps): JSX.E
 
   return (
     <nav className="bg-gradient-to-r from-indigo-600 to-blue-600 shadow-lg sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container-center px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => handleNavegacao("inicio")}>

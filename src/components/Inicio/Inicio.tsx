@@ -13,7 +13,7 @@ function Inicio(): JSX.Element {
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full mix-blend-multiply filter blur-3xl"></div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto text-center">
+        <div className="relative container-center text-center">
           <div className="mb-8 animate-slide-up">
             <span className="inline-block px-4 py-2 bg-white bg-opacity-20 text-white rounded-full text-sm font-semibold">
               ✨ Bem-vindo ao LoanSystem
@@ -47,7 +47,7 @@ function Inicio(): JSX.Element {
 
       {/* Stats Section */}
       <section className="py-16 md:py-24 px-4 bg-white">
-        <div className="max-w-7xl mx-auto">
+        <div className="container-center">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-16">Resumo do Sistema</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -71,7 +71,7 @@ function Inicio(): JSX.Element {
 
       {/* Features Section */}
       <section className="py-16 md:py-24 px-4 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
+        <div className="container-center">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Funcionalidades Poderosas</h2>
           <p className="text-center text-gray-600 text-lg mb-16">Tudo que você precisa para gerenciar empréstimos com excelência</p>
 
@@ -138,7 +138,7 @@ function Inicio(): JSX.Element {
 
       {/* Footer Info */}
       <section className="bg-gray-900 text-white py-12 px-4">
-        <div className="max-w-7xl mx-auto text-center">
+        <div className="container-center text-center">
           <p className="text-gray-400">
             &copy; 2024 LoanSystem. Gerenciamento inteligente de empréstimos.
           </p>

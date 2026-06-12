@@ -215,6 +215,83 @@ tr:hover {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
 }
 
+/* Layout helpers */
+.container-center {
+  max-width: 1120px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* Soft shadow utility */
+.shadow-soft {
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+/* Card refinement */
+.card {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(15, 23, 42, 0.04);
+  box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(2,6,23,0.08);
+}
+
+/* Table polish */
+.table-wrapper {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid rgba(15,23,42,0.06);
+}
+
+.table-wrapper table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-wrapper thead tr th {
+  background: linear-gradient(90deg, rgba(79,70,229,0.04), rgba(37,99,235,0.03));
+  color: #0f172a;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.table-wrapper tbody tr td {
+  background: transparent;
+}
+
+.table-wrapper tbody tr:hover td {
+  background: rgba(79,70,229,0.02);
+}
+
+/* Focus-visible accessible outlines */
+:focus-visible {
+  outline: 3px solid rgba(79,70,229,0.16);
+  outline-offset: 2px;
+}
+
+/* Utility spacing */
+.gap-6 {
+  gap: 1.5rem;
+}
+
+/* Small helpers */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.6rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
 /* Animations */
 @keyframes fadeIn {
   from {
