@@ -72,8 +72,7 @@ function FormEmprestimo() {
       status_emprestimo: formData.status_emprestimo,
     };
 
-    const resposta =
-      await EmprestimoRequests.enviarFormularioEmprestimo(payload);
+    const resposta = await EmprestimoRequests.enviarFormularioEmprestimo(payload);
 
     if (resposta) {
       alert("Empréstimo cadastrado com sucesso!");
@@ -84,45 +83,47 @@ function FormEmprestimo() {
   };
 
   return (
-    <main className="bg-gray-100 flex-1 py-8 px-4">
+    <div className="py-8 px-4">
       <div className="max-w-3xl mx-auto">
         <form
           onSubmit={handleSubmit}
           className="bg-white shadow-xl rounded-2xl p-8"
         >
-          <h1 className="text-3xl font-bold text-center mb-8">
+          <h1 className="text-3xl font-bold text-center mb-8 text-slate-800">
             Novo Empréstimo
           </h1>
 
           <div className="space-y-5">
             <div>
-              <label>ID do Cliente</label>
+              <label className="block mb-2 font-medium text-slate-700">ID do Cliente</label>
               <input
                 type="number"
                 name="id_cliente"
                 min={1}
                 required
-                value={formData.id_cliente}
+                value={formData.id_cliente || ""}
                 onChange={handleChange}
-                className="w-full border rounded-xl p-3"
+                className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="Ex: 12"
               />
             </div>
 
             <div>
-              <label>Valor do Empréstimo</label>
+              <label className="block mb-2 font-medium text-slate-700">Valor do Empréstimo</label>
               <input
                 type="number"
                 name="valor_emprestimo"
                 step="0.01"
                 required
-                value={formData.valor_emprestimo}
+                value={formData.valor_emprestimo || ""}
                 onChange={handleChange}
-                className="w-full border rounded-xl p-3"
+                className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="0,00"
               />
             </div>
 
             <div>
-              <label>Número de Parcelas</label>
+              <label className="block mb-2 font-medium text-slate-700">Número de Parcelas</label>
               <input
                 type="number"
                 name="num_parcelas"
@@ -130,17 +131,17 @@ function FormEmprestimo() {
                 required
                 value={formData.num_parcelas}
                 onChange={handleChange}
-                className="w-full border rounded-xl p-3"
+                className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
 
             <div>
-              <label>Tipo de Juros</label>
+              <label className="block mb-2 font-medium text-slate-700">Tipo de Juros</label>
               <select
                 name="tipo_juros"
                 value={formData.tipo_juros}
                 onChange={handleChange}
-                className="w-full border rounded-xl p-3"
+                className="w-full border border-slate-200 rounded-xl p-3 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="simples">Juros Simples</option>
                 <option value="composto">Juros Compostos</option>
@@ -148,37 +149,38 @@ function FormEmprestimo() {
             </div>
 
             <div>
-              <label>Taxa de Juros (%)</label>
+              <label className="block mb-2 font-medium text-slate-700">Taxa de Juros (%)</label>
               <input
                 type="number"
                 name="juros"
                 step="0.01"
                 required
-                value={formData.juros}
+                value={formData.juros || ""}
                 onChange={handleChange}
-                className="w-full border rounded-xl p-3"
+                className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="0,00"
               />
             </div>
 
             <div>
-              <label>Data do Empréstimo</label>
+              <label className="block mb-2 font-medium text-slate-700">Data do Empréstimo</label>
               <input
                 type="date"
                 name="data_emprestimo"
                 value={formData.data_emprestimo}
                 onChange={handleChange}
-                className="w-full border rounded-xl p-3"
+                className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
 
             <div>
-              <label>Data de Devolução</label>
+              <label className="block mb-2 font-medium text-slate-700">Data de Devolução</label>
               <input
                 type="date"
                 name="data_devolucao"
                 value={formData.data_devolucao}
                 onChange={handleChange}
-                className="w-full border rounded-xl p-3"
+                className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
           </div>
@@ -186,7 +188,7 @@ function FormEmprestimo() {
           <div className="mt-8 flex gap-4">
             <button
               type="submit"
-              className="flex-1 bg-slate-800 text-white py-3 rounded-xl font-bold"
+              className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-md"
             >
               CADASTRAR
             </button>
@@ -194,14 +196,14 @@ function FormEmprestimo() {
             <button
               type="button"
               onClick={() => navigate("/emprestimos")}
-              className="flex-1 border border-slate-300 py-3 rounded-xl font-bold"
+              className="flex-1 border border-slate-300 py-3 rounded-xl font-bold text-slate-700 hover:bg-slate-50 transition-all"
             >
               VOLTAR
             </button>
           </div>
         </form>
       </div>
-    </main>
+    </div>
   );
 }
 
