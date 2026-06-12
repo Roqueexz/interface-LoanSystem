@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 * {
-  @apply transition-colors duration-200;
+  transition: colors 0.2s;
 }
 
 :root {
@@ -24,129 +24,138 @@ html {
 }
 
 body {
-  @apply m-0 p-0 font-sans;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   min-height: 100vh;
 }
 
 /* Tipografia */
 h1 {
-  @apply text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.02em;
 }
 
 h2 {
-  @apply text-3xl font-bold text-gray-900;
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
 }
 
 h3 {
-  @apply text-xl font-semibold text-gray-800;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
 }
 
 p {
-  @apply text-gray-600 leading-relaxed;
+  color: #4b5563;
+  line-height: 1.625;
 }
 
 /* Botões */
 button {
-  @apply font-medium transition-all duration-300 cursor-pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+  cursor: pointer;
 }
 
 button:disabled {
-  @apply opacity-50 cursor-not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Links */
 a {
-  @apply text-primary-600 hover:text-primary-700 no-underline transition-colors;
+  color: #4f46e5;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: #4338ca;
 }
 
 /* Inputs */
 input,
 textarea,
 select {
-  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: transparent;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.5);
 }
 
 input:disabled,
 textarea:disabled,
 select:disabled {
-  @apply bg-gray-100 cursor-not-allowed;
+  background-color: #f3f4f6;
+  cursor: not-allowed;
 }
 
 /* Cards */
 .card {
-  @apply bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .card-header {
-  @apply px-6 py-4 border-b border-gray-200;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .card-body {
-  @apply px-6 py-4;
+  padding: 1.5rem;
 }
 
 .card-footer {
-  @apply px-6 py-4 border-t border-gray-200 bg-gray-50;
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
 }
 
-/* Badge */
-.badge {
-  @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium;
-}
-
-.badge-primary {
-  @apply bg-blue-100 text-blue-700;
-}
-
-.badge-success {
-  @apply bg-green-100 text-green-700;
-}
-
-.badge-warning {
-  @apply bg-yellow-100 text-yellow-700;
-}
-
-.badge-danger {
-  @apply bg-red-100 text-red-700;
-}
-
-/* Alert */
-.alert {
-  @apply p-4 rounded-lg border flex items-start gap-3;
-}
-
-.alert-info {
-  @apply bg-blue-50 border-blue-200 text-blue-800;
-}
-
-.alert-success {
-  @apply bg-green-50 border-green-200 text-green-800;
-}
-
-.alert-warning {
-  @apply bg-yellow-50 border-yellow-200 text-yellow-800;
-}
-
-.alert-danger {
-  @apply bg-red-50 border-red-200 text-red-800;
-}
-
-/* Tabela */
+/* Table */
 table {
-  @apply w-full border-collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 th {
-  @apply bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b border-gray-200;
+  background-color: #f9fafb;
+  padding: 1rem;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 td {
-  @apply px-4 py-3 border-b border-gray-200;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 tr:hover {
-  @apply bg-gray-50;
+  background-color: #f9fafb;
 }
 
 /* Gradient backgrounds */
@@ -211,4 +220,5 @@ tr:hover {
 .animate-slide-up {
   animation: slideUp 0.3s ease-out;
 }
+
 
