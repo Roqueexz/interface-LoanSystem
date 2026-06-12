@@ -1,216 +1,278 @@
-import type { JSX } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Plus,
+  Eye,
+  Pencil,
+  Trash2,
+  Users,
+  Search,
+} from "lucide-react";
 
-interface Cliente {
-    id: number;
-    nome: string;
-    email: string;
-    telefone: string;
-    documento: string;
-    dataCadastro: string;
-    ativo: boolean;
-}
+import ClienteRequests from "../../../fetch/ClienteRequests";
+import type ClienteDTO from "../../../interface/ClienteDTO";
 
-function ListagemCliente(): JSX.Element {
-    const navigate = useNavigate();
+function ListagemCliente() {
+  const navigate = useNavigate();
 
-    const clientesExemplo: Cliente[] = [
-        {
-            id: 1,
-            nome: "João Silva",
-            email: "joao.silva@email.com",
-            telefone: "(11) 98765-4321",
-            documento: "123.456.789-00",
-            dataCadastro: "2024-01-15",
-            ativo: true,
-        },
-        {
-            id: 2,
-            nome: "Maria Santos",
-            email: "maria.santos@email.com",
-            telefone: "(11) 97654-3210",
-            documento: "987.654.321-00",
-            dataCadastro: "2024-02-20",
-            ativo: true,
-        },
-        {
-            id: 3,
-            nome: "Pedro Costa",
-            email: "pedro.costa@email.com",
-            telefone: "(11) 96543-2109",
-            documento: "456.789.123-00",
-            dataCadastro: "2024-03-10",
-            ativo: false,
-        },
-    ];
+  const [clientes, setClientes] = useState<ClienteDTO[]>([]);
+  const [busca, setBusca] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
 
-    const getAvatarLetters = (nome: string): string => {
-        return nome
-            .split(" ")
-            .slice(0, 2)
-            .map((n) => n[0])
-            .join("")
-            .toUpperCase();
-    };
+  useEffect(() => {
+    carregarClientes();
+  }, []);
 
-    const getAvatarColor = (id: number): string => {
-        const colors = [
-            "bg-gradient-to-br from-blue-500 to-blue-600",
-            "bg-gradient-to-br from-purple-500 to-purple-600",
-            "bg-gradient-to-br from-pink-500 to-pink-600",
-            "bg-gradient-to-br from-green-500 to-green-600",
-            "bg-gradient-to-br from-yellow-500 to-yellow-600",
-            "bg-gradient-to-br from-red-500 to-red-600",
-        ];
-        return colors[id % colors.length];
-    };
+  const carregarClientes = async () => {
+    const lista = await ClienteRequests.obterListaDeClientes();
 
-    return (
-        <main className="flex-1 bg-gradient-to-br from-blue-50 via-white to-indigo-50 min-h-screen py-8 px-4">
-            <div className="container-center">
-                {/* Header Section */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 animate-slide-up">
-                    <div>
-                        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent mb-2">
-                            👥 Clientes
-                        </h1>
-                        <p className="text-gray-600 text-lg">Gerencie todos os clientes cadastrados no sistema</p>
-                    </div>
-                    <button
-                        onClick={() => navigate('/novo-cliente')}
-                        className="mt-4 md:mt-0 px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold rounded-lg hover:shadow-lg transition-all transform hover:-translate-y-1 active:translate-y-0"
-                    >
-                        ➕ Novo Cliente
-                    </button>
-                </div>
+    if (lista) {
+      setClientes(lista);
+    }
+  };
 
-                {/* Filters Section */}
-                <div className="bg-white rounded-xl shadow-md p-6 mb-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <input
-                            type="text"
-                            placeholder="🔍 Buscar por nome ou email..."
-                            className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                        />
-                        <select className="px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
-                            <option value="">📋 Filtrar por status</option>
-                            <option value="ativo">✓ Ativo</option>
-                            <option value="inativo">✕ Inativo</option>
-                        </select>
-                    </div>
-                </div>
+  const handleDelete = async (id: number) => {
+    const sucesso = await ClienteRequests.excluirCliente(id);
 
-                {/* Table Section */}
-                <div className="table-wrapper card animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="bg-gradient-to-r from-indigo-50 to-blue-50 border-b-2 border-indigo-200">
-                                    <th className="px-6 py-4 text-left text-sm font-bold text-indigo-900">Cliente</th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold text-indigo-900">Email</th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold text-indigo-900">Telefone</th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold text-indigo-900">Documento</th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold text-indigo-900">Cadastro</th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold text-indigo-900">Status</th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold text-indigo-900">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {clientesExemplo.map((cliente, index) => (
-                                    <tr
-                                        key={cliente.id}
-                                        className={`border-b border-gray-200 hover:bg-indigo-50 transition-colors ${
-                                            index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                                        }`}
-                                    >
-                                        {/* Cliente */}
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div
-                                                    className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-base shadow-md ${getAvatarColor(cliente.id)}`}
-                                                >
-                                                    {getAvatarLetters(cliente.nome)}
-                                                </div>
-                                                <span className="font-semibold text-gray-900">{cliente.nome}</span>
-                                            </div>
-                                        </td>
+    if (sucesso) {
+      setClientes((prev) =>
+        prev.filter((c) => c.id_cliente !== id)
+      );
 
-                                        {/* Email */}
-                                        <td className="px-6 py-4">
-                                            <span className="text-sm text-gray-600">{cliente.email}</span>
-                                        </td>
+      alert("Cliente excluído com sucesso!");
+    } else {
+      alert("Erro ao excluir cliente.");
+    }
 
-                                        {/* Telefone */}
-                                        <td className="px-6 py-4">
-                                            <span className="text-sm text-gray-600">{cliente.telefone}</span>
-                                        </td>
+    setConfirmDelete(null);
+  };
 
-                                        {/* Documento */}
-                                        <td className="px-6 py-4">
-                                            <span className="text-sm text-gray-600 font-mono">{cliente.documento}</span>
-                                        </td>
+  const filtrados = clientes.filter((c) =>
+    `${c.nome_cliente} ${c.sobrenome_cliente} ${c.telefone} ${c.cidade} ${c.estado}`
+      .toLowerCase()
+      .includes(busca.toLowerCase())
+  );
 
-                                        {/* Data Cadastro */}
-                                        <td className="px-6 py-4">
-                                            <span className="text-sm text-gray-600">
-                                                {new Date(cliente.dataCadastro).toLocaleDateString("pt-BR")}
-                                            </span>
-                                        </td>
+  return (
+    <div className="min-h-screen bg-[#f8fafc] p-4 sm:p-8">
+      <div className="max-w-7xl mx-auto">
 
-                                        {/* Status */}
-                                        <td className="px-6 py-4">
-                                            <span
-                                                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold ${
-                                                    cliente.ativo
-                                                        ? "bg-green-100 text-green-800"
-                                                        : "bg-red-100 text-red-800"
-                                                }`}
-                                            >
-                                                {cliente.ativo ? "✓ Ativo" : "✕ Inativo"}
-                                            </span>
-                                        </td>
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-800">
+              Clientes
+            </h1>
 
-                                        {/* Ações */}
-                                        <td className="px-6 py-4">
-                                            <div className="flex gap-2">
-                                                <button
-                                                    className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all hover:shadow-md"
-                                                    title="Editar cliente"
-                                                >
-                                                    ✏️
-                                                </button>
-                                                <button
-                                                    className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all hover:shadow-md"
-                                                    title="Deletar cliente"
-                                                >
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+            <p className="text-slate-500 text-sm mt-1">
+              {clientes.length} cliente(s) cadastrado(s)
+            </p>
+          </div>
 
-                    {/* Pagination */}
-                    <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-gradient-to-r from-gray-50 to-indigo-50 border-t-2 border-indigo-200">
-                        <span className="text-sm font-semibold text-gray-700 mb-4 sm:mb-0">
-                            Mostrando <span className="text-indigo-600">3 de 3</span> clientes
-                        </span>
-                        <div className="flex gap-3">
-                            <button className="px-4 py-2 border-2 border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-indigo-50 hover:border-indigo-300 transition-all">
-                                ← Anterior
-                            </button>
-                            <button className="px-4 py-2 border-2 border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-indigo-50 hover:border-indigo-300 transition-all">
-                                Próximo →
-                            </button>
-                        </div>
-                    </div>
-                </div>
+          <button
+            onClick={() => navigate("/novo-cliente")}
+            className="flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-md"
+          >
+            <Plus size={18} />
+            Novo Cliente
+          </button>
+        </div>
+
+        {/* Busca */}
+        <div className="relative mb-6">
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+          />
+
+          <input
+            type="text"
+            placeholder="Buscar cliente..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        {/* Lista vazia */}
+        {filtrados.length === 0 ? (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-16 flex flex-col items-center gap-4 text-center">
+            <div className="bg-indigo-50 p-5 rounded-full">
+              <Users
+                size={36}
+                className="text-indigo-400"
+              />
             </div>
-        </main>
-    );
+
+            <div>
+              <p className="font-semibold text-slate-700">
+                Nenhum cliente encontrado
+              </p>
+
+              <p className="text-sm text-slate-400 mt-1">
+                {busca
+                  ? "Tente outra busca."
+                  : "Cadastre seu primeiro cliente."}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+
+                <thead>
+                  <tr className="bg-slate-700 text-white text-sm">
+                    <th className="text-left px-5 py-3">
+                      ID
+                    </th>
+
+                    <th className="text-left px-5 py-3">
+                      Nome
+                    </th>
+
+                    <th className="text-left px-5 py-3">
+                      Telefone
+                    </th>
+
+                    <th className="text-left px-5 py-3">
+                      Cidade
+                    </th>
+
+                    <th className="text-left px-5 py-3">
+                      Status
+                    </th>
+
+                    <th className="text-center px-5 py-3">
+                      Ações
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {filtrados.map((c) => (
+                    <tr
+                      key={c.id_cliente}
+                      className="border-t border-slate-100 hover:bg-slate-50"
+                    >
+                      <td className="px-5 py-4">
+                        #{c.id_cliente}
+                      </td>
+
+                      <td className="px-5 py-4">
+                        {c.nome_cliente} {c.sobrenome_cliente}
+                      </td>
+
+                      <td className="px-5 py-4">
+                        {c.telefone}
+                      </td>
+
+                      <td className="px-5 py-4">
+                        {c.cidade}/{c.estado}
+                      </td>
+
+                      <td className="px-5 py-4">
+                        <span
+                          className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${
+                            c.status_cliente
+                              ? "bg-green-100 text-green-700"
+                              : "bg-gray-100 text-gray-500"
+                          }`}
+                        >
+                          {c.status_cliente
+                            ? "Ativo"
+                            : "Inativo"}
+                        </span>
+                      </td>
+
+                      <td className="px-5 py-4">
+                        <div className="flex justify-center gap-2">
+
+                          <button
+                            onClick={() =>
+                              alert(
+                                "Detalhes ainda não implementado"
+                              )
+                            }
+                            className="p-2 rounded-lg hover:bg-indigo-50"
+                          >
+                            <Eye size={16} />
+                          </button>
+
+                          <button
+                            onClick={() =>
+                              alert(
+                                "Edição ainda não implementada"
+                              )
+                            }
+                            className="p-2 rounded-lg hover:bg-blue-50"
+                          >
+                            <Pencil size={16} />
+                          </button>
+
+                          <button
+                            onClick={() =>
+                              setConfirmDelete(
+                                c.id_cliente!
+                              )
+                            }
+                            className="p-2 rounded-lg hover:bg-red-50"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Modal Exclusão */}
+      {confirmDelete !== null && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
+
+            <h2 className="text-lg font-bold mb-3">
+              Excluir Cliente
+            </h2>
+
+            <p className="text-slate-600 mb-6">
+              Deseja realmente excluir este cliente?
+            </p>
+
+            <div className="flex gap-3">
+
+              <button
+                onClick={() =>
+                  setConfirmDelete(null)
+                }
+                className="flex-1 border border-slate-300 rounded-xl py-2"
+              >
+                Cancelar
+              </button>
+
+              <button
+                onClick={() =>
+                  handleDelete(confirmDelete)
+                }
+                className="flex-1 bg-red-600 text-white rounded-xl py-2"
+              >
+                Excluir
+              </button>
+
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default ListagemCliente;
