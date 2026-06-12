@@ -1,14 +1,13 @@
 import type { JSX } from "react";
-import Navegacao from "../../components/Navegacao/Navegacao";
+import Layout from "../../components/Layout/Layout";
 import Inicio from "../../components/Inicio/Inicio";
 
-function PHome(): JSX.Element {
+function PInicio(): JSX.Element {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navegacao paginaAtiva="inicio" />
+    <Layout>
       <Inicio />
-    </div>
+    </Layout>
   );
 }
 
-export default PHome;
+export default PInicio;
