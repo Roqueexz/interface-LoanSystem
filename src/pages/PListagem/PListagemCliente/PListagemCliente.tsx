@@ -1,13 +1,14 @@
 import type { JSX } from "react";
-import Navegacao from "../../../components/Navegacao/Navegacao";
+import Layout from "../../../components/Layout/Layout";
 import ListagemCliente from "../../../components/Listagens/ListagemCliente/ListagemCliente";
 
 function PListagemCliente(): JSX.Element {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navegacao paginaAtiva="clientes" />
-      <ListagemCliente />
-    </div>
+    <Layout>
+      <div className="w-full min-h-full bg-slate-50">
+        <ListagemCliente />
+      </div>
+    </Layout>
   );
 }
 
