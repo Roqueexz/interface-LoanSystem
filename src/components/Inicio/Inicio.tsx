@@ -1,99 +1,152 @@
 import type { JSX } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Inicio(): JSX.Element {
-    return (
-        <main className="flex-1 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
-                {/* Hero Section */}
-                <section className="text-center mb-16 md:mb-24">
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-                        Sistema de <span className="text-indigo-600">Empréstimos</span>
-                    </h1>
-                    <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-                        Gerenciamento completo e eficiente de empréstimos. Simule, analise e acompanhe todas as operações em um único lugar.
-                    </p>
-                </section>
+  const navigate = useNavigate();
 
-                {/* Stats Section */}
-                <section className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-                    <div className="bg-white rounded-lg shadow-md p-8 text-center hover:shadow-lg transition-shadow">
-                        <div className="text-4xl font-bold text-indigo-600 mb-2">0</div>
-                        <p className="text-gray-600">Clientes Cadastrados</p>
-                    </div>
-                    <div className="bg-white rounded-lg shadow-md p-8 text-center hover:shadow-lg transition-shadow">
-                        <div className="text-4xl font-bold text-green-600 mb-2">R$ 0</div>
-                        <p className="text-gray-600">Valor Total Emprestado</p>
-                    </div>
-                    <div className="bg-white rounded-lg shadow-md p-8 text-center hover:shadow-lg transition-shadow">
-                        <div className="text-4xl font-bold text-blue-600 mb-2">0</div>
-                        <p className="text-gray-600">Empréstimos Ativos</p>
-                    </div>
-                </section>
+  return (
+    <main className="flex-1">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-blue-500 to-blue-600 py-20 md:py-32 px-4">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full mix-blend-multiply filter blur-3xl"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full mix-blend-multiply filter blur-3xl"></div>
+        </div>
 
-                {/* Features Section */}
-                <section className="mb-16">
-                    <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Funcionalidades</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="flex gap-4 items-start">
-                            <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <span className="text-2xl">👥</span>
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Gestão de Clientes</h3>
-                                <p className="text-gray-600">Cadastre, edite e acompanhe informações de todos os seus clientes em um lugar centralizado.</p>
-                            </div>
-                        </div>
+        <div className="relative max-w-7xl mx-auto text-center">
+          <div className="mb-8 animate-slide-up">
+            <span className="inline-block px-4 py-2 bg-white bg-opacity-20 text-white rounded-full text-sm font-semibold">
+              ✨ Bem-vindo ao LoanSystem
+            </span>
+          </div>
 
-                        <div className="flex gap-4 items-start">
-                            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <span className="text-2xl">💰</span>
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Simulação de Empréstimos</h3>
-                                <p className="text-gray-600">Calcule juros, prazos e valores com base em diferentes cenários e taxas personalizadas.</p>
-                            </div>
-                        </div>
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white mb-6 leading-tight animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            Sistema de <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-100">Empréstimos</span>
+          </h1>
 
-                        <div className="flex gap-4 items-start">
-                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <span className="text-2xl">📊</span>
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Relatórios Detalhados</h3>
-                                <p className="text-gray-600">Gere relatórios completos sobre empréstimos, clientes e rentabilidade das operações.</p>
-                            </div>
-                        </div>
+          <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            Gerencie empréstimos com precisão. Simule, analise e acompanhe todas as operações em um único lugar de forma profissional.
+          </p>
 
-                        <div className="flex gap-4 items-start">
-                            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <span className="text-2xl">⚙️</span>
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Configurações Flexíveis</h3>
-                                <p className="text-gray-600">Customize taxas, prazos e condições de empréstimo conforme suas necessidades.</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up" style={{ animationDelay: '0.3s' }}>
+            <button
+              onClick={() => navigate('/clientes')}
+              className="px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+            >
+              👥 Ver Clientes
+            </button>
+            <button
+              onClick={() => navigate('/emprestimos')}
+              className="px-8 py-4 bg-indigo-700 text-white font-bold rounded-lg hover:bg-indigo-800 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-2 border-white border-opacity-50"
+            >
+              💰 Ver Empréstimos
+            </button>
+          </div>
+        </div>
+      </section>
 
-                {/* CTA Section */}
-                <section className="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-lg shadow-lg p-8 md:p-12 text-center">
-                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Pronto para começar?</h2>
-                    <p className="text-indigo-100 mb-8 max-w-2xl mx-auto">
-                        Explore todas as funcionalidades do sistema e gerencie seus empréstimos de forma profissional.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <button className="px-8 py-3 bg-white text-indigo-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors">
-                            Ver Clientes
-                        </button>
-                        <button className="px-8 py-3 bg-indigo-700 text-white font-semibold rounded-lg hover:bg-indigo-800 transition-colors">
-                            Ver Empréstimos
-                        </button>
-                    </div>
-                </section>
-            </div>
-        </main>
-    );
+      {/* Stats Section */}
+      <section className="py-16 md:py-24 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-16">Resumo do Sistema</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { icon: '👥', number: '0', label: 'Clientes Cadastrados', color: 'indigo' },
+              { icon: '💵', number: 'R$ 0', label: 'Valor Total Emprestado', color: 'green' },
+              { icon: '📊', number: '0', label: 'Empréstimos Ativos', color: 'blue' }
+            ].map((stat, idx) => (
+              <div
+                key={idx}
+                className={`bg-gradient-to-br from-${stat.color}-50 to-${stat.color}-100 rounded-xl p-8 text-center hover:shadow-lg transition-all transform hover:-translate-y-1 border border-${stat.color}-200`}
+              >
+                <div className="text-5xl mb-4">{stat.icon}</div>
+                <div className={`text-4xl font-bold text-${stat.color}-600 mb-2`}>{stat.number}</div>
+                <p className="text-gray-700 font-medium">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 md:py-24 px-4 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Funcionalidades Poderosas</h2>
+          <p className="text-center text-gray-600 text-lg mb-16">Tudo que você precisa para gerenciar empréstimos com excelência</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {[
+              {
+                icon: '👥',
+                title: 'Gestão de Clientes',
+                description: 'Cadastre, edite e acompanhe informações de todos os seus clientes em um lugar centralizado.'
+              },
+              {
+                icon: '💰',
+                title: 'Simulação de Empréstimos',
+                description: 'Calcule juros, prazos e valores com base em diferentes cenários e taxas personalizadas.'
+              },
+              {
+                icon: '📊',
+                title: 'Relatórios Detalhados',
+                description: 'Gere relatórios completos sobre empréstimos, clientes e rentabilidade das operações.'
+              },
+              {
+                icon: '⚙️',
+                title: 'Configurações Flexíveis',
+                description: 'Customize taxas, prazos e condições de empréstimo conforme suas necessidades específicas.'
+              }
+            ].map((feature, idx) => (
+              <div
+                key={idx}
+                className="bg-white rounded-xl p-8 shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
+              >
+                <div className="text-4xl mb-4">{feature.icon}</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
+                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="bg-gradient-to-r from-indigo-600 to-blue-600 py-16 md:py-24 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Pronto para começar?</h2>
+          <p className="text-blue-100 text-lg mb-10">
+            Explore todas as funcionalidades do sistema e gerencie seus empréstimos de forma profissional e eficiente.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={() => navigate('/novo-cliente')}
+              className="px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 shadow-lg transition-all transform hover:-translate-y-1"
+            >
+              ➕ Novo Cliente
+            </button>
+            <button
+              onClick={() => navigate('/novo-emprestimo')}
+              className="px-8 py-4 bg-indigo-700 text-white font-bold rounded-lg hover:bg-indigo-800 border-2 border-white border-opacity-50 shadow-lg transition-all transform hover:-translate-y-1"
+            >
+              💵 Novo Empréstimo
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer Info */}
+      <section className="bg-gray-900 text-white py-12 px-4">
+        <div className="max-w-7xl mx-auto text-center">
+          <p className="text-gray-400">
+            &copy; 2024 LoanSystem. Gerenciamento inteligente de empréstimos.
+          </p>
+        </div>
+      </section>
+    </main>
+  );
 }
 
 export default Inicio;
+
