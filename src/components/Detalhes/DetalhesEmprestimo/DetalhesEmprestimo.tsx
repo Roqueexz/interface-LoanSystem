@@ -8,29 +8,19 @@ interface DetalhesEmprestimoProps {
   id_emprestimo: number;
 }
 
-function DetalhesEmprestimo({
-  id_emprestimo,
-}: DetalhesEmprestimoProps) {
+function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps) {
   const navigate = useNavigate();
 
-  const [emprestimo, setEmprestimo] =
-    useState<EmprestimoDTO | null>(null);
-
-  const [loading, setLoading] =
-    useState<boolean>(true);
-
-  const [error, setError] =
-    useState<string | null>(null);
+  const [emprestimo, setEmprestimo] = useState<EmprestimoDTO | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function carregarEmprestimo() {
       try {
         setLoading(true);
 
-        const resposta =
-          await EmprestimoRequests.obterEmprestimoPorId(
-            id_emprestimo
-          );
+        const resposta = await EmprestimoRequests.obterEmprestimoPorId(id_emprestimo);
 
         if (resposta) {
           setEmprestimo(resposta);
@@ -39,9 +29,7 @@ function DetalhesEmprestimo({
         }
       } catch (err) {
         console.error(err);
-        setError(
-          "Erro ao carregar os dados do empréstimo."
-        );
+        setError("Erro ao carregar os dados do empréstimo.");
       } finally {
         setLoading(false);
       }
@@ -52,206 +40,165 @@ function DetalhesEmprestimo({
 
   if (loading) {
     return (
-      <main className="bg-gray-100 min-h-screen flex items-center justify-center">
-        <div className="bg-white p-8 rounded-2xl shadow-lg">
-          <h2 className="text-xl font-semibold">
+      <div className="py-8 px-4 flex items-center justify-center min-h-[50vh]">
+        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full text-center">
+          <h2 className="text-xl font-semibold text-slate-700 animate-pulse">
             Carregando empréstimo...
           </h2>
         </div>
-      </main>
+      </div>
     );
   }
 
   if (error || !emprestimo) {
     return (
-      <main className="bg-gray-100 min-h-screen flex items-center justify-center">
-        <div className="bg-white p-8 rounded-2xl shadow-lg">
-          <h2 className="text-red-600 font-semibold">
+      <div className="py-8 px-4 flex items-center justify-center min-h-[50vh]">
+        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full text-center">
+          <h2 className="text-red-600 font-bold mb-4">
             {error}
           </h2>
-
           <button
             onClick={() => navigate("/emprestimos")}
-            className="mt-4 bg-slate-700 text-white px-4 py-2 rounded-lg"
+            className="w-full bg-slate-700 hover:bg-slate-600 text-white py-2.5 rounded-xl font-bold transition-all"
           >
             Voltar
           </button>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="bg-gray-100 flex-1 py-8 px-4">
+    <div className="py-8 px-4"> {/* Alterado de main para div limpa */}
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8">
-
         <h1 className="text-3xl font-bold text-slate-800 mb-2">
           Empréstimo #{emprestimo.id_emprestimo}
         </h1>
 
-        <p className="text-slate-500 mb-8">
+        <p className="text-slate-400 font-medium mb-8">
           Informações completas do empréstimo
         </p>
 
         <div className="grid md:grid-cols-2 gap-8">
-
           {/* Dados Financeiros */}
           <div>
-            <h2 className="text-xl font-semibold mb-4 text-slate-700 border-b pb-2">
+            <h2 className="text-xl font-bold mb-4 text-slate-800 border-b border-slate-100 pb-2">
               Dados Financeiros
             </h2>
 
             <div className="space-y-4">
-
               <div>
-                <span className="text-sm text-slate-500">
+                <span className="text-xs font-semibold uppercase text-slate-400 block mb-0.5">
                   Valor do Empréstimo
                 </span>
-
-                <p className="font-bold text-lg">
-                  R$
-                  {" "}
-                  {emprestimo.valor_emprestimo.toFixed(2)}
+                <p className="font-extrabold text-2xl text-slate-800">
+                  R$ {emprestimo.valor_emprestimo.toFixed(2)}
                 </p>
               </div>
 
               <div>
-                <span className="text-sm text-slate-500">
+                <span className="text-xs font-semibold uppercase text-slate-400 block mb-0.5">
                   Valor da Parcela
                 </span>
-
-                <p className="font-bold text-lg">
-                  R$
-                  {" "}
-                  {emprestimo.valor_parcela.toFixed(2)}
+                <p className="font-extrabold text-xl text-emerald-600">
+                  R$ {emprestimo.valor_parcela.toFixed(2)}
                 </p>
               </div>
 
               <div>
-                <span className="text-sm text-slate-500">
+                <span className="text-xs font-semibold uppercase text-slate-400 block mb-0.5">
                   Número de Parcelas
                 </span>
-
-                <p>
-                  {emprestimo.num_parcelas}
-                </p>
+                <p className="text-slate-700 font-medium">{emprestimo.num_parcelas}</p>
               </div>
 
               <div>
-                <span className="text-sm text-slate-500">
+                <span className="text-xs font-semibold uppercase text-slate-400 block mb-0.5">
                   Taxa de Juros
                 </span>
-
-                <p>
-                  {emprestimo.juros}%
-                </p>
+                <p className="text-slate-700 font-medium">{emprestimo.juros}%</p>
               </div>
 
               <div>
-                <span className="text-sm text-slate-500">
+                <span className="text-xs font-semibold uppercase text-slate-400 block mb-0.5">
                   Tipo de Juros
                 </span>
-
-                <p className="capitalize">
-                  {emprestimo.tipo_juros}
-                </p>
+                <p className="text-slate-700 font-medium capitalize">{emprestimo.tipo_juros}</p>
               </div>
-
             </div>
           </div>
 
           {/* Dados Gerais */}
           <div>
-            <h2 className="text-xl font-semibold mb-4 text-slate-700 border-b pb-2">
+            <h2 className="text-xl font-bold mb-4 text-slate-800 border-b border-slate-100 pb-2">
               Dados Gerais
             </h2>
 
             <div className="space-y-4">
-
               <div>
-                <span className="text-sm text-slate-500">
+                <span className="text-xs font-semibold uppercase text-slate-400 block mb-0.5">
                   ID do Cliente
                 </span>
-
-                <p>
-                  #{emprestimo.id_cliente}
-                </p>
+                <p className="text-slate-700 font-medium">#{emprestimo.id_cliente}</p>
               </div>
 
               <div>
-                <span className="text-sm text-slate-500">
+                <span className="text-xs font-semibold uppercase text-slate-400 block mb-0.5">
                   Data do Empréstimo
                 </span>
-
-                <p>
-                  {new Date(
-                    emprestimo.data_emprestimo
-                  ).toLocaleDateString("pt-BR")}
+                <p className="text-slate-700 font-medium">
+                  {new Date(emprestimo.data_emprestimo).toLocaleDateString("pt-BR")}
                 </p>
               </div>
 
               <div>
-                <span className="text-sm text-slate-500">
+                <span className="text-xs font-semibold uppercase text-slate-400 block mb-0.5">
                   Data de Devolução
                 </span>
-
-                <p>
+                <p className="text-slate-700 font-medium">
                   {emprestimo.data_devolucao
-                    ? new Date(
-                        emprestimo.data_devolucao
-                      ).toLocaleDateString("pt-BR")
+                    ? new Date(emprestimo.data_devolucao).toLocaleDateString("pt-BR")
                     : "Não informada"}
                 </p>
               </div>
 
               <div>
-                <span className="text-sm text-slate-500">
+                <span className="text-xs font-semibold uppercase text-slate-400 block mb-1">
                   Status
                 </span>
-
-                <div className="mt-1">
+                <div>
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    className={`px-3 py-1 rounded-full text-xs font-bold ${
                       emprestimo.status_emprestimo
                         ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
+                        : "bg-slate-100 text-slate-600"
                     }`}
                   >
-                    {emprestimo.status_emprestimo
-                      ? "Ativo"
-                      : "Finalizado"}
+                    {emprestimo.status_emprestimo ? "Ativo" : "Finalizado"}
                   </span>
                 </div>
               </div>
-
             </div>
           </div>
-
         </div>
 
         <div className="mt-10 flex flex-col md:flex-row gap-4">
-
           <button
-            onClick={() =>
-              navigate(
-                `/editar-emprestimo/${emprestimo.id_emprestimo}`
-              )
-            }
-            className="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-bold"
+            onClick={() => navigate(`/editar-emprestimo/${emprestimo.id_emprestimo}`)}
+            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold shadow-md transition-all"
           >
             Editar Empréstimo
           </button>
 
           <button
             onClick={() => navigate("/emprestimos")}
-            className="flex-1 border border-slate-300 hover:bg-slate-100 py-3 rounded-xl font-bold"
+            className="flex-1 border border-slate-300 hover:bg-slate-50 text-slate-700 py-3 rounded-xl font-bold transition-all"
           >
             Voltar
           </button>
-
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
