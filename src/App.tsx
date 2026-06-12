@@ -1,6 +1,6 @@
 import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import PHome from './pages/PHome/PHome'
+import PHome from './pages/PInicio/PInicio'
 import PListagemCliente from './pages/PListagem/PListagemCliente/PListagemCliente'
 import PListagemEmprestimo from './pages/PListagem/PListagemEmprestimo/PListagemEmprestimo'
 import PFormCliente from './pages/PFormularios/PFormCliente/PFormCliente'

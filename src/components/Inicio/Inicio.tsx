@@ -1,152 +1,152 @@
-import type { JSX } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Users,
+  CreditCard,
+  TrendingUp,
+  ShieldCheck,
+  Zap,
+  BarChart3,
+} from "lucide-react";
 
-function Inicio(): JSX.Element {
+function Inicio() {
   const navigate = useNavigate();
 
+  const funcionalidades = [
+    {
+      icon: <Users size={28} className="text-indigo-600" />,
+      titulo: "Gestão de Clientes",
+      descricao:
+        "Cadastre e gerencie clientes de forma simples e organizada.",
+    },
+    {
+      icon: <CreditCard size={28} className="text-blue-600" />,
+      titulo: "Controle de Empréstimos",
+      descricao:
+        "Registre empréstimos e acompanhe todas as operações.",
+    },
+    {
+      icon: <BarChart3 size={28} className="text-emerald-600" />,
+      titulo: "Relatórios",
+      descricao:
+        "Visualize informações importantes para tomada de decisão.",
+    },
+    {
+      icon: <ShieldCheck size={28} className="text-purple-600" />,
+      titulo: "Segurança",
+      descricao:
+        "Armazenamento seguro das informações cadastradas.",
+    },
+    {
+      icon: <Zap size={28} className="text-amber-600" />,
+      titulo: "Produtividade",
+      descricao:
+        "Interface rápida e intuitiva para o dia a dia.",
+    },
+    {
+      icon: <TrendingUp size={28} className="text-rose-600" />,
+      titulo: "Cálculo de Juros",
+      descricao:
+        "Juros simples e compostos calculados automaticamente.",
+    },
+  ];
+
   return (
-    <main className="flex-1">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-blue-500 to-blue-600 py-20 md:py-32 px-4">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full mix-blend-multiply filter blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full mix-blend-multiply filter blur-3xl"></div>
-        </div>
+    <div className="bg-slate-50">
 
-        <div className="relative container-center text-center">
-          <div className="mb-8 animate-slide-up">
-            <span className="inline-block px-4 py-2 bg-white bg-opacity-20 text-white rounded-full text-sm font-semibold">
-              ✨ Bem-vindo ao LoanSystem
-            </span>
-          </div>
+      {/* Hero */}
+      <section className="bg-gradient-to-r from-indigo-600 to-blue-700 text-white py-24">
+        <div className="max-w-6xl mx-auto px-6 text-center">
 
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white mb-6 leading-tight animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            Sistema de <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-100">Empréstimos</span>
+          <h1 className="text-5xl font-bold mb-6">
+            LoanSystem
           </h1>
 
-          <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            Gerencie empréstimos com precisão. Simule, analise e acompanhe todas as operações em um único lugar de forma profissional.
+          <p className="text-xl text-indigo-100 max-w-3xl mx-auto">
+            Sistema de gerenciamento de clientes e empréstimos.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up" style={{ animationDelay: '0.3s' }}>
+          <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+
             <button
-              onClick={() => navigate('/clientes')}
-              className="px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+              onClick={() => navigate("/novo-cliente")}
+              className="bg-white text-indigo-700 px-8 py-3 rounded-xl font-semibold"
             >
-              👥 Ver Clientes
+              Novo Cliente
             </button>
+
             <button
-              onClick={() => navigate('/emprestimos')}
-              className="px-8 py-4 bg-indigo-700 text-white font-bold rounded-lg hover:bg-indigo-800 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-2 border-white border-opacity-50"
+              onClick={() => navigate("/novo-emprestimo")}
+              className="bg-indigo-500 px-8 py-3 rounded-xl font-semibold border border-white"
             >
-              💰 Ver Empréstimos
+              Novo Empréstimo
             </button>
+
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 md:py-24 px-4 bg-white">
-        <div className="container-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-16">Resumo do Sistema</h2>
+      {/* Ações rápidas */}
+      <section className="max-w-6xl mx-auto px-6 py-12">
+        <div className="grid md:grid-cols-2 gap-6">
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { icon: '👥', number: '0', label: 'Clientes Cadastrados', color: 'indigo' },
-              { icon: '💵', number: 'R$ 0', label: 'Valor Total Emprestado', color: 'green' },
-              { icon: '📊', number: '0', label: 'Empréstimos Ativos', color: 'blue' }
-            ].map((stat, idx) => (
-              <div
-                key={idx}
-                className={`bg-gradient-to-br from-${stat.color}-50 to-${stat.color}-100 rounded-xl p-8 text-center hover:shadow-lg transition-all transform hover:-translate-y-1 border border-${stat.color}-200`}
-              >
-                <div className="text-5xl mb-4">{stat.icon}</div>
-                <div className={`text-4xl font-bold text-${stat.color}-600 mb-2`}>{stat.number}</div>
-                <p className="text-gray-700 font-medium">{stat.label}</p>
-              </div>
-            ))}
-          </div>
+          <button
+            onClick={() => navigate("/clientes")}
+            className="bg-white p-8 rounded-2xl shadow hover:shadow-lg transition text-left"
+          >
+            <Users className="mb-4 text-indigo-600" size={32} />
+            <h3 className="text-xl font-bold">
+              Clientes
+            </h3>
+            <p className="text-slate-500">
+              Visualizar clientes cadastrados.
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/emprestimos")}
+            className="bg-white p-8 rounded-2xl shadow hover:shadow-lg transition text-left"
+          >
+            <CreditCard className="mb-4 text-blue-600" size={32} />
+            <h3 className="text-xl font-bold">
+              Empréstimos
+            </h3>
+            <p className="text-slate-500">
+              Visualizar empréstimos registrados.
+            </p>
+          </button>
+
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-16 md:py-24 px-4 bg-gray-50">
-        <div className="container-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Funcionalidades Poderosas</h2>
-          <p className="text-center text-gray-600 text-lg mb-16">Tudo que você precisa para gerenciar empréstimos com excelência</p>
+      {/* Funcionalidades */}
+      <section className="max-w-6xl mx-auto px-6 pb-16">
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {[
-              {
-                icon: '👥',
-                title: 'Gestão de Clientes',
-                description: 'Cadastre, edite e acompanhe informações de todos os seus clientes em um lugar centralizado.'
-              },
-              {
-                icon: '💰',
-                title: 'Simulação de Empréstimos',
-                description: 'Calcule juros, prazos e valores com base em diferentes cenários e taxas personalizadas.'
-              },
-              {
-                icon: '📊',
-                title: 'Relatórios Detalhados',
-                description: 'Gere relatórios completos sobre empréstimos, clientes e rentabilidade das operações.'
-              },
-              {
-                icon: '⚙️',
-                title: 'Configurações Flexíveis',
-                description: 'Customize taxas, prazos e condições de empréstimo conforme suas necessidades específicas.'
-              }
-            ].map((feature, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-xl p-8 shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
-              >
-                <div className="text-4xl mb-4">{feature.icon}</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        <h2 className="text-3xl font-bold text-center mb-10">
+          Funcionalidades
+        </h2>
 
-      {/* CTA Section */}
-      <section className="bg-gradient-to-r from-indigo-600 to-blue-600 py-16 md:py-24 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Pronto para começar?</h2>
-          <p className="text-blue-100 text-lg mb-10">
-            Explore todas as funcionalidades do sistema e gerencie seus empréstimos de forma profissional e eficiente.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => navigate('/novo-cliente')}
-              className="px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 shadow-lg transition-all transform hover:-translate-y-1"
+        <div className="grid md:grid-cols-3 gap-6">
+          {funcionalidades.map((item) => (
+            <div
+              key={item.titulo}
+              className="bg-white p-6 rounded-2xl shadow"
             >
-              ➕ Novo Cliente
-            </button>
-            <button
-              onClick={() => navigate('/novo-emprestimo')}
-              className="px-8 py-4 bg-indigo-700 text-white font-bold rounded-lg hover:bg-indigo-800 border-2 border-white border-opacity-50 shadow-lg transition-all transform hover:-translate-y-1"
-            >
-              💵 Novo Empréstimo
-            </button>
-          </div>
-        </div>
-      </section>
+              {item.icon}
 
-      {/* Footer Info */}
-      <section className="bg-gray-900 text-white py-12 px-4">
-        <div className="container-center text-center">
-          <p className="text-gray-400">
-            &copy; 2024 LoanSystem. Gerenciamento inteligente de empréstimos.
-          </p>
+              <h3 className="font-bold mt-4 mb-2">
+                {item.titulo}
+              </h3>
+
+              <p className="text-slate-500 text-sm">
+                {item.descricao}
+              </p>
+            </div>
+          ))}
         </div>
+
       </section>
-    </main>
+    </div>
   );
 }
 
 export default Inicio;
-
