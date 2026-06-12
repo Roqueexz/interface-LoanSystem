@@ -1,13 +1,14 @@
 import type { JSX } from "react";
-import Navegacao from "../../../components/Navegacao/Navegacao";
+import Layout from "../../../components/Layout/Layout";
 import ListagemEmprestimo from "../../../components/Listagens/ListagemEmprestimo/ListagemEmprestimo";
 
 function PListagemEmprestimo(): JSX.Element {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navegacao paginaAtiva="emprestimos" />
-      <ListagemEmprestimo />
-    </div>
+    <Layout>
+      <div className="w-full min-h-full bg-slate-50">
+        <ListagemEmprestimo />
+      </div>
+    </Layout>
   );
 }
 
