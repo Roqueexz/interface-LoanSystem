@@ -1,6 +1,6 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 * {
   @apply transition-colors duration-200;
@@ -211,3 +211,4 @@ tr:hover {
 .animate-slide-up {
   animation: slideUp 0.3s ease-out;
 }
+
