@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Importação do mecanismo de proteção e da tela de login
 import ProtectedRoute from './components/Rotas/ProtectedRoutes';
@@ -15,29 +15,53 @@ import PDetalhesCliente from './pages/PDetalhes/PDetalhesCliente/PDetalhesClient
 import PDetalhesEmprestimo from './pages/PDetalhes/PDetalhesEmprestimo/PDetalhesEmprestimo';
 
 function App() {
+  // Verifica o estado real de autenticação no armazenamento local
+  const isAuthenticated = !!localStorage.getItem('isAuth');
+
   return (
     <BrowserRouter>
       <Routes>
-        {/*  Rota Pública */}
+        {/* Rota de Autenticação Pública */}
         <Route path='/login' element={<PLogin />} />
 
-        {/*  Rota de Início Protegida */}
-        <Route path='/' element={<ProtectedRoute element={PHome} />} />
+        {/* Bloqueio Total: Se não estiver logado, qualquer rota abaixo redireciona para /login */}
+        <Route 
+          path='/' 
+          element={isAuthenticated ? <ProtectedRoute element={PHome} /> : <Navigate to="/login" replace />} 
+        />
+        
+        <Route 
+          path='/clientes' 
+          element={isAuthenticated ? <ProtectedRoute element={PListagemCliente} /> : <Navigate to="/login" replace />} 
+        />
+        
+        <Route 
+          path='/emprestimos' 
+          element={isAuthenticated ? <ProtectedRoute element={PListagemEmprestimo} /> : <Navigate to="/login" replace />} 
+        />
 
-        {/*  Listagens Protegidas */}
-        <Route path='/clientes' element={<ProtectedRoute element={PListagemCliente} />} />
-        <Route path='/emprestimos' element={<ProtectedRoute element={PListagemEmprestimo} />} />
+        <Route 
+          path='/novo-cliente' 
+          element={isAuthenticated ? <ProtectedRoute element={PFormCliente} /> : <Navigate to="/login" replace />} 
+        />
+        
+        <Route 
+          path='/novo-emprestimo' 
+          element={isAuthenticated ? <ProtectedRoute element={PFormEmprestimo} /> : <Navigate to="/login" replace />} 
+        />
 
-        {/*  Formulários (Cadastro) Protegidos */}
-        <Route path='/novo-cliente' element={<ProtectedRoute element={PFormCliente} />} />
-        <Route path='/novo-emprestimo' element={<ProtectedRoute element={PFormEmprestimo} />} />
+        <Route 
+          path='/clientes/:id' 
+          element={isAuthenticated ? <ProtectedRoute element={PDetalhesCliente} /> : <Navigate to="/login" replace />} 
+        />
+        
+        <Route 
+          path='/emprestimos/:id' 
+          element={isAuthenticated ? <ProtectedRoute element={PDetalhesEmprestimo} /> : <Navigate to="/login" replace />} 
+        />
 
-        {/*  Detalhes (Visualização) Protegidos */}
-        <Route path='/clientes/:id' element={<ProtectedRoute element={PDetalhesCliente} />} />
-        <Route path='/emprestimos/:id' element={<ProtectedRoute element={PDetalhesEmprestimo} />} />
-
-        {/*  Rota de fuga: se digitar qualquer coisa inválida, joga para a Home (que vai validar o login) */}
-        <Route path='*' element={<ProtectedRoute element={PHome} />} />
+        {/* Rota de segurança para caminhos inexistentes ou tentativas de burla */}
+        <Route path='*' element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );
