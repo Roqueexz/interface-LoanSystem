@@ -1,30 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { Message } from "primereact/message";
 
-// 1. O caminho agora precisa subir 3 níveis para alcançar a pasta fetch
+// O caminho sobe 3 níveis para alcançar a pasta fetch
 import authRequests from "../../../fetch/AuthRequests";
 
-// 2. REMOVIDA a linha "const authRequests = new AuthRequests();"
-// O objeto "authRequests" importado acima já está instanciado!
-
 export default function FormLogin() {
-  // Renomeado para combinar com o seu arquivo
   const [email, setEmail] = useState<string>("");
   const [senha, setSenha] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [erro, setErro] = useState<string | null>(null);
 
-  const navigate = useNavigate();
-
+  // Efeito para verificar se o usuário já possui um token válido ao carregar o formulário
   useEffect(() => {
     if (authRequests.checkTokenExpiry()) {
-      navigate("/");
+      window.location.reload();
     }
-  }, [navigate]);
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +34,8 @@ export default function FormLogin() {
     try {
       const sucesso = await authRequests.login({ email, senha });
       if (sucesso) {
-        navigate("/");
+        // Recarrega a página para que o App.tsx identifique o estado 'isAuth' e monte a PHome
+        window.location.reload();
       }
     } catch (err: any) {
       setErro("Usuário ou senha incorretos. Tente novamente.");
