@@ -2,24 +2,30 @@ import { Navigate } from 'react-router-dom';
 import { type ComponentType } from 'react';
 
 interface ProtectedRouteProps {
-    element: ComponentType;
-    [key: string]: unknown; // representa o ...rest com tipagem genérica
+  /*
+   * Recebe o estado de autenticacao diretamente do App.tsx via prop,
+   * em vez de ler o localStorage de forma independente.
+   * Isso garante que o ProtectedRoute sempre reflita o mesmo estado
+   * reativo que controla as demais rotas, sem dessincronizacao.
+   */
+  isAuth: boolean;
+  element: ComponentType;
+  [key: string]: unknown;
 }
 
-/**
- * Lida com a proteção das rotas
- * A proteção previne o acesso não autorizado a rotas privadas, evitando também que a aplicação quebre.
- * 
- * A função recebe o elemento que será renderizado e as demais propriedades. Caso o usuário esteja autenticado, o elemento é renderizado, caso contrário, o usuário é redirecionado para a página de login.
- * 
- * @param element - elemento (componente) que será renderizado
- * @param rest - demais propriedades
- * @returns Elemento renderizado caso o usuário esteja autenticado, caso contrário, redireciona para a página de login
+/*
+ * Componente de protecao de rota.
+ *
+ * Se o usuario estiver autenticado (isAuth === true), renderiza o componente
+ * solicitado normalmente. Caso contrario, redireciona para a raiz ('/'),
+ * onde o App.tsx, ciente do estado nao autenticado, exibira a pagina de login.
+ *
+ * O redirecionamento aponta para '/' e nao para '/login' porque a rota
+ * '/login' nao existe nesta arquitetura. A raiz e responsavel por decidir
+ * o que exibir com base no estado de autenticacao.
  */
-const ProtectedRoute = ({ element: Element, ...rest }: ProtectedRouteProps) => {
-    const isAuthenticated = !!localStorage.getItem('isAuth');   // recupera o valor de isAuth no localstorage
-
-    return isAuthenticated ? <Element {...rest} /> : <Navigate to="/login" />;  // verifica se o usuário está autenticado (isAuth = true), caso sim, renderiza o elemento, caso contrário, redireciona para a página de login
+const ProtectedRoute = ({ isAuth, element: Element, ...rest }: ProtectedRouteProps) => {
+  return isAuth ? <Element {...rest} /> : <Navigate to="/" replace />;
 };
 
 export default ProtectedRoute;
