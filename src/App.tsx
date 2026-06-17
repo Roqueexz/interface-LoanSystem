@@ -1,5 +1,11 @@
 import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+// Importação do mecanismo de proteção e da tela de login
+import ProtectedRoute from './components/Rotas/ProtectedRoutes';
+import PLogin from './pages/PLogin/PLogin';
+
+// Suas páginas existentes
 import PHome from './pages/PInicio/PInicio';
 import PListagemCliente from './pages/PListagem/PListagemCliente/PListagemCliente';
 import PListagemEmprestimo from './pages/PListagem/PListagemEmprestimo/PListagemEmprestimo';
@@ -12,20 +18,26 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Início */}
-        <Route path='/' element={<PHome />} />
+        {/*  Rota Pública */}
+        <Route path='/login' element={<PLogin />} />
 
-        {/* Listagens */}
-        <Route path='/clientes' element={<PListagemCliente />} />
-        <Route path='/emprestimos' element={<PListagemEmprestimo />} />
+        {/*  Rota de Início Protegida */}
+        <Route path='/' element={<ProtectedRoute element={PHome} />} />
 
-        {/* Formulários (Cadastro) */}
-        <Route path='/novo-cliente' element={<PFormCliente />} />
-        <Route path='/novo-emprestimo' element={<PFormEmprestimo />} />
+        {/*  Listagens Protegidas */}
+        <Route path='/clientes' element={<ProtectedRoute element={PListagemCliente} />} />
+        <Route path='/emprestimos' element={<ProtectedRoute element={PListagemEmprestimo} />} />
 
-        {/* Detalhes (Visualização) */}
-        <Route path='/clientes/:id' element={<PDetalhesCliente />} />
-        <Route path='/emprestimos/:id' element={<PDetalhesEmprestimo />} />
+        {/*  Formulários (Cadastro) Protegidos */}
+        <Route path='/novo-cliente' element={<ProtectedRoute element={PFormCliente} />} />
+        <Route path='/novo-emprestimo' element={<ProtectedRoute element={PFormEmprestimo} />} />
+
+        {/*  Detalhes (Visualização) Protegidos */}
+        <Route path='/clientes/:id' element={<ProtectedRoute element={PDetalhesCliente} />} />
+        <Route path='/emprestimos/:id' element={<ProtectedRoute element={PDetalhesEmprestimo} />} />
+
+        {/*  Rota de fuga: se digitar qualquer coisa inválida, joga para a Home (que vai validar o login) */}
+        <Route path='*' element={<ProtectedRoute element={PHome} />} />
       </Routes>
     </BrowserRouter>
   );
