@@ -9,6 +9,7 @@ import PDetalhesCliente from './pages/PDetalhes/PDetalhesCliente/PDetalhesClient
 import PDetalhesEmprestimo from './pages/PDetalhes/PDetalhesEmprestimo/PDetalhesEmprestimo';
 import PEditarEmprestimo from './pages/PFormularios/PEditarEmprestimo/PEditarEmprestimo';
 import PEditarCliente from "./pages/PFormularios/PEditarCliente/PEditarCliente";
+import PCaixa from './pages/PCaixa/PCaixa';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         {/* Listagens */}
         <Route path='/clientes' element={<PListagemCliente />} />
         <Route path='/emprestimos' element={<PListagemEmprestimo />} />
+        <Route path='/caixa' element={<PCaixa />} />
 
         {/* Formulários (Cadastro) */}
         <Route path='/novo-cliente' element={<PFormCliente />} />
