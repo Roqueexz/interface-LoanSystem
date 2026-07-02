@@ -8,6 +8,7 @@ import PFormEmprestimo from './pages/PFormularios/PFormEmprestimo/PFormEmprestim
 import PDetalhesCliente from './pages/PDetalhes/PDetalhesCliente/PDetalhesCliente';
 import PDetalhesEmprestimo from './pages/PDetalhes/PDetalhesEmprestimo/PDetalhesEmprestimo';
 import PEditarEmprestimo from './pages/PFormularios/PEditarEmprestimo/PEditarEmprestimo';
+import PEditarCliente from "./pages/PFormularios/PEditarCliente/PEditarCliente";
 
 function App() {
   return (
@@ -26,7 +27,9 @@ function App() {
 
         {/* Formulários (Edição) */}
         <Route path='/editar-emprestimo/:id' element={<PEditarEmprestimo />} />
-
+        <Route path="/editar-cliente/:id"   element={<PEditarCliente />}
+        />
+  
         {/* Detalhes (Visualização) */}
         <Route path='/clientes/:id' element={<PDetalhesCliente />} />
         <Route path='/emprestimos/:id' element={<PDetalhesEmprestimo />} />

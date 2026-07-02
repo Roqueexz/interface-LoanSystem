@@ -80,12 +80,19 @@ function FormEditarCliente() {
 
     if (!id) return;
 
-    setSalvando(true);
+const payload: ClienteDTO = {
+  nome_cliente: formData.nome_cliente,
+  sobrenome_cliente: formData.sobrenome_cliente,
+  telefone: formData.telefone,
+  cidade: formData.cidade,
+  estado: formData.estado,
+  status_cliente: formData.status_cliente,
+};
 
-    const sucesso = await ClienteRequests.atualizarCliente(
-      Number(id),
-      formData
-    );
+const sucesso = await ClienteRequests.atualizarCliente(
+  Number(id),
+  payload
+);
 
     setSalvando(false);
 
