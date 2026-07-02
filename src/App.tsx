@@ -1,6 +1,6 @@
 import './App.css';
 import { useState } from 'react';
-import { BrowserRouter, Routes, Route,  } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import ProtectedRoute from './components/Rotas/ProtectedRoutes';
 import PLogin from './pages/PLogin/PLogin';
@@ -14,21 +14,10 @@ import PEditarCliente from "./pages/PFormularios/PEditarCliente/PEditarCliente";
 import PCaixa from './pages/PCaixa/PCaixa';
 
 function App() {
-  /*
-   * A fonte da verdade sobre autenticação vive aqui como estado React.
-   * Inicializamos lendo o localStorage uma única vez, na montagem do App.
-   * A partir daí, apenas o callback onLoginSuccess altera esse valor,
-   * garantindo que o React re-renderize as rotas de forma limpa e sem reload.
-   */
   const [isAuth, setIsAuth] = useState<boolean>(() => {
     return localStorage.getItem('isAuth') === 'true';
   });
 
-  /*
-   * Callback passado para o FormLogin via PLogin.
-   * Quando o login for bem-sucedido, o AuthRequests já terá persistido
-   * os dados no localStorage. Basta sinalizar ao App que o estado mudou.
-   */
   const handleLoginSuccess = () => {
     setIsAuth(true);
   };
@@ -36,11 +25,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/*
-         * Rota raiz: comportamento condicional baseado no estado reativo.
-         * Nao autenticado -> exibe a pagina de login passando o callback.
-         * Autenticado     -> exibe a PHome protegida.
-         */}
+        {/* Rota Raiz */}
         <Route
           path="/"
           element={
@@ -50,24 +35,18 @@ function App() {
           }
         />
 
-        {/* Listagens */}
-        <Route path='/clientes' element={<PListagemCliente />} />
-        <Route path='/emprestimos' element={<PListagemEmprestimo />} />
-        <Route path='/caixa' element={<PCaixa />} />
+        {/* Listagens (Todas Protegidas) */}
+        <Route path='/clientes' element={<ProtectedRoute isAuth={isAuth} element={PListagemCliente} />} />
+        <Route path='/emprestimos' element={<ProtectedRoute isAuth={isAuth} element={PListagemEmprestimo} />} />
+        <Route path='/caixa' element={<ProtectedRoute isAuth={isAuth} element={PCaixa} />} />
 
-        <Route
-          path="/emprestimos"
-          element={<ProtectedRoute isAuth={isAuth} element={PListagemEmprestimo} />}
-        />
-
-        {/* Formulários (Edição) */}
-        <Route path='/editar-emprestimo/:id' element={<PEditarEmprestimo />} />
-        <Route path="/editar-cliente/:id"   element={<PEditarCliente />}
-        />
+        {/* Formulários de Edição (Todos Protegidos) */}
+        <Route path='/editar-emprestimo/:id' element={<ProtectedRoute isAuth={isAuth} element={PEditarEmprestimo} />} />
+        <Route path="/editar-cliente/:id" element={<ProtectedRoute isAuth={isAuth} element={PEditarCliente} />} />
   
-        {/* Detalhes (Visualização) */}
-        <Route path='/clientes/:id' element={<PDetalhesCliente />} />
-        <Route path='/emprestimos/:id' element={<PDetalhesEmprestimo />} />
+        {/* Detalhes de Visualização (Todos Protegidos) */}
+        <Route path='/clientes/:id' element={<ProtectedRoute isAuth={isAuth} element={PDetalhesCliente} />} />
+        <Route path='/emprestimos/:id' element={<ProtectedRoute isAuth={isAuth} element={PDetalhesEmprestimo} />} />
       </Routes>
     </BrowserRouter>
   );
