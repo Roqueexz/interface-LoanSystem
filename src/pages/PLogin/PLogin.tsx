@@ -1,18 +1,17 @@
-import FormLogin from '../../components/Formularios/FormLogin/FormLogin';
+import type { JSX } from "react";
+import FormLogin from "../../components/Formularios/FormLogin/FormLogin";
 
-/*
- * PLogin recebe o callback onLoginSuccess do App.tsx e o repassa
- * diretamente para o FormLogin. A pagina em si e apenas estrutural
- * e nao precisa saber o que o callback faz.
- */
-interface PLoginProps {
-  onLoginSuccess: () => void;
-}
-
-export default function PLogin({ onLoginSuccess }: PLoginProps) {
+function PLogin(): JSX.Element {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-      <FormLogin onSuccess={onLoginSuccess} />
+    <div className="min-h-screen w-full flex items-center justify-center bg-slate-50 p-4">
+      {/* Elementos decorativos de fundo opcionais */}
+      <div className="absolute top-0 left-0 w-full h-96 bg-indigo-600 rounded-b-[4rem] opacity-10 pointer-events-none"></div>
+      
+      <div className="relative z-10 w-full flex justify-center">
+        <FormLogin />
+      </div>
     </div>
   );
 }
+
+export default PLogin;
