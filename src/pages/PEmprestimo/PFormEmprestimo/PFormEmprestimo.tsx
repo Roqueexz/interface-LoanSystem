@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 import Layout from "../../../components/Layout/Layout";
-import FormEmprestimo from "../../../components/Formularios/FormEmprestimo/FormEmprestimo";
+import FormEmprestimo from "../../../components/Emprestimo/FormEmprestimo/FormEmprestimo";
 
 function PFormEmprestimo(): JSX.Element {
   return (

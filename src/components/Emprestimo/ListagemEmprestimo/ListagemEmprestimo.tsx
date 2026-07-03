@@ -2,12 +2,17 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import EmprestimoRequests from "../../../fetch/EmprestimoRequests";
+import ClienteRequests from "../../../fetch/ClienteRequests";
+
 import type EmprestimoDTO from "../../../interface/EmprestimoDTO";
+import type ClienteDTO from "../../../interface/ClienteDTO";
 
 function ListagemEmprestimo() {
   const navigate = useNavigate();
 
   const [emprestimos, setEmprestimos] = useState<EmprestimoDTO[]>([]);
+  const [clientes, setClientes] = useState<ClienteDTO[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
 
@@ -18,12 +23,19 @@ function ListagemEmprestimo() {
     setLoading(true);
     setErro("");
 
-    const dados = await EmprestimoRequests.obterListaDeEmprestimos();
+    const [emprestimosData, clientesData] = await Promise.all([
+      EmprestimoRequests.obterListaDeEmprestimos(),
+      ClienteRequests.obterListaDeClientes(),
+    ]);
 
-    if (dados) {
-      setEmprestimos(dados);
+    if (emprestimosData) {
+      setEmprestimos(emprestimosData);
     } else {
       setErro("Erro ao carregar empréstimos.");
+    }
+
+    if (clientesData) {
+      setClientes(clientesData);
     }
 
     setLoading(false);
@@ -58,8 +70,18 @@ function ListagemEmprestimo() {
   }
 
   // -----------------------------
-  // STATUS
+  // HELPERS
   // -----------------------------
+  function getNomeCliente(id_cliente: number) {
+    const cliente = clientes.find(
+      (c) => c.id_cliente === id_cliente
+    );
+
+    return cliente
+      ? `${cliente.nome_cliente} ${cliente.sobrenome_cliente}`
+      : `Cliente #${id_cliente}`;
+  }
+
   function getStatus(emp: EmprestimoDTO) {
     if (!emp.data_devolucao) return "EM ABERTO";
 
@@ -135,8 +157,9 @@ function ListagemEmprestimo() {
                     className="border-t hover:bg-slate-50"
                   >
 
-                    <td className="p-4">
-                      {emp.id_cliente}
+                    {/* CLIENTE (NOME) */}
+                    <td className="p-4 font-medium">
+                      {getNomeCliente(emp.id_cliente)}
                     </td>
 
                     <td className="p-4 font-semibold">

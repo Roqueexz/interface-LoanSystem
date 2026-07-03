@@ -1,7 +1,7 @@
 import type { JSX } from "react";
 import { useParams } from "react-router-dom";
 import Layout from "../../../components/Layout/Layout";
-import DetalhesEmprestimo from "../../../components/Detalhes/DetalhesEmprestimo/DetalhesEmprestimo";
+import DetalhesEmprestimo from "../../../components/Emprestimo/DetalhesEmprestimo/DetalhesEmprestimo";
 
 function PDetalhesEmprestimo(): JSX.Element {
   const { id } = useParams<{ id: string }>();

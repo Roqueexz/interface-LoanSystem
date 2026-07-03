@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 import Layout from "../../../components/Layout/Layout";
-import FormCliente from "../../../components/Formularios/FormCliente/FormCliente";
+import FormCliente from "../../../components/Cliente/FormCliente/FormCliente";
 
 function PFormCliente(): JSX.Element {
   return (

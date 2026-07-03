@@ -5,12 +5,12 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './components/Rotas/ProtectedRoutes';
 import PLogin from './pages/PLogin/PLogin';
 import PHome from './pages/PInicio/PInicio';
-import PListagemCliente from './pages/PListagem/PListagemCliente/PListagemCliente';
-import PListagemEmprestimo from './pages/PListagem/PListagemEmprestimo/PListagemEmprestimo';
-import PDetalhesCliente from './pages/PDetalhes/PDetalhesCliente/PDetalhesCliente';
-import PDetalhesEmprestimo from './pages/PDetalhes/PDetalhesEmprestimo/PDetalhesEmprestimo';
-import PEditarEmprestimo from './pages/PFormularios/PEditarEmprestimo/PEditarEmprestimo';
-import PEditarCliente from "./pages/PFormularios/PEditarCliente/PEditarCliente";
+import PListagemCliente from './pages/PCliente/PListagemCliente/PListagemCliente';
+import PListagemEmprestimo from './pages/PEmprestimo/PListagemEmprestimo/PListagemEmprestimo';
+import PDetalhesCliente from './pages/PCliente/PDetalhesCliente/PDetalhesCliente';
+import PDetalhesEmprestimo from './pages/PEmprestimo/PDetalhesEmprestimo/PDetalhesEmprestimo';
+import PEditarEmprestimo from './pages/PEmprestimo/PEditarEmprestimo/PEditarEmprestimo';
+import PEditarCliente from "./pages/PCliente/PEditarCliente/PEditarCliente";
 import PCaixa from './pages/PCaixa/PCaixa';
 
 function App() {

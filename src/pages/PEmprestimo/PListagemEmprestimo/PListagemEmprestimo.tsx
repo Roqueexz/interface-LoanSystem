@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 import Layout from "../../../components/Layout/Layout";
-import ListagemEmprestimo from "../../../components/Listagens/ListagemEmprestimo/ListagemEmprestimo";
+import ListagemEmprestimo from "../../../components/Emprestimo/ListagemEmprestimo/ListagemEmprestimo";
 
 function PListagemEmprestimo(): JSX.Element {
   return (

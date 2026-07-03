@@ -1,5 +1,5 @@
 import type { JSX } from "react";
-import FormLogin from "../../components/Formularios/FormLogin/FormLogin";
+import FormLogin from "../../components/Login/FormLogin/FormLogin";
 
 // 1. Criamos a interface para a prop
 interface PLoginProps {
