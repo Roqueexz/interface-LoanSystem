@@ -16,6 +16,10 @@ function ListagemEmprestimo() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
 
+  const [filtro, setFiltro] = useState<
+    "TODOS" | "EM DIA" | "ATRASADO" | "EM ABERTO"
+  >("TODOS");
+
   // -----------------------------
   // LOAD DATA
   // -----------------------------
@@ -88,19 +92,32 @@ function ListagemEmprestimo() {
     const hoje = new Date();
     const dev = new Date(emp.data_devolucao);
 
-    return dev < hoje ? "ATRASADO" : "EM DIA";
+    if (dev < hoje) return "ATRASADO";
+
+    return "EM DIA";
   }
 
-  function getStatusColor(status: string) {
+  function getStatusStyle(status: string) {
     switch (status) {
       case "EM DIA":
-        return "text-green-600";
+        return "bg-green-100 text-green-700";
       case "ATRASADO":
-        return "text-red-600";
+        return "bg-red-100 text-red-700";
       default:
-        return "text-yellow-600";
+        return "bg-yellow-100 text-yellow-700";
     }
   }
+
+  // -----------------------------
+  // FILTERED DATA
+  // -----------------------------
+  const emprestimosFiltrados = emprestimos.filter((emp) => {
+    const status = getStatus(emp);
+
+    if (filtro === "TODOS") return true;
+
+    return status === filtro;
+  });
 
   // -----------------------------
   // RENDER
@@ -109,7 +126,7 @@ function ListagemEmprestimo() {
     <div className="p-6">
 
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold text-slate-800">
           Empréstimos
         </h1>
@@ -122,6 +139,55 @@ function ListagemEmprestimo() {
         </button>
       </div>
 
+      {/* FILTERS */}
+      <div className="flex gap-2 mb-6">
+
+        <button
+          onClick={() => setFiltro("TODOS")}
+          className={`px-3 py-1 rounded-lg text-sm font-bold ${
+            filtro === "TODOS"
+              ? "bg-slate-800 text-white"
+              : "bg-slate-200"
+          }`}
+        >
+          Todos
+        </button>
+
+        <button
+          onClick={() => setFiltro("EM DIA")}
+          className={`px-3 py-1 rounded-lg text-sm font-bold ${
+            filtro === "EM DIA"
+              ? "bg-green-600 text-white"
+              : "bg-green-100 text-green-700"
+          }`}
+        >
+          Em Dia
+        </button>
+
+        <button
+          onClick={() => setFiltro("ATRASADO")}
+          className={`px-3 py-1 rounded-lg text-sm font-bold ${
+            filtro === "ATRASADO"
+              ? "bg-red-600 text-white"
+              : "bg-red-100 text-red-700"
+          }`}
+        >
+          Atrasado
+        </button>
+
+        <button
+          onClick={() => setFiltro("EM ABERTO")}
+          className={`px-3 py-1 rounded-lg text-sm font-bold ${
+            filtro === "EM ABERTO"
+              ? "bg-yellow-500 text-white"
+              : "bg-yellow-100 text-yellow-700"
+          }`}
+        >
+          Em Aberto
+        </button>
+
+      </div>
+
       {/* STATES */}
       {loading && (
         <p className="text-slate-500">Carregando...</p>
@@ -132,7 +198,7 @@ function ListagemEmprestimo() {
       )}
 
       {/* TABLE */}
-      {!loading && emprestimos.length > 0 && (
+      {!loading && emprestimosFiltrados.length > 0 && (
         <div className="overflow-x-auto bg-white shadow-xl rounded-2xl">
           <table className="w-full">
 
@@ -148,7 +214,7 @@ function ListagemEmprestimo() {
             </thead>
 
             <tbody>
-              {emprestimos.map((emp) => {
+              {emprestimosFiltrados.map((emp) => {
                 const status = getStatus(emp);
 
                 return (
@@ -157,7 +223,7 @@ function ListagemEmprestimo() {
                     className="border-t hover:bg-slate-50"
                   >
 
-                    {/* CLIENTE (NOME) */}
+                    {/* CLIENTE */}
                     <td className="p-4 font-medium">
                       {getNomeCliente(emp.id_cliente)}
                     </td>
@@ -174,10 +240,16 @@ function ListagemEmprestimo() {
                       R$ {Number(emp.valor_parcela).toFixed(2)}
                     </td>
 
-                    <td className={`p-4 font-bold ${getStatusColor(status)}`}>
-                      {status}
+                    {/* STATUS BADGE */}
+                    <td className="p-4">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusStyle(status)}`}
+                      >
+                        {status}
+                      </span>
                     </td>
 
+                    {/* ACTIONS */}
                     <td className="p-4">
                       <div className="flex gap-2 justify-center">
 
@@ -221,9 +293,9 @@ function ListagemEmprestimo() {
       )}
 
       {/* EMPTY */}
-      {!loading && emprestimos.length === 0 && (
+      {!loading && emprestimosFiltrados.length === 0 && (
         <p className="text-slate-500">
-          Nenhum empréstimo cadastrado.
+          Nenhum empréstimo encontrado para este filtro.
         </p>
       )}
 
