@@ -1,31 +1,30 @@
-import { Navigate } from 'react-router-dom';
-import { type ComponentType } from 'react';
+import type { JSX, ComponentType } from "react";
+import { Navigate } from "react-router-dom";
 
 interface ProtectedRouteProps {
-  /*
-   * Recebe o estado de autenticacao diretamente do App.tsx via prop,
-   * em vez de ler o localStorage de forma independente.
-   * Isso garante que o ProtectedRoute sempre reflita o mesmo estado
-   * reativo que controla as demais rotas, sem dessincronizacao.
-   */
   isAuth: boolean;
   element: ComponentType;
-  [key: string]: unknown;
 }
 
-/*
- * Componente de protecao de rota.
+/**
+ * ProtectedRoute
  *
- * Se o usuario estiver autenticado (isAuth === true), renderiza o componente
- * solicitado normalmente. Caso contrario, redireciona para a raiz ('/'),
- * onde o App.tsx, ciente do estado nao autenticado, exibira a pagina de login.
+ * Responsável por proteger rotas autenticadas.
  *
- * O redirecionamento aponta para '/' e nao para '/login' porque a rota
- * '/login' nao existe nesta arquitetura. A raiz e responsavel por decidir
- * o que exibir com base no estado de autenticacao.
+ * - Se autenticado: renderiza o componente normalmente
+ * - Se não autenticado: redireciona para login (/)
+ *
+ * Mantém a lógica centralizada no App.tsx (single source of truth)
  */
-const ProtectedRoute = ({ isAuth, element: Element, ...rest }: ProtectedRouteProps) => {
-  return isAuth ? <Element {...rest} /> : <Navigate to="/" replace />;
-};
+function ProtectedRoute({
+  isAuth,
+  element: Element,
+}: ProtectedRouteProps): JSX.Element {
+  if (!isAuth) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Element />;
+}
 
 export default ProtectedRoute;
