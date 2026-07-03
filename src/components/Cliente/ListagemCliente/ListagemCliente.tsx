@@ -2,28 +2,40 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import ClienteRequests from "../../../fetch/ClienteRequests";
+import EmprestimoRequests from "../../../fetch/EmprestimoRequests";
+
 import type ClienteDTO from "../../../interface/ClienteDTO";
+import type EmprestimoDTO from "../../../interface/EmprestimoDTO";
 
 function ListagemCliente() {
   const navigate = useNavigate();
 
   const [clientes, setClientes] = useState<ClienteDTO[]>([]);
+  const [emprestimos, setEmprestimos] = useState<EmprestimoDTO[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
 
   // -----------------------------
-  // CARREGAR CLIENTES
+  // CARREGAR DADOS
   // -----------------------------
   async function carregarClientes() {
     setLoading(true);
     setErro("");
 
-    const dados = await ClienteRequests.obterListaDeClientes();
+    const [clientesData, emprestimosData] = await Promise.all([
+      ClienteRequests.obterListaDeClientes(),
+      EmprestimoRequests.obterListaDeEmprestimos(),
+    ]);
 
-    if (dados) {
-      setClientes(dados);
+    if (clientesData) {
+      setClientes(clientesData);
     } else {
       setErro("Erro ao carregar clientes.");
+    }
+
+    if (emprestimosData) {
+      setEmprestimos(emprestimosData);
     }
 
     setLoading(false);
@@ -55,6 +67,29 @@ function ListagemCliente() {
     } else {
       alert("Erro ao remover cliente.");
     }
+  }
+
+  // -----------------------------
+  // HELPERS
+  // -----------------------------
+  function clienteTemDivida(id_cliente: number) {
+    return emprestimos.some(
+      (emp) =>
+        emp.id_cliente === id_cliente &&
+        emp.status_emprestimo === true
+    );
+  }
+
+  function getClienteStatus(id_cliente: number) {
+    return clienteTemDivida(id_cliente)
+      ? "COM DÍVIDA"
+      : "SEM DÍVIDA";
+  }
+
+  function getStatusStyle(id_cliente: number) {
+    return clienteTemDivida(id_cliente)
+      ? "bg-red-100 text-red-700"
+      : "bg-green-100 text-green-700";
   }
 
   // -----------------------------
@@ -98,6 +133,7 @@ function ListagemCliente() {
                 <th className="p-4">Telefone</th>
                 <th className="p-4">Cidade</th>
                 <th className="p-4">Estado</th>
+                <th className="p-4">Status</th>
                 <th className="p-4 text-center">Ações</th>
               </tr>
             </thead>
@@ -106,10 +142,14 @@ function ListagemCliente() {
               {clientes.map((cliente) => (
                 <tr
                   key={cliente.id_cliente}
-                  className="border-t hover:bg-slate-50"
+                  className="border-t hover:bg-slate-50 cursor-pointer"
+                  onClick={() =>
+                    navigate(`/clientes/${cliente.id_cliente!}`)
+                  }
                 >
 
-                  <td className="p-4">
+                  {/* NOME */}
+                  <td className="p-4 font-medium">
                     {cliente.nome_cliente} {cliente.sobrenome_cliente}
                   </td>
 
@@ -125,34 +165,46 @@ function ListagemCliente() {
                     {cliente.estado}
                   </td>
 
+                  {/* STATUS */}
+                  <td className="p-4">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusStyle(
+                        cliente.id_cliente!
+                      )}`}
+                    >
+                      {getClienteStatus(cliente.id_cliente!)}
+                    </span>
+                  </td>
+
+                  {/* AÇÕES */}
                   <td className="p-4">
                     <div className="flex gap-2 justify-center">
 
-                      {/* VER */}
                       <button
-                        onClick={() =>
-                          navigate(`/clientes/${cliente.id_cliente}`)
-                        }
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/clientes/${cliente.id_cliente!}`);
+                        }}
                         className="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm"
                       >
                         Ver
                       </button>
 
-                      {/* EDITAR */}
                       <button
-                        onClick={() =>
-                          navigate(`/clientes/editar/${cliente.id_cliente}`)
-                        }
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/clientes/editar/${cliente.id_cliente!}`);
+                        }}
                         className="px-3 py-1 bg-yellow-500 text-white rounded-lg text-sm"
                       >
                         Editar
                       </button>
 
-                      {/* EXCLUIR */}
                       <button
-                        onClick={() =>
-                          handleExcluir(cliente.id_cliente)
-                        }
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleExcluir(cliente.id_cliente);
+                        }}
                         className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm"
                       >
                         Excluir
