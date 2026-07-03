@@ -19,12 +19,19 @@ function FormEmprestimo() {
     valor_parcela: 0,
     tipo_juros: "simples",
     juros: 0,
-    data_emprestimo: new Date().toISOString().split("T")[0],
+    data_emprestimo: (() => {
+      const hoje = new Date();
+      hoje.setMinutes(hoje.getMinutes() - hoje.getTimezoneOffset());
+      return hoje.toISOString().split("T")[0];
+    })(),
     data_devolucao: "",
     forma_pagamento: "",
     status_emprestimo: true,
   });
 
+  // ---------------------------
+  // CARREGAR CLIENTES
+  // ---------------------------
   useEffect(() => {
     carregarClientes();
   }, []);
@@ -37,26 +44,88 @@ function FormEmprestimo() {
     }
   }
 
+  // ---------------------------
+  // CÁLCULO DA PARCELA
+  // ---------------------------
+  useEffect(() => {
+    if (formData.valor_emprestimo <= 0 || formData.num_parcelas <= 0) return;
+
+    let total = formData.valor_emprestimo;
+
+    if (formData.tipo_juros === "simples") {
+      total =
+        formData.valor_emprestimo +
+        (formData.valor_emprestimo * formData.juros) / 100;
+    } else {
+      total =
+        formData.valor_emprestimo *
+        Math.pow(1 + formData.juros / 100, formData.num_parcelas);
+    }
+
+    const valorParcela = Number(
+      (total / formData.num_parcelas).toFixed(2)
+    );
+
+    if (valorParcela !== formData.valor_parcela) {
+      setFormData((prev) => ({
+        ...prev,
+        valor_parcela: valorParcela,
+      }));
+    }
+  }, [
+    formData.valor_emprestimo,
+    formData.num_parcelas,
+    formData.juros,
+    formData.tipo_juros,
+  ]);
+
+  // ---------------------------
+  // CÁLCULO DATA DEVOLUÇÃO
+  // ---------------------------
+  useEffect(() => {
+    if (!formData.data_emprestimo) return;
+
+    const data = new Date(formData.data_emprestimo);
+
+    data.setMonth(data.getMonth() + Number(formData.num_parcelas));
+
+    const novaData = data.toISOString().split("T")[0];
+
+    if (novaData !== formData.data_devolucao) {
+      setFormData((prev) => ({
+        ...prev,
+        data_devolucao: novaData,
+      }));
+    }
+  }, [formData.data_emprestimo, formData.num_parcelas]);
+
+  // ---------------------------
+  // HANDLE CHANGE
+  // ---------------------------
   function handleChange(
-    e: ChangeEvent<
-      HTMLInputElement | HTMLSelectElement
-    >
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) {
     const { name, value } = e.target;
 
+    const camposNumericos = [
+      "id_cliente",
+      "valor_emprestimo",
+      "num_parcelas",
+      "valor_parcela",
+      "juros",
+    ];
+
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        name === "id_cliente" ||
-        name === "num_parcelas" ||
-        name === "valor_emprestimo" ||
-        name === "valor_parcela" ||
-        name === "juros"
-          ? Number(value)
-          : value,
+      [name]: camposNumericos.includes(name)
+        ? Number(value)
+        : value,
     }));
   }
 
+  // ---------------------------
+  // SUBMIT
+  // ---------------------------
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
@@ -70,26 +139,21 @@ function FormEmprestimo() {
       alert("Erro ao cadastrar empréstimo.");
     }
   }
-
-  return (
+    return (
     <div className="py-8 px-4">
       <div className="max-w-4xl mx-auto">
-
         <form
           onSubmit={handleSubmit}
           className="bg-white shadow-xl rounded-2xl p-8"
         >
-
           <h1 className="text-3xl font-bold text-center mb-8 text-slate-800">
             Novo Empréstimo
           </h1>
 
           <div className="space-y-6">
 
-            {/* Cliente */}
-
+            {/* CLIENTE */}
             <div>
-
               <label className="block mb-2 font-medium text-slate-700">
                 Cliente
               </label>
@@ -101,10 +165,7 @@ function FormEmprestimo() {
                 onChange={handleChange}
                 className="w-full border border-slate-200 rounded-xl p-3"
               >
-
-                <option value={0}>
-                  Selecione um cliente
-                </option>
+                <option value={0}>Selecione um cliente</option>
 
                 {clientes.map((cliente) => (
                   <option
@@ -114,15 +175,11 @@ function FormEmprestimo() {
                     {cliente.nome_cliente} {cliente.sobrenome_cliente}
                   </option>
                 ))}
-
               </select>
-
             </div>
 
-            {/* Valor */}
-
+            {/* VALOR EMPRÉSTIMO */}
             <div>
-
               <label className="block mb-2 font-medium text-slate-700">
                 Valor do Empréstimo
               </label>
@@ -130,21 +187,16 @@ function FormEmprestimo() {
               <input
                 type="number"
                 required
-                step="0.01"
                 name="valor_emprestimo"
                 value={formData.valor_emprestimo}
                 onChange={handleChange}
-                className="w-full border border-slate-200 rounded-xl p-3"
+                className="w-full border rounded-xl p-3"
               />
-
             </div>
 
-            {/* Parcelas */}
-
+            {/* PARCELAS */}
             <div className="grid grid-cols-2 gap-4">
-
               <div>
-
                 <label className="block mb-2 font-medium">
                   Parcelas
                 </label>
@@ -158,35 +210,25 @@ function FormEmprestimo() {
                   onChange={handleChange}
                   className="w-full border rounded-xl p-3"
                 />
-
               </div>
 
               <div>
-
                 <label className="block mb-2 font-medium">
                   Valor Parcela
                 </label>
 
                 <input
                   type="number"
-                  required
-                  step="0.01"
-                  name="valor_parcela"
+                  readOnly
                   value={formData.valor_parcela}
-                  onChange={handleChange}
-                  className="w-full border rounded-xl p-3"
+                  className="w-full border rounded-xl p-3 bg-slate-100 font-semibold"
                 />
-
               </div>
-
             </div>
 
-            {/* Juros */}
-
+            {/* JUROS */}
             <div className="grid grid-cols-2 gap-4">
-
               <div>
-
                 <label className="block mb-2 font-medium">
                   Tipo de Juros
                 </label>
@@ -197,43 +239,31 @@ function FormEmprestimo() {
                   onChange={handleChange}
                   className="w-full border rounded-xl p-3"
                 >
-                  <option value="simples">
-                    Simples
-                  </option>
-
-                  <option value="compostos">
-                    Compostos
-                  </option>
+                  <option value="simples">Simples</option>
+                  <option value="compostos">Compostos</option>
                 </select>
-
               </div>
 
               <div>
-
                 <label className="block mb-2 font-medium">
                   Juros (%)
                 </label>
 
                 <input
                   type="number"
-                  required
                   step="0.01"
+                  required
                   name="juros"
                   value={formData.juros}
                   onChange={handleChange}
                   className="w-full border rounded-xl p-3"
                 />
-
               </div>
-
             </div>
 
-            {/* Datas */}
-
+            {/* DATAS */}
             <div className="grid grid-cols-2 gap-4">
-
               <div>
-
                 <label className="block mb-2 font-medium">
                   Data do Empréstimo
                 </label>
@@ -246,31 +276,24 @@ function FormEmprestimo() {
                   onChange={handleChange}
                   className="w-full border rounded-xl p-3"
                 />
-
               </div>
 
               <div>
-
                 <label className="block mb-2 font-medium">
                   Data da Devolução
                 </label>
 
                 <input
                   type="date"
-                  name="data_devolucao"
-                  value={String(formData.data_devolucao)}
-                  onChange={handleChange}
-                  className="w-full border rounded-xl p-3"
+                  readOnly
+                  value={String(formData.data_devolucao ?? "")}
+                  className="w-full border rounded-xl p-3 bg-slate-100"
                 />
-
               </div>
-
             </div>
 
-            {/* Forma Pagamento */}
-
+            {/* PAGAMENTO */}
             <div>
-
               <label className="block mb-2 font-medium">
                 Forma de Pagamento
               </label>
@@ -283,13 +306,11 @@ function FormEmprestimo() {
                 className="w-full border rounded-xl p-3"
                 placeholder="PIX, Dinheiro, Transferência..."
               />
-
             </div>
-
           </div>
 
+          {/* BOTÕES */}
           <div className="mt-8 flex gap-4">
-
             <button
               type="submit"
               className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700"
@@ -304,11 +325,8 @@ function FormEmprestimo() {
             >
               VOLTAR
             </button>
-
           </div>
-
         </form>
-
       </div>
     </div>
   );

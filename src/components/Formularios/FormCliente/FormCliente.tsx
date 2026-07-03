@@ -16,28 +16,45 @@ function FormCliente() {
     status_cliente: true,
   });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const [loading, setLoading] = useState(false);
+
+  // -------------------------
+  // HANDLE CHANGE
+  // -------------------------
+  function handleChange(
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-  };
+  }
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  // -------------------------
+  // SUBMIT
+  // -------------------------
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const resposta = await ClienteRequests.enviarFormularioCliente(formData);
 
-    if (resposta) {
+    setLoading(true);
+
+    const sucesso =
+      await ClienteRequests.enviarFormularioCliente(formData);
+
+    setLoading(false);
+
+    if (sucesso) {
       alert("Cliente cadastrado com sucesso!");
       navigate("/clientes");
     } else {
       alert("Erro ao cadastrar cliente.");
     }
-  };
+  }
 
   return (
-    <div className="py-8 px-4"> {/* Alterado de main para div limpa */}
+    <div className="py-8 px-4">
       <div className="max-w-3xl mx-auto">
         <form
           onSubmit={handleSubmit}
@@ -48,94 +65,107 @@ function FormCliente() {
           </h1>
 
           <div className="space-y-6">
-            {/* Nome e Sobrenome */}
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <label className="block mb-2 font-medium text-slate-700">Nome</label>
+
+            {/* NOME */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-2 font-medium">
+                  Nome
+                </label>
+
                 <input
                   type="text"
-                  name="nome_cliente"
                   required
-                  minLength={3}
+                  name="nome_cliente"
                   value={formData.nome_cliente}
                   onChange={handleChange}
-                  className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Digite o nome"
+                  className="w-full border rounded-xl p-3"
                 />
               </div>
 
-              <div className="flex-1">
-                <label className="block mb-2 font-medium text-slate-700">Sobrenome</label>
+              <div>
+                <label className="block mb-2 font-medium">
+                  Sobrenome
+                </label>
+
                 <input
                   type="text"
-                  name="sobrenome_cliente"
                   required
-                  minLength={3}
+                  name="sobrenome_cliente"
                   value={formData.sobrenome_cliente}
                   onChange={handleChange}
-                  className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Digite o sobrenome"
+                  className="w-full border rounded-xl p-3"
                 />
               </div>
             </div>
 
-            {/* Telefone */}
+            {/* TELEFONE */}
             <div>
-              <label className="block mb-2 font-medium text-slate-700">Telefone</label>
+              <label className="block mb-2 font-medium">
+                Telefone
+              </label>
+
               <input
-                type="tel"
-                name="telefone"
+                type="text"
                 required
+                name="telefone"
                 value={formData.telefone}
                 onChange={handleChange}
-                className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                placeholder="(13) 99999-9999"
+                className="w-full border rounded-xl p-3"
+                placeholder="(11) 99999-9999"
               />
             </div>
 
-            {/* Cidade e Estado */}
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <label className="block mb-2 font-medium text-slate-700">Cidade</label>
+            {/* CIDADE / ESTADO */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-2 font-medium">
+                  Cidade
+                </label>
+
                 <input
                   type="text"
-                  name="cidade"
                   required
+                  name="cidade"
                   value={formData.cidade}
                   onChange={handleChange}
-                  className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Ex: Peruíbe"
+                  className="w-full border rounded-xl p-3"
                 />
               </div>
 
-              <div className="flex-1">
-                <label className="block mb-2 font-medium text-slate-700">Estado</label>
+              <div>
+                <label className="block mb-2 font-medium">
+                  Estado
+                </label>
+
                 <input
                   type="text"
-                  name="estado"
                   required
-                  maxLength={2}
+                  name="estado"
                   value={formData.estado}
                   onChange={handleChange}
-                  className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 uppercase"
+                  className="w-full border rounded-xl p-3"
+                  maxLength={2}
                   placeholder="SP"
                 />
               </div>
             </div>
           </div>
 
+          {/* BOTÕES */}
           <div className="mt-8 flex gap-4">
             <button
               type="submit"
-              className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-md"
+              disabled={loading}
+              className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 disabled:opacity-50"
             >
-              CADASTRAR
+              {loading ? "SALVANDO..." : "CADASTRAR"}
             </button>
 
             <button
               type="button"
               onClick={() => navigate("/clientes")}
-              className="flex-1 border border-slate-300 py-3 rounded-xl font-bold text-slate-700 hover:bg-slate-50 transition-all"
+              className="flex-1 border py-3 rounded-xl font-bold"
             >
               VOLTAR
             </button>

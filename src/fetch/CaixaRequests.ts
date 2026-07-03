@@ -1,4 +1,5 @@
 import type CaixaDTO from "../interface/CaixaDTO";
+import AuthRequests from "./AuthRequests";
 
 class CaixaRequests {
   private serverURL: string;
@@ -23,6 +24,11 @@ class CaixaRequests {
           },
         },
       );
+            if (respostaAPI.status === 401) {
+              console.warn("Token expirado ou não informado. Redirecionando para login...");
+              AuthRequests.removeToken(); // Limpa o storage e faz o redirecionamento
+              return undefined; // Interrompe a execução
+            }
 
       if (respostaAPI.ok) {
         const resumoFinanceiro: CaixaDTO = await respostaAPI.json();

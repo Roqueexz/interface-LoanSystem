@@ -1,4 +1,5 @@
 import type EmprestimoDTO from "../interface/EmprestimoDTO";
+import AuthRequests from "./AuthRequests";
 
 class EmprestimoRequests {
   private serverURL;
@@ -18,22 +19,29 @@ class EmprestimoRequests {
         {
           headers: {
             "Content-Type": "application/json",
-            "x-access-token": `${token}`,
+            "x-access-token": token || "",
           },
         },
       );
 
-      if (respostaAPI.ok) {
-        const listaEmprestimos: EmprestimoDTO[] = await respostaAPI.json();
+      // Bloqueio de intrusos
+      if (respostaAPI.status === 401) {
+        console.warn("Token expirado. Redirecionando para login...");
+        AuthRequests.removeToken(); 
+        return undefined; 
+      }
 
+      if (respostaAPI.ok) {
+        const data = await respostaAPI.json();
+        // O Pulo do Gato: Verifica se é um array puro. Se não for, extrai da propriedade correta.
+        const listaEmprestimos = Array.isArray(data) ? data : (data.emprestimos || data.dados || []);
         return listaEmprestimos;
       }
 
       throw new Error("Não foi possível listar os empréstimos.");
     } catch (error) {
       console.error(`Erro ao consultar empréstimos. ${error}`);
-
-      return;
+      return []; // Retorne um array vazio em vez de undefined para não quebrar a tela
     }
   }
 

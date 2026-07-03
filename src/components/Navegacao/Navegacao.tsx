@@ -7,7 +7,6 @@ import {
   Menu,
   X,
   TrendingUp,
-  UserPlus,
   HandCoins,
 } from "lucide-react";
 
@@ -32,15 +31,10 @@ function Navegacao() {
       icon: <CreditCard size={18} />,
     },
     {
-      to: "/novo-cliente",
-      label: "Novo Cliente",
-      icon: <UserPlus size={18} />,
-    },
-    {
-      to: "/novo-emprestimo",
-      label: "Novo Empréstimo",
+      to: "/caixa",
+      label: "Caixa",
       icon: <HandCoins size={18} />,
-    },
+    }
   ];
 
   return (
