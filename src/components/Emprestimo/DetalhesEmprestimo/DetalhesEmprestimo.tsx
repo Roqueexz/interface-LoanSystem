@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import EmprestimoRequests from "../../../fetch/EmprestimoRequests";
 import type EmprestimoDTO from "../../../interface/EmprestimoDTO";
+import { SkeletonDetalhes } from "../../../ui/Skeleton";
 
 interface DetalhesEmprestimoProps {
   id_emprestimo: number;
@@ -38,25 +39,27 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps) {
     carregarEmprestimo();
   }, [id_emprestimo]);
 
+  const formatarData = (data: string | Date | undefined) => {
+    if (!data) return "Não informada";
+    return new Date(data).toLocaleDateString("pt-BR");
+  };
+
+  const formatarMoeda = (valor: number) => {
+    return valor.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  };
+
   if (loading) {
-    return (
-      <div className="py-8 px-4 flex items-center justify-center min-h-[50vh]">
-        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full text-center">
-          <h2 className="text-xl font-semibold text-slate-700 animate-pulse">
-            Carregando empréstimo...
-          </h2>
-        </div>
-      </div>
-    );
+    return <SkeletonDetalhes />;
   }
 
   if (error || !emprestimo) {
     return (
       <div className="py-8 px-4 flex items-center justify-center min-h-[50vh]">
         <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full text-center">
-          <h2 className="text-red-600 font-bold mb-4">
-            {error}
-          </h2>
+          <h2 className="text-red-600 font-bold mb-4">{error}</h2>
           <button
             onClick={() => navigate("/emprestimos")}
             className="w-full bg-slate-700 hover:bg-slate-600 text-white py-2.5 rounded-xl font-bold transition-all"
@@ -91,7 +94,7 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps) {
                   Valor do Empréstimo
                 </span>
                 <p className="font-extrabold text-2xl text-slate-800">
-                  R$ {emprestimo.valor_emprestimo.toFixed(2)}
+                  {formatarMoeda(emprestimo.valor_emprestimo)}
                 </p>
               </div>
 
@@ -100,7 +103,9 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps) {
                   Valor da Parcela
                 </span>
                 <p className="font-extrabold text-xl text-emerald-600">
-                  R$ {emprestimo.valor_parcela ? emprestimo.valor_parcela.toFixed(2) : "N/A"}
+                  {emprestimo.valor_parcela
+                    ? formatarMoeda(emprestimo.valor_parcela)
+                    : "N/A"}
                 </p>
               </div>
 
@@ -124,6 +129,17 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps) {
                 </span>
                 <p className="text-slate-700 font-medium capitalize">{emprestimo.tipo_juros}</p>
               </div>
+
+              {emprestimo.forma_pagamento && (
+                <div>
+                  <span className="text-xs font-semibold uppercase text-slate-400 block mb-0.5">
+                    Forma de Pagamento
+                  </span>
+                  <p className="text-slate-700 font-medium capitalize">
+                    {emprestimo.forma_pagamento}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -145,7 +161,7 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps) {
                   Data do Empréstimo
                 </span>
                 <p className="text-slate-700 font-medium">
-                  {new Date(emprestimo.data_emprestimo).toLocaleDateString("pt-BR")}
+                  {formatarData(emprestimo.data_emprestimo)}
                 </p>
               </div>
 
@@ -154,9 +170,7 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps) {
                   Data de Devolução
                 </span>
                 <p className="text-slate-700 font-medium">
-                  {emprestimo.data_devolucao
-                    ? new Date(emprestimo.data_devolucao).toLocaleDateString("pt-BR")
-                    : "Não informada"}
+                  {formatarData(emprestimo.data_devolucao)}
                 </p>
               </div>
 
