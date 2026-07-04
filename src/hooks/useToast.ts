@@ -27,10 +27,19 @@ export function useToast() {
     messages: {
       loading: string;
       success: string;
-      error: string;
+      error: string | ((err: any) => string);
     }
   ) => {
-    return toast.promise(promiseFn, messages);
+    return toast.promise(promiseFn, {
+      loading: messages.loading,
+      success: messages.success,
+      error: (err) => {
+        if (typeof messages.error === 'function') {
+          return messages.error(err);
+        }
+        return messages.error;
+      },
+    });
   };
 
   return {

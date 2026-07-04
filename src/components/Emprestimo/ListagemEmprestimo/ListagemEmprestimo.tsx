@@ -64,28 +64,27 @@ function ListagemEmprestimo() {
     setModalConfirmOpen(true);
   }
 
-  async function confirmarExclusao() {
-    if (!emprestimoParaExcluir) return;
+ async function confirmarExclusao() {
+  if (!emprestimoParaExcluir) return;
 
-    const sucesso = await toast.promise(
-      EmprestimoRequests.excluirEmprestimo(emprestimoParaExcluir),
-      {
-        loading: 'Excluindo empréstimo...',
-        success: '✅ Empréstimo removido com sucesso!',
-        error: '❌ Erro ao remover empréstimo.',
-      }
-    );
-
-    if (sucesso) {
-      setEmprestimos((prev) =>
-        prev.filter((e) => e.id_emprestimo !== emprestimoParaExcluir)
-      );
+  const sucesso = await toast.promise(
+    EmprestimoRequests.excluirEmprestimo(emprestimoParaExcluir),
+    {
+      loading: 'Excluindo empréstimo...',
+      success: '✅ Empréstimo removido com sucesso!',
+      error: (err) => err?.message || '❌ Erro ao remover empréstimo.',
     }
+  );
 
-    setEmprestimoParaExcluir(null);
-    setModalConfirmOpen(false);
+  if (sucesso) {
+    setEmprestimos((prev) =>
+      prev.filter((e) => e.id_emprestimo !== emprestimoParaExcluir)
+    );
   }
 
+  setEmprestimoParaExcluir(null);
+  setModalConfirmOpen(false);
+}
   // -----------------------------
   // HELPERS
   // -----------------------------
