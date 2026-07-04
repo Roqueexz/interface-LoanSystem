@@ -2,14 +2,17 @@ import { useNavigate } from "react-router-dom";
 import {
   Users,
   CreditCard,
-  TrendingUp,
-  ShieldCheck,
-  Zap,
-  BarChart3,
-  ArrowRight,
-  DollarSign,
   Wallet,
+  TrendingUp,
+  CheckCircle,
   Clock,
+  AlertTriangle,
+  ChevronRight,
+  BarChart2,
+  Bell,
+  Shield,
+  Activity,
+  DollarSign,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import CaixaRequests from "../../fetch/CaixaRequests";
@@ -18,13 +21,15 @@ import { formatarMoeda } from "../../services/Utilitario";
 function Inicio() {
   const navigate = useNavigate();
 
-  // Verifica se o usuario esta logado
   const isAuthenticated = localStorage.getItem("isAuth") === "true";
 
   const [resumo, setResumo] = useState({
     totalEmprestado: 0,
     totalRecebido: 0,
     entradaPendente: 0,
+    totalAtrasado: 0,
+    totalClientes: 0,
+    totalEmprestimos: 0,
   });
   const [carregando, setCarregando] = useState(true);
 
@@ -42,6 +47,9 @@ function Inicio() {
             totalEmprestado: dados.totalEmprestado,
             totalRecebido: dados.totalRecebido,
             entradaPendente: dados.entradaPendente,
+            totalAtrasado: dados.totalAtrasado || 0,
+            totalClientes: dados.totalClientes || 0,
+            totalEmprestimos: dados.totalEmprestimos || 0,
           });
         }
       } catch (error) {
@@ -53,207 +61,231 @@ function Inicio() {
     carregarResumo();
   }, [isAuthenticated]);
 
-  const funcionalidades = [
+  const summaryCards = [
     {
-      icon: <Users size={28} className="text-indigo-600 dark:text-indigo-400" />,
-      titulo: "Gestão de Clientes",
-      descricao: "Cadastre e gerencie clientes de forma simples e organizada.",
+      label: "Total Emprestado",
+      value: formatarMoeda(resumo.totalEmprestado),
+      sub: `${resumo.totalEmprestimos} empréstimos ativos`,
+      icon: TrendingUp,
+      color: "from-indigo-500 to-indigo-700",
     },
     {
-      icon: <CreditCard size={28} className="text-blue-600 dark:text-blue-400" />,
-      titulo: "Controle de Empréstimos",
-      descricao: "Registre empréstimos e acompanhe todas as operações.",
+      label: "Total Recebido",
+      value: formatarMoeda(resumo.totalRecebido),
+      sub: "Pagamentos realizados",
+      icon: CheckCircle,
+      color: "from-emerald-500 to-emerald-700",
     },
     {
-      icon: <BarChart3 size={28} className="text-emerald-600 dark:text-emerald-400" />,
-      titulo: "Relatórios",
-      descricao: "Visualize informações importantes para tomada de decisão.",
+      label: "A Receber",
+      value: formatarMoeda(resumo.entradaPendente),
+      sub: `${resumo.totalEmprestimos} empréstimos ativos`,
+      icon: Clock,
+      color: "from-amber-500 to-amber-600",
     },
     {
-      icon: <ShieldCheck size={28} className="text-purple-600 dark:text-purple-400" />,
-      titulo: "Segurança",
-      descricao: "Armazenamento seguro das informações cadastradas.",
-    },
-    {
-      icon: <Zap size={28} className="text-amber-600 dark:text-amber-400" />,
-      titulo: "Produtividade",
-      descricao: "Interface rápida e intuitiva para o dia a dia.",
-    },
-    {
-      icon: <TrendingUp size={28} className="text-rose-600 dark:text-rose-400" />,
-      titulo: "Cálculo de Juros",
-      descricao: "Juros simples e compostos calculados automaticamente.",
+      label: "Em Atraso",
+      value: formatarMoeda(resumo.totalAtrasado),
+      sub: `${resumo.totalClientes} clientes inadimplentes`,
+      icon: AlertTriangle,
+      color: "from-red-500 to-red-700",
     },
   ];
 
+  const quickActions = [
+    {
+      path: "/clientes",
+      icon: Users,
+      title: "Clientes",
+      desc: `${resumo.totalClientes} clientes cadastrados`,
+      iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400",
+    },
+    {
+      path: "/emprestimos",
+      icon: CreditCard,
+      title: "Empréstimos",
+      desc: `${resumo.totalEmprestimos} empréstimos ativos`,
+      iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400",
+    },
+    {
+      path: "/caixa",
+      icon: Wallet,
+      title: "Caixa",
+      desc: "Ver relatórios financeiros",
+      iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400",
+    },
+  ];
+
+  const features = [
+    {
+      icon: Users,
+      title: "Gestão de Clientes",
+      desc: "Cadastre e gerencie seus clientes com facilidade. Mantenha histórico completo de cada devedor.",
+    },
+    {
+      icon: CreditCard,
+      title: "Controle de Parcelas",
+      desc: "Acompanhe parcelas, vencimentos e status de pagamento em tempo real com visualização clara.",
+    },
+    {
+      icon: BarChart2,
+      title: "Relatórios Detalhados",
+      desc: "Visualize seu fluxo de caixa com relatórios diários, mensais e anuais em gráficos interativos.",
+    },
+    {
+      icon: Bell,
+      title: "Alertas de Atraso",
+      desc: "Identifique rapidamente pagamentos atrasados e tome ações preventivas antes da inadimplência.",
+    },
+    {
+      icon: Shield,
+      title: "Dados Seguros",
+      desc: "Suas informações financeiras protegidas com segurança de nível bancário e backups automáticos.",
+    },
+    {
+      icon: Activity,
+      title: "Histórico Completo",
+      desc: "Acesse o histórico completo de cada empréstimo, pagamento e movimentação do seu negócio.",
+    },
+  ];
+
+  const dataAtual = new Date().toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+
   return (
-    <div className="min-h-screen bg-background">
-
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Hero */}
-      <section className="relative bg-gradient-to-br from-indigo-700 via-indigo-600 to-blue-700 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/pattern.svg')] opacity-10" />
-        <div className="relative max-w-6xl mx-auto px-6 py-20 lg:py-28">
-          <div className="text-center lg:text-left lg:flex lg:items-center lg:justify-between">
-            <div className="lg:max-w-2xl">
-              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium mb-6">
-                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                Sistema em funcionamento
-              </div>
-              <h1 className="text-4xl lg:text-6xl font-bold leading-tight mb-4">
-                Gerencie seus <br />
-                <span className="text-indigo-200">Empréstimos</span> com Facilidade
-              </h1>
-              <p className="text-lg text-indigo-100 max-w-xl mb-8">
-                Controle total de clientes, empréstimos e parcelas em um só lugar.
-                Simples, rápido e seguro.
-              </p>
-              <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-                <button
-                  onClick={() => navigate("/clientes/novo")}
-                  className="bg-white text-indigo-700 px-8 py-3.5 rounded-xl font-bold hover:bg-slate-50 transition-all shadow-lg shadow-indigo-500/25 flex items-center gap-2"
-                >
-                  <Users size={20} />
-                  Novo Cliente
-                </button>
-                <button
-                  onClick={() => navigate("/emprestimos/novo")}
-                  className="bg-indigo-500/30 backdrop-blur-sm text-white px-8 py-3.5 rounded-xl font-bold border border-white/30 hover:bg-indigo-500/40 transition-all flex items-center gap-2"
-                >
-                  <CreditCard size={20} />
-                  Novo Empréstimo
-                </button>
-              </div>
-            </div>
-
-            {/* Cards de resumo rápido - so aparece se logado */}
-            {isAuthenticated && (
-              <div className="mt-10 lg:mt-0 grid grid-cols-1 gap-4 w-full lg:w-80">
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-emerald-400/20 rounded-xl">
-                      <DollarSign size={20} className="text-emerald-300" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-indigo-200 font-medium">Total Emprestado</p>
-                      <p className="text-xl font-bold">
-                        {carregando ? "..." : formatarMoeda(resumo.totalEmprestado)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-emerald-400/20 rounded-xl">
-                      <TrendingUp size={20} className="text-emerald-300" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-indigo-200 font-medium">Total Recebido</p>
-                      <p className="text-xl font-bold">
-                        {carregando ? "..." : formatarMoeda(resumo.totalRecebido)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-amber-400/20 rounded-xl">
-                      <Clock size={20} className="text-amber-300" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-indigo-200 font-medium">A Receber</p>
-                      <p className="text-xl font-bold">
-                        {carregando ? "..." : formatarMoeda(resumo.entradaPendente)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Mensagem para nao logados */}
-            {!isAuthenticated && (
-              <div className="mt-10 lg:mt-0 w-full lg:w-80">
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center">
-                  <p className="text-indigo-100 text-sm">
-                    Faça login para visualizar<br />
-                    <span className="text-white font-bold">seus números</span>
-                  </p>
-                </div>
-              </div>
-            )}
+      <div
+        className="relative rounded-2xl overflow-hidden p-8 md:p-12"
+        style={{
+          background: "linear-gradient(135deg, #4338ca 0%, #4f46e5 40%, #2563eb 100%)",
+        }}
+      >
+        <div className="absolute inset-0 overflow-hidden">
+          <div
+            className="absolute -top-10 -right-10 w-80 h-80 rounded-full opacity-10"
+            style={{ background: "radial-gradient(circle, #ffffff 0%, transparent 70%)" }}
+          />
+          <div
+            className="absolute bottom-0 left-1/2 w-64 h-64 rounded-full opacity-[0.06]"
+            style={{ background: "radial-gradient(circle, #a5b4fc 0%, transparent 70%)" }}
+          />
+        </div>
+        <div className="relative z-10 max-w-2xl">
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-5 text-xs font-semibold"
+            style={{ background: "rgba(255,255,255,0.15)", color: "#e0e7ff" }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Sistema Ativo — {dataAtual}
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">
+            Bem-vindo ao LoanSystem
+          </h1>
+          <p className="text-indigo-200 text-lg mb-8 leading-relaxed">
+            Gerencie seus empréstimos com segurança e eficiência. Controle clientes, parcelas e fluxo de caixa em um só lugar.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => navigate("/emprestimos/novo")}
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:scale-105"
+              style={{ background: "#ffffff", color: "#4338ca" }}
+            >
+              + Novo Empréstimo
+            </button>
+            <button
+              onClick={() => navigate("/clientes")}
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:scale-105"
+              style={{
+                background: "rgba(255,255,255,0.12)",
+                color: "#ffffff",
+                borderColor: "rgba(255,255,255,0.3)",
+              }}
+            >
+              Gerenciar Clientes
+            </button>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Ações rápidas */}
-      <section className="max-w-6xl mx-auto px-6 -mt-6 relative z-10">
-        <div className="grid md:grid-cols-3 gap-6">
-          <button
-            onClick={() => navigate("/clientes")}
-            className="card p-6 hover:shadow-xl transition-all text-left group hover:border-indigo-200 dark:hover:border-indigo-700"
+      {/* Summary metrics */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {summaryCards.map((card) => (
+          <div
+            key={card.label}
+            className="bg-card rounded-2xl border border-border shadow-sm p-5 overflow-hidden relative group hover:shadow-md transition-shadow"
           >
-            <div className="flex items-center justify-between">
-              <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl group-hover:bg-indigo-100 dark:group-hover:bg-indigo-800/30 transition-all">
-                <Users size={28} className="text-indigo-600 dark:text-indigo-400" />
-              </div>
-              <ArrowRight size={20} className="text-muted-foreground group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-all" />
-            </div>
-            <h3 className="text-lg font-bold mt-4 text-foreground">Clientes</h3>
-            <p className="text-muted-foreground text-sm">Visualizar e gerenciar clientes cadastrados.</p>
-          </button>
-
-          <button
-            onClick={() => navigate("/emprestimos")}
-            className="card p-6 hover:shadow-xl transition-all text-left group hover:border-blue-200 dark:hover:border-blue-700"
-          >
-            <div className="flex items-center justify-between">
-              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-xl group-hover:bg-blue-100 dark:group-hover:bg-blue-800/30 transition-all">
-                <CreditCard size={28} className="text-blue-600 dark:text-blue-400" />
-              </div>
-              <ArrowRight size={20} className="text-muted-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all" />
-            </div>
-            <h3 className="text-lg font-bold mt-4 text-foreground">Empréstimos</h3>
-            <p className="text-muted-foreground text-sm">Visualizar e gerenciar empréstimos registrados.</p>
-          </button>
-
-          <button
-            onClick={() => navigate("/caixa")}
-            className="card p-6 hover:shadow-xl transition-all text-left group hover:border-emerald-200 dark:hover:border-emerald-700"
-          >
-            <div className="flex items-center justify-between">
-              <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl group-hover:bg-emerald-100 dark:group-hover:bg-emerald-800/30 transition-all">
-                <Wallet size={28} className="text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <ArrowRight size={20} className="text-muted-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-all" />
-            </div>
-            <h3 className="text-lg font-bold mt-4 text-foreground">Caixa</h3>
-            <p className="text-muted-foreground text-sm">Dashboard financeiro com relatórios completos.</p>
-          </button>
-        </div>
-      </section>
-
-      {/* Funcionalidades */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-foreground">Funcionalidades</h2>
-          <p className="text-muted-foreground mt-2">Tudo que você precisa para gerenciar seus empréstimos</p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          {funcionalidades.map((item) => (
             <div
-              key={item.titulo}
-              className="card p-6 hover:shadow-lg transition-all hover:border-indigo-200 dark:hover:border-indigo-700 group"
+              className="absolute top-0 right-0 w-24 h-24 opacity-[0.04] rounded-bl-full"
+              style={{
+                background: `linear-gradient(135deg, ${card.color.split("-")[1] === "indigo" ? "#4f46e5" : card.color.split("-")[1] === "emerald" ? "#10b981" : card.color.split("-")[1] === "amber" ? "#f59e0b" : "#ef4444"} 0%, transparent 100%)`,
+              }}
+            />
+            <div
+              className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 text-white bg-gradient-to-br ${card.color}`}
             >
-              <div className="p-3 bg-muted rounded-xl w-fit group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30 transition-all">
-                {item.icon}
+              <card.icon size={18} />
+            </div>
+            <p className="text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wide">
+              {card.label}
+            </p>
+            <p className="text-xl font-bold text-foreground">
+              {carregando ? "..." : card.value}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1.5">{card.sub}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Quick access cards */}
+      <div>
+        <h2 className="text-base font-bold text-foreground mb-4">Acesso Rápido</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {quickActions.map((item) => (
+            <button
+              key={item.path}
+              onClick={() => navigate(item.path)}
+              className="bg-card rounded-2xl border border-border shadow-sm p-6 text-left hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md transition-all group"
+            >
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${item.iconBg}`}>
+                <item.icon size={22} />
               </div>
-              <h3 className="font-bold mt-4 mb-2 text-foreground">{item.titulo}</h3>
-              <p className="text-muted-foreground text-sm">{item.descricao}</p>
+              <div className="flex items-end justify-between">
+                <div>
+                  <h3 className="font-bold text-foreground mb-1">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                </div>
+                <ChevronRight
+                  size={18}
+                  className="text-muted-foreground group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all"
+                />
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Features grid */}
+      <div>
+        <h2 className="text-base font-bold text-foreground mb-4">Funcionalidades do Sistema</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {features.map((f) => (
+            <div
+              key={f.title}
+              className="bg-card rounded-2xl border border-border shadow-sm p-5 hover:shadow-md transition-shadow"
+            >
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4">
+                <f.icon size={20} />
+              </div>
+              <h3 className="font-bold text-foreground text-sm mb-2">{f.title}</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>
-      </section>
+      </div>
     </div>
   );
 }
