@@ -15,6 +15,8 @@ import {
 
 import CaixaRequests from "../../../fetch/CaixaRequests";
 import type CaixaDTO from "../../../interface/CaixaDTO";
+import ModalParcelasAtrasadas from "../ModalParcelasAtrasadas/ModalParcelasAtrasadas";
+import { SkeletonCaixaCards } from "../../Skeleton";
 
 function ResumoCaixa() {
   const navigate = useNavigate();
@@ -22,6 +24,9 @@ function ResumoCaixa() {
   const [resumo, setResumo] = useState<CaixaDTO | undefined>(undefined);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
+
+  // Estado para o modal
+  const [modalAtrasadasOpen, setModalAtrasadasOpen] = useState(false);
 
   useEffect(() => {
     const carregar = async () => {
@@ -46,12 +51,7 @@ function ResumoCaixa() {
     v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
   if (carregando) {
-    return (
-      <div className="flex items-center justify-center min-h-64 text-slate-400">
-        <Loader2 className="animate-spin mr-2" size={20} />
-        Carregando balanço financeiro...
-      </div>
-    );
+    return <SkeletonCaixaCards />;
   }
 
   if (erro || !resumo) {
@@ -89,6 +89,7 @@ function ResumoCaixa() {
         {/* Cards Financeiros */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           
+          {/* Total Emprestado */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-slate-50 text-slate-600 rounded-xl">
@@ -101,6 +102,7 @@ function ResumoCaixa() {
             </p>
           </div>
 
+          {/* Total Recebido */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
@@ -113,6 +115,7 @@ function ResumoCaixa() {
             </p>
           </div>
 
+          {/* A Receber */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
@@ -125,7 +128,11 @@ function ResumoCaixa() {
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col gap-4">
+          {/* Em Atraso - INTERATIVO */}
+          <button
+            onClick={() => setModalAtrasadasOpen(true)}
+            className="bg-white rounded-2xl shadow-sm border-2 border-red-100 p-6 flex flex-col gap-4 hover:shadow-md hover:border-red-300 transition-all cursor-pointer text-left w-full"
+          >
             <div className="flex items-center gap-3">
               <div className="p-3 bg-red-50 text-red-600 rounded-xl">
                 <Clock size={24} />
@@ -135,19 +142,10 @@ function ResumoCaixa() {
             <p className="text-2xl font-bold text-red-600">
               {formatarMoeda(resumo.totalAtrasado)}
             </p>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
-                <CircleDollarSign size={24} />
-              </div>
-              <h2 className="text-sm font-semibold text-slate-600">Lucro Previsto</h2>
-            </div>
-            <p className="text-2xl font-bold text-indigo-600">
-              {formatarMoeda(resumo.lucroPrevisto)}
+            <p className="text-xs text-slate-400 flex items-center gap-1">
+              Clique para ver detalhes →
             </p>
-          </div>
+          </button>
 
         </div>
 
@@ -174,6 +172,12 @@ function ResumoCaixa() {
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      <ModalParcelasAtrasadas
+        isOpen={modalAtrasadasOpen}
+        onClose={() => setModalAtrasadasOpen(false)}
+      />
     </div>
   );
 }
