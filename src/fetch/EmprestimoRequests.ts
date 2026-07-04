@@ -24,7 +24,6 @@ class EmprestimoRequests {
         },
       );
 
-      // Bloqueio de intrusos
       if (respostaAPI.status === 401) {
         console.warn("Token expirado. Redirecionando para login...");
         AuthRequests.removeToken(); 
@@ -33,7 +32,6 @@ class EmprestimoRequests {
 
       if (respostaAPI.ok) {
         const data = await respostaAPI.json();
-        // O Pulo do Gato: Verifica se é um array puro. Se não for, extrai da propriedade correta.
         const listaEmprestimos = Array.isArray(data) ? data : (data.emprestimos || data.dados || []);
         return listaEmprestimos;
       }
@@ -41,7 +39,7 @@ class EmprestimoRequests {
       throw new Error("Não foi possível listar os empréstimos.");
     } catch (error) {
       console.error(`Erro ao consultar empréstimos. ${error}`);
-      return []; // Retorne um array vazio em vez de undefined para não quebrar a tela
+      return [];
     }
   }
 
@@ -56,21 +54,19 @@ class EmprestimoRequests {
         {
           headers: {
             "Content-Type": "application/json",
-            "x-access-token": `${token}`,
+            "x-access-token": token || "",
           },
         },
       );
 
       if (respostaAPI.ok) {
         const emprestimo: EmprestimoDTO = await respostaAPI.json();
-
         return emprestimo;
       }
 
       throw new Error("Não foi possível buscar o empréstimo.");
     } catch (error) {
       console.error(`Erro ao consultar empréstimo por ID. ${error}`);
-
       return;
     }
   }
@@ -81,28 +77,46 @@ class EmprestimoRequests {
     try {
       const token = localStorage.getItem("token");
 
+     
+      const { valor_parcela, ...dadosParaEnviar } = formEmprestimo;
+
+      // Se valor_parcela existir e for > 0, mantém; senão, envia sem ele
+      const dadosFinais: any = { ...dadosParaEnviar };
+      
+      // Só adiciona valor_parcela se for > 0 (para enviar manual)
+      if (valor_parcela && valor_parcela > 0) {
+        dadosFinais.valor_parcela = valor_parcela;
+      }
+
       const respostaAPI = await fetch(
         `${this.serverURL}${this.endpointEmprestimo}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-access-token": `${token}`,
+            "x-access-token": token || "",
           },
-          body: JSON.stringify(formEmprestimo),
+          body: JSON.stringify(dadosFinais),
         },
       );
 
       if (!respostaAPI.ok) {
-        throw new Error(
-          `Erro ${respostaAPI.status}: ${respostaAPI.statusText}`,
-        );
+        let mensagemErro = `Erro ${respostaAPI.status}: ${respostaAPI.statusText}`;
+        try {
+          const errorData = await respostaAPI.json();
+          if (errorData.mensagem) {
+            mensagemErro = errorData.mensagem;
+          }
+        } catch (e) {
+          // Ignora se não for JSON
+        }
+        throw new Error(mensagemErro);
       }
 
       return true;
-    } catch (error) {
-      console.error(`Erro ao cadastrar empréstimo. ${error}`);
-
+    } catch (error: any) {
+      console.error(`Erro ao cadastrar empréstimo. ${error.message || error}`);
+      alert(error.message || "Erro ao cadastrar empréstimo.");
       return false;
     }
   }
@@ -114,28 +128,42 @@ class EmprestimoRequests {
     try {
       const token = localStorage.getItem("token");
 
+      const { valor_parcela, ...dadosParaEnviar } = emprestimo;
+      const dadosFinais: any = { ...dadosParaEnviar };
+      
+      if (valor_parcela && valor_parcela > 0) {
+        dadosFinais.valor_parcela = valor_parcela;
+      }
+
       const respostaAPI = await fetch(
         `${this.serverURL}${this.endpointEmprestimo}/${id_emprestimo}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            "x-access-token": `${token}`,
+            "x-access-token": token || "",
           },
-          body: JSON.stringify(emprestimo),
+          body: JSON.stringify(dadosFinais),
         },
       );
 
       if (!respostaAPI.ok) {
-        throw new Error(
-          `Erro ${respostaAPI.status}: ${respostaAPI.statusText}`,
-        );
+        let mensagemErro = `Erro ${respostaAPI.status}: ${respostaAPI.statusText}`;
+        try {
+          const errorData = await respostaAPI.json();
+          if (errorData.mensagem) {
+            mensagemErro = errorData.mensagem;
+          }
+        } catch (e) {
+          // Ignora se não for JSON
+        }
+        throw new Error(mensagemErro);
       }
 
       return true;
-    } catch (error) {
-      console.error(`Erro ao atualizar empréstimo. ${error}`);
-
+    } catch (error: any) {
+      console.error(`Erro ao atualizar empréstimo. ${error.message || error}`);
+      alert(error.message || "Erro ao atualizar empréstimo.");
       return false;
     }
   }
@@ -150,21 +178,28 @@ class EmprestimoRequests {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            "x-access-token": `${token}`,
+            "x-access-token": token || "",
           },
         },
       );
 
       if (!respostaAPI.ok) {
-        throw new Error(
-          `Erro ${respostaAPI.status}: ${respostaAPI.statusText}`,
-        );
+        let mensagemErro = `Erro ${respostaAPI.status}: ${respostaAPI.statusText}`;
+        try {
+          const errorData = await respostaAPI.json();
+          if (errorData.mensagem) {
+            mensagemErro = errorData.mensagem;
+          }
+        } catch (e) {
+          // Ignora se não for JSON
+        }
+        throw new Error(mensagemErro);
       }
 
       return true;
-    } catch (error) {
-      console.error(`Erro ao excluir empréstimo. ${error}`);
-
+    } catch (error: any) {
+      console.error(`Erro ao excluir empréstimo. ${error.message || error}`);
+      alert(error.message || "Erro ao excluir empréstimo.");
       return false;
     }
   }

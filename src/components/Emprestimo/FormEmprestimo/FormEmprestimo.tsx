@@ -16,7 +16,7 @@ function FormEmprestimo() {
     id_cliente: 0,
     valor_emprestimo: 0,
     num_parcelas: 1,
-    valor_parcela: 0,
+    valor_parcela: 0, // Mantido para exibição, mas NÃO será enviado
     tipo_juros: "simples",
     juros: 0,
     data_emprestimo: (() => {
@@ -45,7 +45,7 @@ function FormEmprestimo() {
   }
 
   // ---------------------------
-  // CÁLCULO DA PARCELA
+  // CÁLCULO DA PARCELA (apenas para exibição)
   // ---------------------------
   useEffect(() => {
     if (formData.valor_emprestimo <= 0 || formData.num_parcelas <= 0) return;
@@ -111,7 +111,6 @@ function FormEmprestimo() {
       "id_cliente",
       "valor_emprestimo",
       "num_parcelas",
-      "valor_parcela",
       "juros",
     ];
 
@@ -124,13 +123,16 @@ function FormEmprestimo() {
   }
 
   // ---------------------------
-  // SUBMIT
+  // SUBMIT - CORRIGIDO
   // ---------------------------
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
+    // 🔥 CRIA UMA CÓPIA DO FORMULÁRIO SEM O valor_parcela
+    const { valor_parcela, ...dadosParaEnviar } = formData;
+
     const sucesso =
-      await EmprestimoRequests.enviarFormularioEmprestimo(formData);
+      await EmprestimoRequests.enviarFormularioEmprestimo(dadosParaEnviar as EmprestimoDTO);
 
     if (sucesso) {
       alert("Empréstimo cadastrado com sucesso!");
@@ -139,7 +141,8 @@ function FormEmprestimo() {
       alert("Erro ao cadastrar empréstimo.");
     }
   }
-    return (
+
+  return (
     <div className="py-8 px-4">
       <div className="max-w-4xl mx-auto">
         <form
@@ -187,10 +190,13 @@ function FormEmprestimo() {
               <input
                 type="number"
                 required
+                min="0.01"
+                step="0.01"
                 name="valor_emprestimo"
-                value={formData.valor_emprestimo}
+                value={formData.valor_emprestimo || ""}
                 onChange={handleChange}
                 className="w-full border rounded-xl p-3"
+                placeholder="Ex: 1000.00"
               />
             </div>
 
@@ -198,7 +204,7 @@ function FormEmprestimo() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block mb-2 font-medium">
-                  Parcelas
+                  Número de Parcelas
                 </label>
 
                 <input
@@ -214,14 +220,14 @@ function FormEmprestimo() {
 
               <div>
                 <label className="block mb-2 font-medium">
-                  Valor Parcela
+                  Valor da Parcela (calculado)
                 </label>
 
                 <input
-                  type="number"
+                  type="text"
                   readOnly
-                  value={formData.valor_parcela}
-                  className="w-full border rounded-xl p-3 bg-slate-100 font-semibold"
+                  value={formData.valor_parcela > 0 ? `R$ ${formData.valor_parcela.toFixed(2)}` : "Aguardando dados..."}
+                  className="w-full border rounded-xl p-3 bg-slate-100 font-semibold text-indigo-600"
                 />
               </div>
             </div>
@@ -252,11 +258,13 @@ function FormEmprestimo() {
                 <input
                   type="number"
                   step="0.01"
+                  min="0"
                   required
                   name="juros"
                   value={formData.juros}
                   onChange={handleChange}
                   className="w-full border rounded-xl p-3"
+                  placeholder="Ex: 5"
                 />
               </div>
             </div>
@@ -280,13 +288,13 @@ function FormEmprestimo() {
 
               <div>
                 <label className="block mb-2 font-medium">
-                  Data da Devolução
+                  Data da Devolução (estimada)
                 </label>
 
                 <input
-                  type="date"
+                  type="text"
                   readOnly
-                  value={String(formData.data_devolucao ?? "")}
+                  value={formData.data_devolucao ? new Date(formData.data_devolucao).toLocaleDateString('pt-BR') : "..."}
                   className="w-full border rounded-xl p-3 bg-slate-100"
                 />
               </div>
@@ -295,7 +303,7 @@ function FormEmprestimo() {
             {/* PAGAMENTO */}
             <div>
               <label className="block mb-2 font-medium">
-                Forma de Pagamento
+                Forma de Pagamento (opcional)
               </label>
 
               <input
@@ -313,7 +321,7 @@ function FormEmprestimo() {
           <div className="mt-8 flex gap-4">
             <button
               type="submit"
-              className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700"
+              className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all"
             >
               CADASTRAR
             </button>
@@ -321,7 +329,7 @@ function FormEmprestimo() {
             <button
               type="button"
               onClick={() => navigate("/emprestimos")}
-              className="flex-1 border py-3 rounded-xl font-bold"
+              className="flex-1 border border-slate-300 py-3 rounded-xl font-bold hover:bg-slate-50 transition-all"
             >
               VOLTAR
             </button>
