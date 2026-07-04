@@ -18,6 +18,7 @@ import PEditarEmprestimo from "./pages/Emprestimo/PEditarEmprestimo/PEditarEmpre
 import PFormEmprestimo from "./pages/Emprestimo/PFormEmprestimo/PFormEmprestimo"; // NOVO
 
 import PCaixa from "./pages/Caixa/PCaixa";
+import PPerfil from "./pages/Usuario/PPerfil/PPerfil";
 
 function App() {
   const [isAuth, setIsAuth] = useState<boolean>(() => {
@@ -93,6 +94,11 @@ function App() {
           path="/emprestimos/:id"
           element={<ProtectedRoute isAuth={isAuth} element={PDetalhesEmprestimo} />}
         />
+
+        <Route
+    path="/perfil"
+  element={<ProtectedRoute isAuth={isAuth} element={PPerfil} />}
+/>
 
       </Routes>
     </BrowserRouter>
