@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import EmprestimoRequests from "../../../fetch/EmprestimoRequests";
+import ParcelaRequests from "../../../fetch/ParcelaRequests";
 import type ParcelaDTO from "../../../interface/ParcelaDTO";
 
 interface EmprestimoComParcelas {
@@ -18,9 +19,6 @@ function ParcelasDoCliente({ id_cliente }: Props) {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
 
-  // --------------------------------------
-  // CARREGAR DADOS
-  // --------------------------------------
   async function carregarDados() {
     setLoading(true);
     setErro("");
@@ -29,7 +27,7 @@ function ParcelasDoCliente({ id_cliente }: Props) {
       const lista = await EmprestimoRequests.obterListaDeEmprestimos();
 
       if (!lista) {
-        setErro("Erro ao carregar parcelas.");
+        setErro("Erro ao carregar emprestimos.");
         setLoading(false);
         return;
       }
@@ -38,8 +36,20 @@ function ParcelasDoCliente({ id_cliente }: Props) {
         (emp: any) => emp.id_cliente === id_cliente
       );
 
-      setEmprestimos(filtrados);
+      const emprestimosComParcelas: EmprestimoComParcelas[] = [];
+
+      for (const emp of filtrados) {
+        const parcelas = await ParcelaRequests.listarPorEmprestimo(emp.id_emprestimo!);
+        emprestimosComParcelas.push({
+          id_emprestimo: emp.id_emprestimo!,
+          valor_emprestimo: emp.valor_emprestimo,
+          parcelas: parcelas || [],
+        });
+      }
+
+      setEmprestimos(emprestimosComParcelas);
     } catch (err) {
+      console.error(err);
       setErro("Erro inesperado ao carregar parcelas.");
     }
 
@@ -50,29 +60,16 @@ function ParcelasDoCliente({ id_cliente }: Props) {
     carregarDados();
   }, [id_cliente]);
 
-  // --------------------------------------
-  // DAR BAIXA NA PARCELA (FRONT SIMULADO)
-  // --------------------------------------
-  function marcarComoPaga(id_parcela: number) {
-    setEmprestimos((prev) =>
-      prev.map((emp) => ({
-        ...emp,
-        parcelas: emp.parcelas.map((p) =>
-          p.id_parcela === id_parcela
-            ? {
-                ...p,
-                status_parcela: "PAGA",
-                data_pagamento: new Date().toISOString(),
-              }
-            : p
-        ),
-      }))
-    );
+  async function marcarComoPaga(id_parcela: number) {
+    const sucesso = await ParcelaRequests.pagar(id_parcela);
+
+    if (sucesso) {
+      await carregarDados();
+    } else {
+      alert("Erro ao pagar parcela.");
+    }
   }
 
-  // --------------------------------------
-  // BADGE STATUS
-  // --------------------------------------
   function getBadge(status: ParcelaDTO["status_parcela"]) {
     switch (status) {
       case "PAGA":
@@ -84,13 +81,9 @@ function ParcelasDoCliente({ id_cliente }: Props) {
     }
   }
 
-  // --------------------------------------
-  // RENDER
-  // --------------------------------------
   return (
     <div className="space-y-6">
 
-      {/* HEADER */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold text-slate-800">
           Parcelas
@@ -101,7 +94,6 @@ function ParcelasDoCliente({ id_cliente }: Props) {
         </span>
       </div>
 
-      {/* STATES */}
       {loading && (
         <p className="text-slate-500">Carregando parcelas...</p>
       )}
@@ -110,17 +102,15 @@ function ParcelasDoCliente({ id_cliente }: Props) {
         <p className="text-red-500">{erro}</p>
       )}
 
-      {/* CONTENT */}
       {!loading &&
         emprestimos.map((emp) => (
           <div
             key={emp.id_emprestimo}
             className="bg-white border rounded-xl p-4 space-y-3 shadow-sm hover:shadow-md transition-all duration-200"
           >
-            {/* EMPRESTIMO HEADER */}
             <div className="flex justify-between">
               <h3 className="font-semibold text-slate-700">
-                Empréstimo #{emp.id_emprestimo}
+                Emprestimo #{emp.id_emprestimo}
               </h3>
 
               <span className="text-sm text-slate-500">
@@ -128,64 +118,63 @@ function ParcelasDoCliente({ id_cliente }: Props) {
               </span>
             </div>
 
-            {/* PARCELAS */}
             <div className="space-y-2">
-              {emp.parcelas?.map((p) => (
-                <div
-                  key={p.id_parcela}
-                  className="flex justify-between items-center bg-slate-50 p-3 rounded-lg hover:bg-slate-100 transition-all"
-                >
-                  {/* INFO */}
-                  <div>
-                    <p className="text-sm font-medium text-slate-700">
-                      Parcela {p.numero_parcela}
-                    </p>
-
-                    <p className="text-xs text-slate-500">
-                      Venc:{" "}
-                      {new Date(p.data_vencimento).toLocaleDateString()}
-                    </p>
-
-                    {p.data_pagamento && (
-                      <p className="text-xs text-green-600">
-                        Pago em{" "}
-                        {new Date(p.data_pagamento).toLocaleDateString()}
+              {emp.parcelas && emp.parcelas.length > 0 ? (
+                emp.parcelas.map((p) => (
+                  <div
+                    key={p.id_parcela}
+                    className="flex justify-between items-center bg-slate-50 p-3 rounded-lg hover:bg-slate-100 transition-all"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-slate-700">
+                        Parcela {p.numero_parcela}
                       </p>
-                    )}
-                  </div>
 
-                  {/* ACTIONS */}
-                  <div className="flex items-center gap-3">
+                      <p className="text-xs text-slate-500">
+                        Venc:{" "}
+                        {new Date(p.data_vencimento).toLocaleDateString("pt-BR")}
+                      </p>
 
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full ${getBadge(
-                        p.status_parcela
-                      )}`}
-                    >
-                      {p.status_parcela}
-                    </span>
+                      {p.data_pagamento && (
+                        <p className="text-xs text-green-600">
+                          Pago em{" "}
+                          {new Date(p.data_pagamento).toLocaleDateString("pt-BR")}
+                        </p>
+                      )}
+                    </div>
 
-                    {p.status_parcela !== "PAGA" && (
-                      <button
-                        onClick={() =>
-                          marcarComoPaga(p.id_parcela)
-                        }
-                        className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg transition-all"
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full ${getBadge(
+                          p.status_parcela
+                        )}`}
                       >
-                        Dar baixa
-                      </button>
-                    )}
+                        {p.status_parcela}
+                      </span>
 
+                      {p.status_parcela !== "PAGA" && (
+                        <button
+                          onClick={() => marcarComoPaga(p.id_parcela)}
+                          className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg transition-all"
+                        >
+                          Dar baixa
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-sm text-slate-400">
+                  Nenhuma parcela encontrada para este emprestimo.
+                </p>
+              )}
             </div>
           </div>
         ))}
 
       {!loading && emprestimos.length === 0 && (
         <p className="text-slate-500">
-          Nenhuma parcela encontrada para este cliente.
+          Nenhum emprestimo encontrado para este cliente.
         </p>
       )}
     </div>
