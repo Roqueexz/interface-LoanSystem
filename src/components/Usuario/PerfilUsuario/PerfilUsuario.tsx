@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Shield, LogOut, Calendar, DollarSign } from "lucide-react";
 import AuthRequests from "../../../fetch/AuthRequests";
+import { useToast } from "../../../hooks/useToast";
+import ModalConfirmacao from "../../../ui/Modal/ModalConfirmacao";
 
 interface UsuarioInfo {
   id_usuario: number;
@@ -12,7 +14,9 @@ interface UsuarioInfo {
 
 function PerfilUsuario() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [usuario, setUsuario] = useState<UsuarioInfo | null>(null);
+  const [modalLogoutOpen, setModalLogoutOpen] = useState(false);
 
   useEffect(() => {
     const nome = localStorage.getItem("nome") || "";
@@ -29,11 +33,14 @@ function PerfilUsuario() {
   }, []);
 
   const handleLogout = () => {
-    const confirmacao = confirm("Tem certeza que deseja sair?");
-    if (confirmacao) {
-      AuthRequests.removeToken();
-      navigate("/");
-    }
+    setModalLogoutOpen(true);
+  };
+
+  const confirmarLogout = () => {
+    toast.success('👋 Até logo!');
+    AuthRequests.removeToken();
+    navigate("/");
+    setModalLogoutOpen(false);
   };
 
   const formatarRole = (role: string) => {
@@ -134,6 +141,18 @@ function PerfilUsuario() {
           </div>
         </div>
       </div>
+
+      {/* Modal de Confirmacao para Logout */}
+      <ModalConfirmacao
+        isOpen={modalLogoutOpen}
+        onClose={() => setModalLogoutOpen(false)}
+        onConfirm={confirmarLogout}
+        title="Sair do Sistema"
+        message="Tem certeza que deseja sair? Voce sera redirecionado para a tela de login."
+        confirmText="Sair"
+        cancelText="Cancelar"
+        variant="warning"
+      />
     </div>
   );
 }
