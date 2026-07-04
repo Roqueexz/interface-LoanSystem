@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Users, CreditCard, Wallet } from 'lucide-react';
+import { Home, Users, CreditCard, Wallet, DollarSign } from 'lucide-react';
 
 function Navegacao() {
   const location = useLocation();
@@ -12,26 +12,52 @@ function Navegacao() {
   ];
 
   return (
-    <nav className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 transition-colors duration-300">
+    <nav className="bg-card border-b border-border sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
-            LoanSystem
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
+              style={{ background: "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)" }}
+            >
+              <DollarSign size={16} className="text-white" />
+            </div>
+            <span className="font-bold text-base tracking-tight text-foreground">
+              Loan<span className="text-primary">System</span>
+            </span>
           </Link>
 
-          <div className="flex items-center gap-1">
+          {/* Nav links */}
+          <div className="hidden md:flex items-center gap-0.5">
             {links.map(({ to, icon: Icon, label }) => (
               <Link
                 key={to}
                 to={to}
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-all ${
                   location.pathname === to
-                    ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                    ? 'bg-secondary/50 text-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Mobile menu placeholder - sera expandido depois */}
+          <div className="md:hidden flex items-center gap-1">
+            {links.map(({ to, icon: Icon }) => (
+              <Link
+                key={to}
+                to={to}
+                className={`p-2 rounded-xl text-sm font-medium transition-all ${
+                  location.pathname === to
+                    ? 'bg-secondary/50 text-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 }`}
               >
                 <Icon size={18} />
-                <span className="hidden sm:inline">{label}</span>
               </Link>
             ))}
           </div>
