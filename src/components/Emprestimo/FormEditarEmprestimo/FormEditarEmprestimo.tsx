@@ -15,6 +15,7 @@ import {
 import EmprestimoRequests from "../../../fetch/EmprestimoRequests";
 import type EmprestimoDTO from "../../../interface/EmprestimoDTO";
 import Juros from "../../../services/Juros";
+import { useToast } from "../../../hooks/useToast";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 type FormState = {
@@ -47,6 +48,7 @@ function toInputDate(d: Date | string | undefined): string {
 function FormEditarEmprestimo() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const toast = useToast();
 
   const [formData, setFormData] = useState<FormState>({
     id_cliente: 0,
@@ -87,7 +89,7 @@ function FormEditarEmprestimo() {
           status_emprestimo: emp.status_emprestimo ?? true,
           forma_pagamento: emp.forma_pagamento ?? "",
         });
-        setValorParcela(emp.valor_parcela);
+        setValorParcela(emp.valor_parcela ?? 0);
       } catch {
         setErro("Erro ao carregar empréstimo.");
       } finally {
@@ -134,13 +136,19 @@ function FormEditarEmprestimo() {
       forma_pagamento: formData.forma_pagamento || undefined,
     };
 
-    const ok = await EmprestimoRequests.atualizarEmprestimo(Number(id), payload);
+    const ok = await toast.promise(
+      EmprestimoRequests.atualizarEmprestimo(Number(id), payload),
+      {
+        loading: 'Atualizando empréstimo...',
+        success: '✅ Empréstimo atualizado com sucesso!',
+        error: '❌ Erro ao atualizar empréstimo.',
+      }
+    );
+
     setSalvando(false);
 
     if (ok) {
       navigate("/emprestimos");
-    } else {
-      alert("Erro ao atualizar empréstimo. Tente novamente.");
     }
   };
 
@@ -264,16 +272,16 @@ function FormEditarEmprestimo() {
                 <label className="block mb-1.5 text-sm font-medium text-slate-600">
                   Taxa de Juros (% ao mês)
                 </label>
-              <input
-  type="number"
-  name="juros"
-  step="0.01"
-  min={0}
-  required
-  value={formData.juros ?? ""}
-  onChange={handleChange}
-  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
-/>
+                <input
+                  type="number"
+                  name="juros"
+                  step="0.01"
+                  min={0}
+                  required
+                  value={formData.juros ?? ""}
+                  onChange={handleChange}
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
+                />
               </div>
 
               {/* Preview do valor da parcela */}
