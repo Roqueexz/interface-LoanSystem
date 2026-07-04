@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
-import { Calendar, TrendingUp, Loader2, AlertCircle } from "lucide-react";
+import { Calendar, AlertCircle } from "lucide-react";
 import CaixaRequests from "../../../fetch/CaixaRequests";
 import GraficoMensal from "../GraficoMensal/GraficoMensal";
+import { formatarMoeda } from "../../../services/Utilitario";
+import { SkeletonCaixaCards } from "../../../ui/Skeleton";
 
 function RelatorioAnual() {
   const hoje = new Date();
@@ -33,13 +35,14 @@ function RelatorioAnual() {
     }
   }
 
-  const formatarMoeda = (v: number) =>
-    v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-
   // Totais do ano
   const totalRecebido = relatorio.reduce((acc, r) => acc + r.recebido, 0);
   const totalEmprestado = relatorio.reduce((acc, r) => acc + r.emprestado, 0);
   const totalLucro = relatorio.reduce((acc, r) => acc + r.lucro, 0);
+
+  if (carregando) {
+    return <SkeletonCaixaCards />;
+  }
 
   return (
     <div className="space-y-6">
@@ -49,9 +52,7 @@ function RelatorioAnual() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
             <h2 className="text-lg font-bold text-slate-800">Relatório Anual</h2>
-            <p className="text-sm text-slate-400">
-              {carregando ? "Carregando..." : `Ano ${ano}`}
-            </p>
+            <p className="text-sm text-slate-400">{`Ano ${ano}`}</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -72,14 +73,7 @@ function RelatorioAnual() {
           </div>
         </div>
 
-        {/* Estados */}
-        {carregando && (
-          <div className="flex items-center justify-center py-8 text-slate-400">
-            <Loader2 className="animate-spin mr-2" size={20} />
-            Carregando...
-          </div>
-        )}
-
+        {/* Estado de erro */}
         {erro && (
           <div className="flex items-center justify-center py-8 text-red-500">
             <AlertCircle size={20} className="mr-2" />
@@ -88,7 +82,7 @@ function RelatorioAnual() {
         )}
 
         {/* Totais do ano */}
-        {!carregando && !erro && relatorio.length > 0 && (
+        {!erro && relatorio.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             <div className="bg-emerald-50 rounded-xl p-4 text-center">
               <p className="text-xs text-emerald-600 font-medium mb-1">
