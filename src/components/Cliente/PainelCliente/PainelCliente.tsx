@@ -1,14 +1,10 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import DetalhesCliente from "../DetalhesCliente/DetalhesCliente";
-import ResumoClienteFinanceiro from "../ResumoClienteFinanceiro/ResumoClienteFinanceiro";
+import ResumoRequests from "../../../fetch/ResumoRequests";
+import type ResumoClienteDTO from "../../../interface/ResumoClienteDTO";
 import EmprestimosDoCliente from "../EmprestimosDoCliente/EmprestimosDoCliente";
 import ParcelasDoCliente from "../ParcelasDoCliente/ParcelasDoCliente";
-
-import ResumoRequests from "../../../fetch/ResumoRequests";
-import ParcelaRequests from "../../../fetch/ParcelaRequests";
-import type ResumoClienteDTO from "../../../interface/ResumoClienteDTO";
 
 interface Props {
   id_cliente: number;
@@ -21,100 +17,90 @@ function PainelCliente({ id_cliente }: Props) {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
 
-  const carregarResumo = useCallback(async () => {
+  async function carregarResumo() {
     setLoading(true);
     setErro("");
 
-    const dados = await ResumoRequests.obterResumoDoCliente(id_cliente);
-
-    if (dados) {
-      setResumo(dados);
-    } else {
-      setErro("Não foi possível carregar os dados do cliente.");
+    try {
+      const dados = await ResumoRequests.obterResumoCliente(id_cliente);
+      if (dados) {
+        setResumo(dados);
+      } else {
+        setErro("Erro ao carregar resumo do cliente.");
+      }
+    } catch (err) {
+      console.error(err);
+      setErro("Erro inesperado ao carregar dados.");
     }
 
     setLoading(false);
-  }, [id_cliente]);
+  }
 
   useEffect(() => {
     if (id_cliente) {
       carregarResumo();
     }
-  }, [id_cliente, carregarResumo]);
+  }, [id_cliente]);
 
-  async function handlePagarParcela(id_parcela: number) {
-    const sucesso = await ParcelaRequests.marcarComoPaga(id_parcela);
-    if (sucesso) carregarResumo();
-  }
-
-  async function handleDesfazerParcela(id_parcela: number) {
-    const sucesso = await ParcelaRequests.desfazerPagamento(id_parcela);
-    if (sucesso) carregarResumo();
-  }
+  const formatarMoeda = (v: number) =>
+    v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
   return (
-    <div className="p-6 space-y-6">
-
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Painel do Cliente</h1>
-          <p className="text-slate-500 text-sm">Visão completa financeira e operacional</p>
-        </div>
-
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold text-slate-800">Resumo Financeiro</h2>
         <button
           onClick={() => navigate(`/editar-cliente/${id_cliente}`)}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-semibold transition-all duration-200"
+          className="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl transition-all"
         >
           Editar Cliente
         </button>
       </div>
 
-      {erro && <p className="text-red-500">{erro}</p>}
+      {loading && (
+        <p className="text-slate-500">Carregando resumo...</p>
+      )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-all duration-200">
-          <p className="text-slate-500 text-sm">Total Emprestado</p>
-          <p className="text-xl font-bold text-slate-800">
-            R$ {(resumo?.totais.total_emprestado ?? 0).toFixed(2)}
-          </p>
-        </div>
+      {erro && (
+        <p className="text-red-500">{erro}</p>
+      )}
 
-        <div className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-all duration-200">
-          <p className="text-slate-500 text-sm">Em Aberto</p>
-          <p className="text-xl font-bold text-yellow-600">
-            R$ {(resumo?.totais.total_em_aberto ?? 0).toFixed(2)}
-          </p>
-        </div>
+      {!loading && resumo && (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+              <p className="text-xs text-slate-500">Total Emprestado</p>
+              <p className="text-xl font-bold text-indigo-600">
+                {formatarMoeda(resumo.totais.total_emprestado)}
+              </p>
+            </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-all duration-200">
-          <p className="text-slate-500 text-sm">Recebido</p>
-          <p className="text-xl font-bold text-green-600">
-            R$ {(resumo?.totais.total_recebido ?? 0).toFixed(2)}
-          </p>
-        </div>
-      </div>
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+              <p className="text-xs text-slate-500">Total Recebido</p>
+              <p className="text-xl font-bold text-green-600">
+                {formatarMoeda(resumo.totais.total_recebido)}
+              </p>
+            </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-all duration-200">
-        <DetalhesCliente id_cliente={id_cliente} />
-      </div>
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+              <p className="text-xs text-slate-500">Total em Aberto</p>
+              <p className="text-xl font-bold text-yellow-600">
+                {formatarMoeda(resumo.totais.total_em_aberto)}
+              </p>
+            </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-all duration-200">
-        <ResumoClienteFinanceiro loading={loading} totais={resumo?.totais} />
-      </div>
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+              <p className="text-xs text-slate-500">Total Atrasado</p>
+              <p className="text-xl font-bold text-red-600">
+                {formatarMoeda(resumo.totais.total_atrasado)}
+              </p>
+            </div>
+          </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-all duration-200">
-        <EmprestimosDoCliente loading={loading} emprestimos={resumo?.emprestimos ?? []} />
-      </div>
-
-      <div className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-all duration-200">
-        <ParcelasDoCliente
-          loading={loading}
-          emprestimos={resumo?.emprestimos ?? []}
-          onPagar={handlePagarParcela}
-          onDesfazer={handleDesfazerParcela}
-        />
-      </div>
-
+          <EmprestimosDoCliente id_cliente={id_cliente} />
+          <ParcelasDoCliente id_cliente={id_cliente} />
+        </>
+      )}
     </div>
   );
 }

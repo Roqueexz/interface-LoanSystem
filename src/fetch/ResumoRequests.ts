@@ -10,10 +10,6 @@ class ResumoRequests {
     this.endpointClientes = "/api/clientes";
   }
 
-  /**
-   * Obtém o resumo completo de um cliente (cliente + empréstimos + parcelas + totais)
-   * GET /api/clientes/:id/resumo
-   */
   async obterResumoCliente(id_cliente: number): Promise<ResumoClienteDTO | undefined> {
     try {
       const token = localStorage.getItem("token");
@@ -35,7 +31,7 @@ class ResumoRequests {
       }
 
       if (respostaAPI.status === 404) {
-        console.warn(`Cliente ${id_cliente} não encontrado.`);
+        console.warn(`Cliente ${id_cliente} nao encontrado.`);
         return undefined;
       }
 
@@ -44,9 +40,9 @@ class ResumoRequests {
         return resumo;
       }
 
-      throw new Error(`Não foi possível obter o resumo do cliente. Status: ${respostaAPI.status}`);
+      throw new Error(`Nao foi possivel obter o resumo do cliente. Status: ${respostaAPI.status}`);
     } catch (error) {
-      console.error(`Erro ao consultar resumo do cliente ${id_cliente}. ${error}`);
+      console.error(`Erro ao consultar resumo do cliente ${id_cliente}.`, error);
       return undefined;
     }
   }
