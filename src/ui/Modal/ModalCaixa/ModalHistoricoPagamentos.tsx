@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { User, Calendar, CheckCircle } from "lucide-react";
-import ModalBase from "../ModalBase"; // ← CORRIGIDO
+import ModalBase from "../ModalBase";
 import { formatarMoeda, formatarDataBR } from "../../../services/Utilitario";
-
+import ParcelaRequests from "../../../fetch/ParcelaRequests";
+import EmprestimoRequests from "../../../fetch/EmprestimoRequests";
 
 interface Pagamento {
   id_parcela: number;
@@ -26,48 +27,43 @@ function ModalHistoricoPagamentos({ isOpen, onClose }: Props) {
 
   useEffect(() => {
     if (isOpen) {
-      carregarPagamentos();
+      carregarHistoricoPagamentos();
     }
   }, [isOpen]);
 
-  async function carregarPagamentos() {
+  async function carregarHistoricoPagamentos() {
     setCarregando(true);
     setErro(null);
 
     try {
-      // Placeholder - idealmente teria um endpoint especifico
-      const pagamentosMock: Pagamento[] = [
-        {
-          id_parcela: 1,
-          id_emprestimo: 5,
-          numero_parcela: 1,
-          valor_pago: 458.33,
-          data_pagamento: '2026-02-14',
-          cliente_nome: 'Carlos Eduardo Silva',
-          cliente_telefone: '(11) 98765-4321',
-        },
-        {
-          id_parcela: 2,
-          id_emprestimo: 5,
-          numero_parcela: 2,
-          valor_pago: 458.33,
-          data_pagamento: '2026-03-15',
-          cliente_nome: 'Carlos Eduardo Silva',
-          cliente_telefone: '(11) 98765-4321',
-        },
-        {
-          id_parcela: 1,
-          id_emprestimo: 2,
-          numero_parcela: 1,
-          valor_pago: 520.83,
-          data_pagamento: '2026-04-10',
-          cliente_nome: 'Ana Beatriz Rodrigues',
-          cliente_telefone: '(21) 99888-7766',
-        },
-      ];
-      setPagamentos(pagamentosMock);
-    } catch {
-      setErro('Erro ao carregar historico de pagamentos.');
+      const emprestimos = await EmprestimoRequests.obterListaDeEmprestimos();
+      if (!emprestimos) {
+        setErro("Erro ao carregar dados.");
+        setCarregando(false);
+        return;
+      }
+
+      const dados = await ParcelaRequests.listarPorStatus('pagas');
+      if (dados && dados.length > 0) {
+        const pagamentosComCliente = dados.map((p: any) => {
+          const emprestimo = emprestimos.find(e => e.id_emprestimo === p.id_emprestimo);
+          return {
+            id_parcela: p.id_parcela,
+            id_emprestimo: p.id_emprestimo,
+            numero_parcela: p.numero_parcela,
+            valor_pago: p.valor_parcela,
+            data_pagamento: p.data_pagamento || new Date().toISOString(),
+            cliente_nome: emprestimo ? `Cliente #${emprestimo.id_cliente}` : "N/A",
+            cliente_telefone: "N/A",
+          };
+        });
+        setPagamentos(pagamentosComCliente);
+      } else {
+        setPagamentos([]);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar historico de pagamentos:", error);
+      setErro("Erro ao carregar historico de pagamentos.");
     } finally {
       setCarregando(false);
     }
@@ -78,52 +74,52 @@ function ModalHistoricoPagamentos({ isOpen, onClose }: Props) {
   return (
     <ModalBase isOpen={isOpen} onClose={onClose} title="Histórico de Pagamentos" maxWidth="2xl">
       {carregando && (
-        <div className="text-center py-8 text-slate-400">Carregando historico...</div>
+        <div className="text-center py-8 text-muted-foreground">Carregando historico...</div>
       )}
 
       {erro && (
-        <div className="text-center py-8 text-red-500">{erro}</div>
+        <div className="text-center py-8 text-red-500 dark:text-red-400">{erro}</div>
       )}
 
       {!carregando && !erro && (
         <>
           {pagamentos.length === 0 ? (
-            <div className="text-center py-8 text-slate-400">
+            <div className="text-center py-8 text-muted-foreground">
               <CheckCircle size={32} className="mx-auto mb-2 opacity-50" />
               <p>Nenhum pagamento registrado.</p>
             </div>
           ) : (
             <>
-              <div className="bg-emerald-50 rounded-xl p-4 mb-4 flex justify-between items-center">
-                <span className="text-sm font-medium text-emerald-700">Total Recebido</span>
-                <span className="text-xl font-bold text-emerald-700">{formatarMoeda(totalRecebido)}</span>
+              <div className="bg-emerald-50 dark:bg-emerald-900/30 rounded-xl p-4 mb-4 flex justify-between items-center border border-emerald-200 dark:border-emerald-800">
+                <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">Total Recebido</span>
+                <span className="text-xl font-bold text-emerald-700 dark:text-emerald-400">{formatarMoeda(totalRecebido)}</span>
               </div>
 
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {pagamentos.map((p) => (
                   <div
                     key={p.id_parcela}
-                    className="bg-slate-50 rounded-xl p-4 border border-slate-100 hover:border-emerald-200 transition-all"
+                    className="bg-muted rounded-xl p-4 border border-border hover:border-emerald-300 dark:hover:border-emerald-700 transition-all"
                   >
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2">
-                          <User size={16} className="text-slate-400" />
-                          <span className="font-medium text-slate-800">{p.cliente_nome}</span>
+                          <User size={16} className="text-muted-foreground" />
+                          <span className="font-medium text-foreground">{p.cliente_nome}</span>
                         </div>
                         <div className="flex items-center gap-2 mt-1">
-                          <Calendar size={14} className="text-slate-400" />
-                          <span className="text-sm text-slate-600">
+                          <Calendar size={14} className="text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">
                             Pago em {formatarDataBR(p.data_pagamento)}
                           </span>
                         </div>
                       </div>
-                      <span className="text-sm font-bold text-emerald-600">
+                      <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
                         {formatarMoeda(p.valor_pago)}
                       </span>
                     </div>
 
-                    <div className="flex gap-4 mt-3 text-xs text-slate-500">
+                    <div className="flex gap-4 mt-3 text-xs text-muted-foreground">
                       <span>Empréstimo #{p.id_emprestimo}</span>
                       <span>•</span>
                       <span>Parcela {p.numero_parcela}</span>

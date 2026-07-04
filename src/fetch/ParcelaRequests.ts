@@ -12,10 +12,6 @@ class ParcelaRequests {
     this.endpointEmprestimo = "/api/emprestimos";
   }
 
-  /**
-   * Lista todas as parcelas de um empréstimo
-   * GET /api/emprestimos/:id/parcelas
-   */
   async listarPorEmprestimo(id_emprestimo: number): Promise<ParcelaDTO[] | undefined> {
     try {
       const token = localStorage.getItem("token");
@@ -30,7 +26,6 @@ class ParcelaRequests {
         },
       );
 
-      // Bloqueio de intrusos
       if (respostaAPI.status === 401) {
         console.warn("Token expirado. Redirecionando para login...");
         AuthRequests.removeToken();
@@ -38,7 +33,7 @@ class ParcelaRequests {
       }
 
       if (respostaAPI.status === 204) {
-        return []; // Sem conteúdo - empréstimo sem parcelas
+        return [];
       }
 
       if (respostaAPI.ok) {
@@ -46,17 +41,13 @@ class ParcelaRequests {
         return parcelas;
       }
 
-      throw new Error("Não foi possível listar as parcelas.");
+      throw new Error("Nao foi possivel listar as parcelas.");
     } catch (error) {
-      console.error(`Erro ao consultar parcelas do empréstimo ${id_emprestimo}. ${error}`);
+      console.error(`Erro ao consultar parcelas do emprestimo ${id_emprestimo}. ${error}`);
       return [];
     }
   }
 
-  /**
-   * Busca uma parcela específica por ID
-   * GET /api/parcelas/:id
-   */
   async buscarPorId(id_parcela: number): Promise<ParcelaDTO | undefined> {
     try {
       const token = localStorage.getItem("token");
@@ -82,17 +73,13 @@ class ParcelaRequests {
         return parcela;
       }
 
-      throw new Error("Não foi possível buscar a parcela.");
+      throw new Error("Nao foi possivel buscar a parcela.");
     } catch (error) {
       console.error(`Erro ao consultar parcela por ID ${id_parcela}. ${error}`);
       return undefined;
     }
   }
 
-  /**
-   * Marca uma parcela como paga
-   * PATCH /api/parcelas/:id/pagar
-   */
   async pagar(id_parcela: number, data_pagamento?: Date): Promise<boolean> {
     try {
       const token = localStorage.getItem("token");
@@ -132,10 +119,6 @@ class ParcelaRequests {
     }
   }
 
-  /**
-   * Desfaz o pagamento de uma parcela
-   * PATCH /api/parcelas/:id/desfazer
-   */
   async desfazerPagamento(id_parcela: number): Promise<boolean> {
     try {
       const token = localStorage.getItem("token");
@@ -166,6 +149,41 @@ class ParcelaRequests {
     } catch (error) {
       console.error(`Erro ao desfazer pagamento da parcela ${id_parcela}. ${error}`);
       return false;
+    }
+  }
+
+  /**
+   * Lista parcelas por status (pagas, pendentes, atrasadas)
+   * GET /api/parcelas?status=status
+   */
+  async listarPorStatus(status: 'pagas' | 'pendentes' | 'atrasadas'): Promise<any[] | undefined> {
+    try {
+      const token = localStorage.getItem("token");
+
+      const respostaAPI = await fetch(
+        `${this.serverURL}${this.endpointParcela}?status=${status}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": token || "",
+          },
+        },
+      );
+
+      if (respostaAPI.status === 401) {
+        console.warn("Token expirado. Redirecionando para login...");
+        AuthRequests.removeToken();
+        return undefined;
+      }
+
+      if (respostaAPI.ok) {
+        return await respostaAPI.json();
+      }
+
+      throw new Error(`Erro ao listar parcelas por status: ${respostaAPI.status}`);
+    } catch (error) {
+      console.error(`Erro ao listar parcelas por status (${status}):`, error);
+      return undefined;
     }
   }
 }
