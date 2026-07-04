@@ -5,18 +5,18 @@ import {
   Wallet,
   TrendingUp,
   Landmark,
-  CircleDollarSign,
-  Loader2,
-  XCircle,
   Users,
   Briefcase,
   Clock,
+  XCircle,
 } from "lucide-react";
 
 import CaixaRequests from "../../../fetch/CaixaRequests";
 import type CaixaDTO from "../../../interface/CaixaDTO";
-import ModalParcelasAtrasadas from "../ModalParcelasAtrasadas/ModalParcelasAtrasadas";
-import { SkeletonCaixaCards } from "../../Skeleton";
+import ModalParcelasAtrasadas from "../../../ui/Modal/ModalCaixa/ModalParcelasAtrasadas";
+import ModalParcelasPendentes from "../../../ui/Modal/ModalCaixa/ModalParcelasPendentes";
+import ModalHistoricoPagamentos from "../../../ui/Modal/ModalCaixa/ModalHistoricoPagamentos";
+import { SkeletonCaixaCards } from "../../../ui/Skeleton";
 
 function ResumoCaixa() {
   const navigate = useNavigate();
@@ -25,8 +25,10 @@ function ResumoCaixa() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
 
-  // Estado para o modal
+  // Estados dos modais
   const [modalAtrasadasOpen, setModalAtrasadasOpen] = useState(false);
+  const [modalPendentesOpen, setModalPendentesOpen] = useState(false);
+  const [modalHistoricoOpen, setModalHistoricoOpen] = useState(false);
 
   useEffect(() => {
     const carregar = async () => {
@@ -102,8 +104,11 @@ function ResumoCaixa() {
             </p>
           </div>
 
-          {/* Total Recebido */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col gap-4">
+          {/* Total Recebido - INTERATIVO */}
+          <button
+            onClick={() => setModalHistoricoOpen(true)}
+            className="bg-white rounded-2xl shadow-sm border-2 border-emerald-100 p-6 flex flex-col gap-4 hover:shadow-md hover:border-emerald-300 transition-all cursor-pointer text-left w-full"
+          >
             <div className="flex items-center gap-3">
               <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
                 <TrendingUp size={24} />
@@ -113,10 +118,16 @@ function ResumoCaixa() {
             <p className="text-2xl font-bold text-emerald-600">
               {formatarMoeda(resumo.totalRecebido)}
             </p>
-          </div>
+            <p className="text-xs text-slate-400 flex items-center gap-1">
+              Clique para ver historico →
+            </p>
+          </button>
 
-          {/* A Receber */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col gap-4">
+          {/* A Receber - INTERATIVO */}
+          <button
+            onClick={() => setModalPendentesOpen(true)}
+            className="bg-white rounded-2xl shadow-sm border-2 border-amber-100 p-6 flex flex-col gap-4 hover:shadow-md hover:border-amber-300 transition-all cursor-pointer text-left w-full"
+          >
             <div className="flex items-center gap-3">
               <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
                 <Wallet size={24} />
@@ -126,7 +137,10 @@ function ResumoCaixa() {
             <p className="text-2xl font-bold text-amber-500">
               {formatarMoeda(resumo.entradaPendente)}
             </p>
-          </div>
+            <p className="text-xs text-slate-400 flex items-center gap-1">
+              Clique para ver detalhes →
+            </p>
+          </button>
 
           {/* Em Atraso - INTERATIVO */}
           <button
@@ -173,10 +187,20 @@ function ResumoCaixa() {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Modais */}
       <ModalParcelasAtrasadas
         isOpen={modalAtrasadasOpen}
         onClose={() => setModalAtrasadasOpen(false)}
+      />
+
+      <ModalParcelasPendentes
+        isOpen={modalPendentesOpen}
+        onClose={() => setModalPendentesOpen(false)}
+      />
+
+      <ModalHistoricoPagamentos
+        isOpen={modalHistoricoOpen}
+        onClose={() => setModalHistoricoOpen(false)}
       />
     </div>
   );
