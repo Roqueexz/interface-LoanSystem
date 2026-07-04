@@ -1,108 +1,42 @@
-import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import {
-  LayoutDashboard,
-  Users,
-  CreditCard,
-  Menu,
-  X,
-  TrendingUp,
-  HandCoins,
-} from "lucide-react";
+import { Link, useLocation } from 'react-router-dom';
+import { Home, Users, CreditCard, Wallet } from 'lucide-react';
 
 function Navegacao() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const navigate = useNavigate();
+  const location = useLocation();
 
   const links = [
-    {
-      to: "/",
-      label: "Início",
-      icon: <LayoutDashboard size={18} />,
-    },
-    {
-      to: "/clientes",
-      label: "Clientes",
-      icon: <Users size={18} />,
-    },
-    {
-      to: "/emprestimos",
-      label: "Empréstimos",
-      icon: <CreditCard size={18} />,
-    },
-    {
-      to: "/caixa",
-      label: "Caixa",
-      icon: <HandCoins size={18} />,
-    }
+    { to: '/', icon: Home, label: 'Início' },
+    { to: '/clientes', icon: Users, label: 'Clientes' },
+    { to: '/emprestimos', icon: CreditCard, label: 'Empréstimos' },
+    { to: '/caixa', icon: Wallet, label: 'Caixa' },
   ];
 
   return (
-    <nav className="bg-indigo-600 shadow-lg sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4">
+    <nav className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 transition-colors duration-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
+          <Link to="/" className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+            LoanSystem
+          </Link>
 
-          <button
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-white"
-          >
-            <TrendingUp size={24} />
-            <span className="font-semibold text-lg">
-              LoanSystem
-            </span>
-          </button>
-
-          <div className="hidden md:flex items-center gap-2">
-            {links.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                end={link.to === "/"}
-                className={({ isActive }) =>
-                  `flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-all ${
-                    isActive
-                      ? "bg-white/20 text-white font-semibold"
-                      : "text-indigo-100 hover:bg-white/10 hover:text-white"
-                  }`
-                }
+          <div className="flex items-center gap-1">
+            {links.map(({ to, icon: Icon, label }) => (
+              <Link
+                key={to}
+                to={to}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                  location.pathname === to
+                    ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                }`}
               >
-                {link.icon}
-                {link.label}
-              </NavLink>
+                <Icon size={18} />
+                <span className="hidden sm:inline">{label}</span>
+              </Link>
             ))}
           </div>
-
-          <button
-            className="md:hidden text-white"
-            onClick={() => setMobileOpen(!mobileOpen)}
-          >
-            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
         </div>
       </div>
-
-      {mobileOpen && (
-        <div className="md:hidden bg-indigo-700 px-4 py-2 space-y-2">
-          {links.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              end={link.to === "/"}
-              onClick={() => setMobileOpen(false)}
-              className={({ isActive }) =>
-                `flex items-center gap-2 px-4 py-3 rounded-lg text-sm ${
-                  isActive
-                    ? "bg-white/20 text-white font-semibold"
-                    : "text-indigo-100 hover:bg-white/10 hover:text-white"
-                }`
-              }
-            >
-              {link.icon}
-              {link.label}
-            </NavLink>
-          ))}
-        </div>
-      )}
     </nav>
   );
 }
