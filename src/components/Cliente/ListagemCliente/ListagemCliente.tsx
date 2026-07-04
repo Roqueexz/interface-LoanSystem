@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Plus, Eye, Pencil, Trash2, Users } from "lucide-react";
 
 import ClienteRequests from "../../../fetch/ClienteRequests";
 import EmprestimoRequests from "../../../fetch/EmprestimoRequests";
@@ -8,6 +9,7 @@ import type ClienteDTO from "../../../interface/ClienteDTO";
 import type EmprestimoDTO from "../../../interface/EmprestimoDTO";
 import { useToast } from "../../../hooks/useToast";
 import ModalConfirmacao from "../../../ui/Modal/ModalConfirmacao";
+import { SkeletonLista } from "../../../ui/Skeleton";
 
 function ListagemCliente() {
   const navigate = useNavigate();
@@ -19,13 +21,9 @@ function ListagemCliente() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
 
-  // Estado para o modal de confirmacao
   const [clienteParaExcluir, setClienteParaExcluir] = useState<number | null>(null);
   const [modalConfirmOpen, setModalConfirmOpen] = useState(false);
 
-  // -----------------------------
-  // CARREGAR DADOS
-  // -----------------------------
   async function carregarClientes() {
     setLoading(true);
     setErro("");
@@ -52,9 +50,6 @@ function ListagemCliente() {
     carregarClientes();
   }, []);
 
-  // -----------------------------
-  // EXCLUIR CLIENTE
-  // -----------------------------
   function handleExcluir(id: number) {
     setClienteParaExcluir(id);
     setModalConfirmOpen(true);
@@ -82,9 +77,6 @@ function ListagemCliente() {
     setModalConfirmOpen(false);
   }
 
-  // -----------------------------
-  // HELPERS
-  // -----------------------------
   function clienteTemDivida(id_cliente: number) {
     return emprestimos.some(
       (emp) =>
@@ -101,144 +93,148 @@ function ListagemCliente() {
 
   function getStatusStyle(id_cliente: number) {
     return clienteTemDivida(id_cliente)
-      ? "bg-red-100 text-red-700"
-      : "bg-green-100 text-green-700";
+      ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+      : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
   }
 
-  // -----------------------------
-  // RENDER
-  // -----------------------------
+  if (loading) {
+    return <SkeletonLista itens={5} />;
+  }
+
   return (
-    <div className="p-6">
+    <div className="p-6 max-w-7xl mx-auto">
 
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-slate-800">
-          Clientes
-        </h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Clientes</h1>
+          <p className="text-muted-foreground text-sm">Gerencie todos os seus clientes</p>
+        </div>
 
         <button
           onClick={() => navigate("/clientes/novo")}
-          className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 transition-all"
+          className="flex items-center gap-2 bg-indigo-600 dark:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-all shadow-lg shadow-indigo-500/25"
         >
-          + Novo Cliente
+          <Plus size={18} />
+          Novo Cliente
         </button>
       </div>
 
-      {/* STATES */}
-      {loading && (
-        <p className="text-slate-500">Carregando clientes...</p>
-      )}
-
+      {/* ERRO */}
       {erro && (
-        <p className="text-red-500 font-medium">{erro}</p>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 text-red-600 dark:text-red-400 mb-6">
+          {erro}
+        </div>
       )}
 
       {/* TABLE */}
       {!loading && clientes.length > 0 && (
-        <div className="overflow-x-auto bg-white shadow-xl rounded-2xl">
-
-          <table className="w-full">
-
-            <thead className="bg-slate-100">
-              <tr>
-                <th className="p-4">Nome</th>
-                <th className="p-4">Telefone</th>
-                <th className="p-4">Cidade</th>
-                <th className="p-4">Estado</th>
-                <th className="p-4">Status</th>
-                <th className="p-4 text-center">Ações</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {clientes.map((cliente) => (
-                <tr
-                  key={cliente.id_cliente}
-                  className="border-t hover:bg-slate-50 cursor-pointer"
-                  onClick={() =>
-                    navigate(`/clientes/${cliente.id_cliente!}`)
-                  }
-                >
-
-                  {/* NOME */}
-                  <td className="p-4 font-medium">
-                    {cliente.nome_cliente} {cliente.sobrenome_cliente}
-                  </td>
-
-                  <td className="p-4">
-                    {cliente.telefone}
-                  </td>
-
-                  <td className="p-4">
-                    {cliente.cidade}
-                  </td>
-
-                  <td className="p-4">
-                    {cliente.estado}
-                  </td>
-
-                  {/* STATUS */}
-                  <td className="p-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusStyle(
-                        cliente.id_cliente!
-                      )}`}
-                    >
-                      {getClienteStatus(cliente.id_cliente!)}
-                    </span>
-                  </td>
-
-                  {/* AÇÕES */}
-                  <td className="p-4">
-                    <div className="flex gap-2 justify-center">
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/clientes/${cliente.id_cliente!}`);
-                        }}
-                        className="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-all"
-                      >
-                        Ver
-                      </button>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/editar-cliente/${cliente.id_cliente!}`);
-                        }}
-                        className="px-3 py-1 bg-yellow-500 text-white rounded-lg text-sm hover:bg-yellow-600 transition-all"
-                      >
-                        Editar
-                      </button>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleExcluir(cliente.id_cliente!);
-                        }}
-                        className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition-all"
-                      >
-                        Excluir
-                      </button>
-
-                    </div>
-                  </td>
-
+        <div className="card overflow-hidden shadow-lg">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-muted/50 border-b border-border">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cliente</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden sm:table-cell">Telefone</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Cidade</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Estado</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-
-          </table>
+              </thead>
+              <tbody>
+                {clientes.map((cliente) => (
+                  <tr
+                    key={cliente.id_cliente}
+                    className="table-row cursor-pointer hover:bg-accent/50"
+                    onClick={() => navigate(`/clientes/${cliente.id_cliente!}`)}
+                  >
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm">
+                          {cliente.nome_cliente?.[0]}{cliente.sobrenome_cliente?.[0]}
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground">
+                            {cliente.nome_cliente} {cliente.sobrenome_cliente}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
+                      {cliente.telefone}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
+                      {cliente.cidade}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
+                      {cliente.estado}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusStyle(
+                          cliente.id_cliente!
+                        )}`}
+                      >
+                        {getClienteStatus(cliente.id_cliente!)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/clientes/${cliente.id_cliente!}`);
+                          }}
+                          className="p-2 rounded-lg text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all"
+                          title="Ver"
+                        >
+                          <Eye size={16} />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/editar-cliente/${cliente.id_cliente!}`);
+                          }}
+                          className="p-2 rounded-lg text-slate-400 hover:text-yellow-600 dark:hover:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-all"
+                          title="Editar"
+                        >
+                          <Pencil size={16} />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleExcluir(cliente.id_cliente!);
+                          }}
+                          className="p-2 rounded-lg text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                          title="Excluir"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
       {/* EMPTY STATE */}
       {!loading && clientes.length === 0 && (
-        <p className="text-slate-500">
-          Nenhum cliente cadastrado.
-        </p>
+        <div className="card p-12 text-center">
+          <Users size={48} className="mx-auto text-muted-foreground/50 mb-4" />
+          <h3 className="text-lg font-semibold text-foreground mb-2">Nenhum cliente cadastrado</h3>
+          <p className="text-muted-foreground text-sm mb-4">Comece cadastrando seu primeiro cliente.</p>
+          <button
+            onClick={() => navigate("/clientes/novo")}
+            className="inline-flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition-all"
+          >
+            <Plus size={18} />
+            Novo Cliente
+          </button>
+        </div>
       )}
 
       {/* Modal de Confirmacao */}
