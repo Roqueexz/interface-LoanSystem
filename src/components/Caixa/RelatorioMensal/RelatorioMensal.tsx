@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
-import { Calendar, TrendingUp, TrendingDown, Loader2, AlertCircle } from "lucide-react";
+import { TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
 import CaixaRequests from "../../../fetch/CaixaRequests";
 import GraficoMensal from "../GraficoMensal/GraficoMensal";
+import { formatarMoeda } from "../../../services/Utilitario";
+import { SkeletonCaixaCards } from "../../../ui/Skeleton";
 
 function RelatorioMensal() {
   const hoje = new Date();
@@ -12,9 +14,22 @@ function RelatorioMensal() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
 
+  // Para o gráfico, precisamos dos últimos 12 meses
+  const [dadosGrafico, setDadosGrafico] = useState<any[]>([]);
+
   useEffect(() => {
     carregarRelatorio();
   }, [ano, mes]);
+
+  useEffect(() => {
+    async function carregarGrafico() {
+      const dados = await CaixaRequests.obterRelatorioAnual(ano);
+      if (dados) {
+        setDadosGrafico(dados);
+      }
+    }
+    carregarGrafico();
+  }, [ano]);
 
   async function carregarRelatorio() {
     setCarregando(true);
@@ -34,25 +49,13 @@ function RelatorioMensal() {
     }
   }
 
-  const formatarMoeda = (v: number) =>
-    v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-
   const nomeMes = new Date(ano, mes - 1).toLocaleDateString("pt-BR", {
     month: "long",
   });
 
-  // Para o gráfico, precisamos dos últimos 12 meses
-  const [dadosGrafico, setDadosGrafico] = useState<any[]>([]);
-
-  useEffect(() => {
-    async function carregarGrafico() {
-      const dados = await CaixaRequests.obterRelatorioAnual(ano);
-      if (dados) {
-        setDadosGrafico(dados);
-      }
-    }
-    carregarGrafico();
-  }, [ano]);
+  if (carregando) {
+    return <SkeletonCaixaCards />;
+  }
 
   return (
     <div className="space-y-6">
@@ -62,9 +65,7 @@ function RelatorioMensal() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
             <h2 className="text-lg font-bold text-slate-800">Relatório Mensal</h2>
-            <p className="text-sm text-slate-400">
-              {carregando ? "Carregando..." : `${nomeMes} ${ano}`}
-            </p>
+            <p className="text-sm text-slate-400">{`${nomeMes} ${ano}`}</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -98,14 +99,7 @@ function RelatorioMensal() {
           </div>
         </div>
 
-        {/* Estados */}
-        {carregando && (
-          <div className="flex items-center justify-center py-8 text-slate-400">
-            <Loader2 className="animate-spin mr-2" size={20} />
-            Carregando...
-          </div>
-        )}
-
+        {/* Estado de erro */}
         {erro && (
           <div className="flex items-center justify-center py-8 text-red-500">
             <AlertCircle size={20} className="mr-2" />
@@ -114,7 +108,7 @@ function RelatorioMensal() {
         )}
 
         {/* Cards do relatório mensal */}
-        {!carregando && !erro && relatorio && (
+        {!erro && relatorio && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-emerald-50 rounded-xl p-4 text-center">
               <p className="text-xs text-emerald-600 font-medium mb-1">Recebido</p>
