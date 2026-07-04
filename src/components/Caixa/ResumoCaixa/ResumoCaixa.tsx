@@ -1,22 +1,19 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft,
   Wallet,
   TrendingUp,
   Landmark,
-  Users,
-  Briefcase,
   Clock,
   XCircle,
+  ArrowLeft,
+  TrendingDown,
 } from "lucide-react";
 
 import CaixaRequests from "../../../fetch/CaixaRequests";
 import type CaixaDTO from "../../../interface/CaixaDTO";
-import ModalParcelasAtrasadas from "../../../ui/Modal/ModalCaixa/ModalParcelasAtrasadas";
-import ModalParcelasPendentes from "../../../ui/Modal/ModalCaixa/ModalParcelasPendentes";
-import ModalHistoricoPagamentos from "../../../ui/Modal/ModalCaixa/ModalHistoricoPagamentos";
 import { SkeletonCaixaCards } from "../../../ui/Skeleton";
+import { formatarMoeda } from "../../../services/Utilitario";
 
 function ResumoCaixa() {
   const navigate = useNavigate();
@@ -24,11 +21,6 @@ function ResumoCaixa() {
   const [resumo, setResumo] = useState<CaixaDTO | undefined>(undefined);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
-
-  // Estados dos modais
-  const [modalAtrasadasOpen, setModalAtrasadasOpen] = useState(false);
-  const [modalPendentesOpen, setModalPendentesOpen] = useState(false);
-  const [modalHistoricoOpen, setModalHistoricoOpen] = useState(false);
 
   useEffect(() => {
     const carregar = async () => {
@@ -48,9 +40,6 @@ function ResumoCaixa() {
     };
     carregar();
   }, []);
-
-  const formatarMoeda = (v: number) =>
-    v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
   if (carregando) {
     return <SkeletonCaixaCards />;
@@ -72,136 +61,103 @@ function ResumoCaixa() {
   }
 
   return (
-    <div className="py-8 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Cabeçalho */}
-        <div className="flex items-center gap-3 mb-8">
-          <button
-            onClick={() => navigate("/")}
-            className="p-2 rounded-xl hover:bg-slate-100 transition-colors text-slate-500"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold text-slate-800">Balanço do Caixa</h1>
-            <p className="text-slate-400 text-sm">Resumo geral das operações</p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      {/* Cabeçalho */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Caixa</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Visão financeira completa do seu negócio
+          </p>
+        </div>
+        <button
+          onClick={() => navigate("/")}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
+        >
+          <ArrowLeft size={16} />
+          Voltar
+        </button>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Emprestado */}
+        <div className="bg-card rounded-2xl border border-border p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+              <Landmark size={18} />
+            </div>
           </div>
+          <p className="text-xs font-semibold text-muted-foreground mb-1">Total Emprestado</p>
+          <p className="text-xl font-bold text-foreground">
+            {formatarMoeda(resumo.totalEmprestado)}
+          </p>
         </div>
 
-        {/* Cards Financeiros */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          
-          {/* Total Emprestado */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-slate-50 text-slate-600 rounded-xl">
-                <Landmark size={24} />
-              </div>
-              <h2 className="text-sm font-semibold text-slate-600">Total Emprestado</h2>
+        {/* Total Recebido */}
+        <div className="bg-card rounded-2xl border border-border p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <TrendingUp size={18} />
             </div>
-            <p className="text-2xl font-bold text-slate-800">
-              {formatarMoeda(resumo.totalEmprestado)}
-            </p>
           </div>
-
-          {/* Total Recebido - INTERATIVO */}
-          <button
-            onClick={() => setModalHistoricoOpen(true)}
-            className="bg-white rounded-2xl shadow-sm border-2 border-emerald-100 p-6 flex flex-col gap-4 hover:shadow-md hover:border-emerald-300 transition-all cursor-pointer text-left w-full"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
-                <TrendingUp size={24} />
-              </div>
-              <h2 className="text-sm font-semibold text-slate-600">Total Recebido</h2>
-            </div>
-            <p className="text-2xl font-bold text-emerald-600">
-              {formatarMoeda(resumo.totalRecebido)}
-            </p>
-            <p className="text-xs text-slate-400 flex items-center gap-1">
-              Clique para ver historico →
-            </p>
-          </button>
-
-          {/* A Receber - INTERATIVO */}
-          <button
-            onClick={() => setModalPendentesOpen(true)}
-            className="bg-white rounded-2xl shadow-sm border-2 border-amber-100 p-6 flex flex-col gap-4 hover:shadow-md hover:border-amber-300 transition-all cursor-pointer text-left w-full"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
-                <Wallet size={24} />
-              </div>
-              <h2 className="text-sm font-semibold text-slate-600">A Receber</h2>
-            </div>
-            <p className="text-2xl font-bold text-amber-500">
-              {formatarMoeda(resumo.entradaPendente)}
-            </p>
-            <p className="text-xs text-slate-400 flex items-center gap-1">
-              Clique para ver detalhes →
-            </p>
-          </button>
-
-          {/* Em Atraso - INTERATIVO */}
-          <button
-            onClick={() => setModalAtrasadasOpen(true)}
-            className="bg-white rounded-2xl shadow-sm border-2 border-red-100 p-6 flex flex-col gap-4 hover:shadow-md hover:border-red-300 transition-all cursor-pointer text-left w-full"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-red-50 text-red-600 rounded-xl">
-                <Clock size={24} />
-              </div>
-              <h2 className="text-sm font-semibold text-slate-600">Em Atraso</h2>
-            </div>
-            <p className="text-2xl font-bold text-red-600">
-              {formatarMoeda(resumo.totalAtrasado)}
-            </p>
-            <p className="text-xs text-slate-400 flex items-center gap-1">
-              Clique para ver detalhes →
-            </p>
-          </button>
-
+          <p className="text-xs font-semibold text-muted-foreground mb-1">Total Recebido</p>
+          <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+            {formatarMoeda(resumo.totalRecebido)}
+          </p>
         </div>
 
-        {/* Cards de Metricas (clientes e emprestimos) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex items-center gap-4">
-            <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
-              <Users size={24} />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-slate-600">Clientes Ativos</p>
-              <p className="text-2xl font-bold text-slate-800">{resumo.totalClientes}</p>
+        {/* A Receber */}
+        <div className="bg-card rounded-2xl border border-border p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+              <Wallet size={18} />
             </div>
           </div>
+          <p className="text-xs font-semibold text-muted-foreground mb-1">A Receber</p>
+          <p className="text-xl font-bold text-amber-600 dark:text-amber-400">
+            {formatarMoeda(resumo.entradaPendente)}
+          </p>
+        </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex items-center gap-4">
-            <div className="p-3 bg-purple-50 text-purple-600 rounded-xl">
-              <Briefcase size={24} />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-slate-600">Empréstimos Ativos</p>
-              <p className="text-2xl font-bold text-slate-800">{resumo.totalEmprestimos}</p>
+        {/* Em Atraso */}
+        <div className="bg-card rounded-2xl border border-border p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center justify-center">
+              <Clock size={18} />
             </div>
           </div>
+          <p className="text-xs font-semibold text-muted-foreground mb-1">Em Atraso</p>
+          <p className="text-xl font-bold text-red-600 dark:text-red-400">
+            {formatarMoeda(resumo.totalAtrasado || 0)}
+          </p>
         </div>
       </div>
 
-      {/* Modais */}
-      <ModalParcelasAtrasadas
-        isOpen={modalAtrasadasOpen}
-        onClose={() => setModalAtrasadasOpen(false)}
-      />
+      {/* Relatorio Diario - Placeholder para futura implementacao */}
+      <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+        <div className="flex items-center gap-1 p-4 border-b border-border bg-muted/30">
+          <button className="px-4 py-2 rounded-xl text-sm font-semibold text-white shadow-sm" style={{ background: "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)" }}>
+            Relatório Diário
+          </button>
+          <button className="px-4 py-2 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
+            Relatório Mensal
+          </button>
+          <button className="px-4 py-2 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
+            Relatório Anual
+          </button>
+        </div>
 
-      <ModalParcelasPendentes
-        isOpen={modalPendentesOpen}
-        onClose={() => setModalPendentesOpen(false)}
-      />
-
-      <ModalHistoricoPagamentos
-        isOpen={modalHistoricoOpen}
-        onClose={() => setModalHistoricoOpen(false)}
-      />
+        <div className="p-6 text-center py-12 text-muted-foreground">
+          <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
+            <TrendingUp size={28} className="text-muted-foreground/50" />
+          </div>
+          <p className="font-semibold text-foreground mb-1">Movimentações do Dia</p>
+          <p className="text-sm">
+            Em breve você poderá ver todas as movimentações do dia aqui.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
