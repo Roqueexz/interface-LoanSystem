@@ -22,11 +22,11 @@ function Layout({ children }: Props) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
+    <div className="min-h-screen w-full flex flex-col bg-background text-foreground transition-colors duration-300">
       <Navegacao />
 
-      <main className="flex-1">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-end items-center gap-3 mb-4">
             <TemaToggle />
 
