@@ -3,17 +3,30 @@
 /* Nova diretiva obrigatória do Tailwind v4 */
 @import "tailwindcss";
 
-:root {
-  --primary: #4f46e5;
-  --primary-dark: #4338ca;
-  --secondary: #2563eb;
-  --accent: #10b981;
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  --success: #10b981;
-  --dark: #1f2937;
-  --light: #f9fafb;
-  --border: #e5e7eb;
+@layer base {
+  :root {
+    --background: #f8fafc;
+    --foreground: #0f172a;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --border: #e5e7eb;
+    --primary: #4f46e5;
+    --primary-foreground: #ffffff;
+    --secondary: #2563eb;
+    --secondary-foreground: #ffffff;
+  }
+
+  .dark {
+    --background: #0f172a;
+    --foreground: #f1f5f9;
+    --card: #1e293b;
+    --card-foreground: #f1f5f9;
+    --border: #334155;
+    --primary: #818cf8;
+    --primary-foreground: #0f172a;
+    --secondary: #60a5fa;
+    --secondary-foreground: #0f172a;
+  }
 }
 
 html {
@@ -24,11 +37,12 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+  background: var(--background);
+  color: var(--foreground);
   min-height: 100vh;
-  color: #0f172a;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Classes utilitárias customizadas */
