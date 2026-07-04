@@ -6,15 +6,22 @@ import EmprestimoRequests from "../../../fetch/EmprestimoRequests";
 
 import type ClienteDTO from "../../../interface/ClienteDTO";
 import type EmprestimoDTO from "../../../interface/EmprestimoDTO";
+import { useToast } from "../../../hooks/useToast";
+import ModalConfirmacao from "../../../ui/Modal/ModalConfirmacao";
 
 function ListagemCliente() {
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [clientes, setClientes] = useState<ClienteDTO[]>([]);
   const [emprestimos, setEmprestimos] = useState<EmprestimoDTO[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
+
+  // Estado para o modal de confirmacao
+  const [clienteParaExcluir, setClienteParaExcluir] = useState<number | null>(null);
+  const [modalConfirmOpen, setModalConfirmOpen] = useState(false);
 
   // -----------------------------
   // CARREGAR DADOS
@@ -48,25 +55,31 @@ function ListagemCliente() {
   // -----------------------------
   // EXCLUIR CLIENTE
   // -----------------------------
-  async function handleExcluir(id?: number) {
-    if (!id) return;
+  function handleExcluir(id: number) {
+    setClienteParaExcluir(id);
+    setModalConfirmOpen(true);
+  }
 
-    const confirmacao = confirm(
-      "Tem certeza que deseja excluir este cliente?"
+  async function confirmarExclusao() {
+    if (!clienteParaExcluir) return;
+
+    const sucesso = await toast.promise(
+      ClienteRequests.excluirCliente(clienteParaExcluir),
+      {
+        loading: 'Excluindo cliente...',
+        success: '✅ Cliente removido com sucesso!',
+        error: '❌ Erro ao remover cliente.',
+      }
     );
-
-    if (!confirmacao) return;
-
-    const sucesso = await ClienteRequests.excluirCliente(id);
 
     if (sucesso) {
       setClientes((prev) =>
-        prev.filter((c) => c.id_cliente !== id)
+        prev.filter((c) => c.id_cliente !== clienteParaExcluir)
       );
-      alert("Cliente removido com sucesso!");
-    } else {
-      alert("Erro ao remover cliente.");
     }
+
+    setClienteParaExcluir(null);
+    setModalConfirmOpen(false);
   }
 
   // -----------------------------
@@ -106,7 +119,7 @@ function ListagemCliente() {
 
         <button
           onClick={() => navigate("/clientes/novo")}
-          className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700"
+          className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 transition-all"
         >
           + Novo Cliente
         </button>
@@ -185,7 +198,7 @@ function ListagemCliente() {
                           e.stopPropagation();
                           navigate(`/clientes/${cliente.id_cliente!}`);
                         }}
-                        className="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm"
+                        className="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-all"
                       >
                         Ver
                       </button>
@@ -195,7 +208,7 @@ function ListagemCliente() {
                           e.stopPropagation();
                           navigate(`/editar-cliente/${cliente.id_cliente!}`);
                         }}
-                        className="px-3 py-1 bg-yellow-500 text-white rounded-lg text-sm"
+                        className="px-3 py-1 bg-yellow-500 text-white rounded-lg text-sm hover:bg-yellow-600 transition-all"
                       >
                         Editar
                       </button>
@@ -203,9 +216,9 @@ function ListagemCliente() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleExcluir(cliente.id_cliente);
+                          handleExcluir(cliente.id_cliente!);
                         }}
-                        className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm"
+                        className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition-all"
                       >
                         Excluir
                       </button>
@@ -228,6 +241,20 @@ function ListagemCliente() {
         </p>
       )}
 
+      {/* Modal de Confirmacao */}
+      <ModalConfirmacao
+        isOpen={modalConfirmOpen}
+        onClose={() => {
+          setModalConfirmOpen(false);
+          setClienteParaExcluir(null);
+        }}
+        onConfirm={confirmarExclusao}
+        title="Excluir Cliente"
+        message="Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita."
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        variant="danger"
+      />
     </div>
   );
 }

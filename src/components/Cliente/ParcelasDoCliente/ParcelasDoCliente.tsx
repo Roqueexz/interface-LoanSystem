@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-
 import EmprestimoRequests from "../../../fetch/EmprestimoRequests";
 import ParcelaRequests from "../../../fetch/ParcelaRequests";
 import type ParcelaDTO from "../../../interface/ParcelaDTO";
+import { useToast } from "../../../hooks/useToast";
 
 interface EmprestimoComParcelas {
   id_emprestimo: number;
@@ -16,6 +16,7 @@ interface Props {
 }
 
 function ParcelasDoCliente({ id_cliente, onRefresh }: Props) {
+  const toast = useToast();
   const [emprestimos, setEmprestimos] = useState<EmprestimoComParcelas[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
@@ -62,30 +63,34 @@ function ParcelasDoCliente({ id_cliente, onRefresh }: Props) {
   }, [id_cliente]);
 
   async function marcarComoPaga(id_parcela: number) {
-    const sucesso = await ParcelaRequests.pagar(id_parcela);
+    const sucesso = await toast.promise(
+      ParcelaRequests.pagar(id_parcela),
+      {
+        loading: 'Processando pagamento...',
+        success: '✅ Parcela paga com sucesso!',
+        error: '❌ Erro ao pagar parcela.',
+      }
+    );
 
     if (sucesso) {
       await carregarDados();
       onRefresh();
-    } else {
-      alert("Erro ao pagar parcela.");
     }
   }
 
   async function desfazerPagamento(id_parcela: number) {
-    const confirmacao = confirm(
-      "Tem certeza que deseja desfazer o pagamento desta parcela?"
+    const sucesso = await toast.promise(
+      ParcelaRequests.desfazerPagamento(id_parcela),
+      {
+        loading: 'Desfazendo pagamento...',
+        success: '✅ Pagamento desfeito com sucesso!',
+        error: '❌ Erro ao desfazer pagamento.',
+      }
     );
-
-    if (!confirmacao) return;
-
-    const sucesso = await ParcelaRequests.desfazerPagamento(id_parcela);
 
     if (sucesso) {
       await carregarDados();
       onRefresh();
-    } else {
-      alert("Erro ao desfazer pagamento.");
     }
   }
 
