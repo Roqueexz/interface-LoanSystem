@@ -18,6 +18,9 @@ import { formatarMoeda } from "../../services/Utilitario";
 function Inicio() {
   const navigate = useNavigate();
 
+  // Verifica se o usuario esta logado
+  const isAuthenticated = localStorage.getItem("isAuth") === "true";
+
   const [resumo, setResumo] = useState({
     totalEmprestado: 0,
     totalRecebido: 0,
@@ -27,6 +30,11 @@ function Inicio() {
 
   useEffect(() => {
     async function carregarResumo() {
+      if (!isAuthenticated) {
+        setCarregando(false);
+        return;
+      }
+
       try {
         const dados = await CaixaRequests.obterResumoFinanceiro();
         if (dados) {
@@ -43,43 +51,43 @@ function Inicio() {
       }
     }
     carregarResumo();
-  }, []);
+  }, [isAuthenticated]);
 
   const funcionalidades = [
     {
-      icon: <Users size={28} className="text-indigo-600" />,
+      icon: <Users size={28} className="text-indigo-600 dark:text-indigo-400" />,
       titulo: "Gestão de Clientes",
       descricao: "Cadastre e gerencie clientes de forma simples e organizada.",
     },
     {
-      icon: <CreditCard size={28} className="text-blue-600" />,
+      icon: <CreditCard size={28} className="text-blue-600 dark:text-blue-400" />,
       titulo: "Controle de Empréstimos",
       descricao: "Registre empréstimos e acompanhe todas as operações.",
     },
     {
-      icon: <BarChart3 size={28} className="text-emerald-600" />,
+      icon: <BarChart3 size={28} className="text-emerald-600 dark:text-emerald-400" />,
       titulo: "Relatórios",
       descricao: "Visualize informações importantes para tomada de decisão.",
     },
     {
-      icon: <ShieldCheck size={28} className="text-purple-600" />,
+      icon: <ShieldCheck size={28} className="text-purple-600 dark:text-purple-400" />,
       titulo: "Segurança",
       descricao: "Armazenamento seguro das informações cadastradas.",
     },
     {
-      icon: <Zap size={28} className="text-amber-600" />,
+      icon: <Zap size={28} className="text-amber-600 dark:text-amber-400" />,
       titulo: "Produtividade",
       descricao: "Interface rápida e intuitiva para o dia a dia.",
     },
     {
-      icon: <TrendingUp size={28} className="text-rose-600" />,
+      icon: <TrendingUp size={28} className="text-rose-600 dark:text-rose-400" />,
       titulo: "Cálculo de Juros",
       descricao: "Juros simples e compostos calculados automaticamente.",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
 
       {/* Hero */}
       <section className="relative bg-gradient-to-br from-indigo-700 via-indigo-600 to-blue-700 text-white overflow-hidden">
@@ -117,48 +125,62 @@ function Inicio() {
               </div>
             </div>
 
-            {/* Cards de resumo rápido */}
-            <div className="mt-10 lg:mt-0 grid grid-cols-1 gap-4 w-full lg:w-80">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-emerald-400/20 rounded-xl">
-                    <DollarSign size={20} className="text-emerald-300" />
+            {/* Cards de resumo rápido - so aparece se logado */}
+            {isAuthenticated && (
+              <div className="mt-10 lg:mt-0 grid grid-cols-1 gap-4 w-full lg:w-80">
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-emerald-400/20 rounded-xl">
+                      <DollarSign size={20} className="text-emerald-300" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-indigo-200 font-medium">Total Emprestado</p>
+                      <p className="text-xl font-bold">
+                        {carregando ? "..." : formatarMoeda(resumo.totalEmprestado)}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs text-indigo-200 font-medium">Total Emprestado</p>
-                    <p className="text-xl font-bold">
-                      {carregando ? "..." : formatarMoeda(resumo.totalEmprestado)}
-                    </p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-emerald-400/20 rounded-xl">
+                      <TrendingUp size={20} className="text-emerald-300" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-indigo-200 font-medium">Total Recebido</p>
+                      <p className="text-xl font-bold">
+                        {carregando ? "..." : formatarMoeda(resumo.totalRecebido)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-amber-400/20 rounded-xl">
+                      <Clock size={20} className="text-amber-300" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-indigo-200 font-medium">A Receber</p>
+                      <p className="text-xl font-bold">
+                        {carregando ? "..." : formatarMoeda(resumo.entradaPendente)}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-emerald-400/20 rounded-xl">
-                    <TrendingUp size={20} className="text-emerald-300" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-indigo-200 font-medium">Total Recebido</p>
-                    <p className="text-xl font-bold">
-                      {carregando ? "..." : formatarMoeda(resumo.totalRecebido)}
-                    </p>
-                  </div>
+            )}
+
+            {/* Mensagem para nao logados */}
+            {!isAuthenticated && (
+              <div className="mt-10 lg:mt-0 w-full lg:w-80">
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center">
+                  <p className="text-indigo-100 text-sm">
+                    Faça login para visualizar<br />
+                    <span className="text-white font-bold">seus números</span>
+                  </p>
                 </div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-amber-400/20 rounded-xl">
-                    <Clock size={20} className="text-amber-300" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-indigo-200 font-medium">A Receber</p>
-                    <p className="text-xl font-bold">
-                      {carregando ? "..." : formatarMoeda(resumo.entradaPendente)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </section>
@@ -168,44 +190,44 @@ function Inicio() {
         <div className="grid md:grid-cols-3 gap-6">
           <button
             onClick={() => navigate("/clientes")}
-            className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all text-left group border border-slate-100"
+            className="card p-6 hover:shadow-xl transition-all text-left group hover:border-indigo-200 dark:hover:border-indigo-700"
           >
             <div className="flex items-center justify-between">
-              <div className="p-3 bg-indigo-50 rounded-xl group-hover:bg-indigo-100 transition-all">
-                <Users size={28} className="text-indigo-600" />
+              <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl group-hover:bg-indigo-100 dark:group-hover:bg-indigo-800/30 transition-all">
+                <Users size={28} className="text-indigo-600 dark:text-indigo-400" />
               </div>
-              <ArrowRight size={20} className="text-slate-300 group-hover:text-indigo-600 transition-all" />
+              <ArrowRight size={20} className="text-muted-foreground group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-all" />
             </div>
-            <h3 className="text-lg font-bold mt-4">Clientes</h3>
-            <p className="text-slate-500 text-sm">Visualizar e gerenciar clientes cadastrados.</p>
+            <h3 className="text-lg font-bold mt-4 text-foreground">Clientes</h3>
+            <p className="text-muted-foreground text-sm">Visualizar e gerenciar clientes cadastrados.</p>
           </button>
 
           <button
             onClick={() => navigate("/emprestimos")}
-            className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all text-left group border border-slate-100"
+            className="card p-6 hover:shadow-xl transition-all text-left group hover:border-blue-200 dark:hover:border-blue-700"
           >
             <div className="flex items-center justify-between">
-              <div className="p-3 bg-blue-50 rounded-xl group-hover:bg-blue-100 transition-all">
-                <CreditCard size={28} className="text-blue-600" />
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-xl group-hover:bg-blue-100 dark:group-hover:bg-blue-800/30 transition-all">
+                <CreditCard size={28} className="text-blue-600 dark:text-blue-400" />
               </div>
-              <ArrowRight size={20} className="text-slate-300 group-hover:text-blue-600 transition-all" />
+              <ArrowRight size={20} className="text-muted-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all" />
             </div>
-            <h3 className="text-lg font-bold mt-4">Empréstimos</h3>
-            <p className="text-slate-500 text-sm">Visualizar e gerenciar empréstimos registrados.</p>
+            <h3 className="text-lg font-bold mt-4 text-foreground">Empréstimos</h3>
+            <p className="text-muted-foreground text-sm">Visualizar e gerenciar empréstimos registrados.</p>
           </button>
 
           <button
             onClick={() => navigate("/caixa")}
-            className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all text-left group border border-slate-100"
+            className="card p-6 hover:shadow-xl transition-all text-left group hover:border-emerald-200 dark:hover:border-emerald-700"
           >
             <div className="flex items-center justify-between">
-              <div className="p-3 bg-emerald-50 rounded-xl group-hover:bg-emerald-100 transition-all">
-                <Wallet size={28} className="text-emerald-600" />
+              <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl group-hover:bg-emerald-100 dark:group-hover:bg-emerald-800/30 transition-all">
+                <Wallet size={28} className="text-emerald-600 dark:text-emerald-400" />
               </div>
-              <ArrowRight size={20} className="text-slate-300 group-hover:text-emerald-600 transition-all" />
+              <ArrowRight size={20} className="text-muted-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-all" />
             </div>
-            <h3 className="text-lg font-bold mt-4">Caixa</h3>
-            <p className="text-slate-500 text-sm">Dashboard financeiro com relatórios completos.</p>
+            <h3 className="text-lg font-bold mt-4 text-foreground">Caixa</h3>
+            <p className="text-muted-foreground text-sm">Dashboard financeiro com relatórios completos.</p>
           </button>
         </div>
       </section>
@@ -213,21 +235,21 @@ function Inicio() {
       {/* Funcionalidades */}
       <section className="max-w-6xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-slate-800">Funcionalidades</h2>
-          <p className="text-slate-500 mt-2">Tudo que você precisa para gerenciar seus empréstimos</p>
+          <h2 className="text-3xl font-bold text-foreground">Funcionalidades</h2>
+          <p className="text-muted-foreground mt-2">Tudo que você precisa para gerenciar seus empréstimos</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
           {funcionalidades.map((item) => (
             <div
               key={item.titulo}
-              className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-lg transition-all hover:border-indigo-200 group"
+              className="card p-6 hover:shadow-lg transition-all hover:border-indigo-200 dark:hover:border-indigo-700 group"
             >
-              <div className="p-3 bg-slate-50 rounded-xl w-fit group-hover:bg-indigo-50 transition-all">
+              <div className="p-3 bg-muted rounded-xl w-fit group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30 transition-all">
                 {item.icon}
               </div>
-              <h3 className="font-bold mt-4 mb-2 text-slate-800">{item.titulo}</h3>
-              <p className="text-slate-500 text-sm">{item.descricao}</p>
+              <h3 className="font-bold mt-4 mb-2 text-foreground">{item.titulo}</h3>
+              <p className="text-muted-foreground text-sm">{item.descricao}</p>
             </div>
           ))}
         </div>
