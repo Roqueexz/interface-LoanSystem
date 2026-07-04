@@ -70,6 +70,22 @@ function ParcelasDoCliente({ id_cliente }: Props) {
     }
   }
 
+  async function desfazerPagamento(id_parcela: number) {
+    const confirmacao = confirm(
+      "Tem certeza que deseja desfazer o pagamento desta parcela?"
+    );
+
+    if (!confirmacao) return;
+
+    const sucesso = await ParcelaRequests.desfazerPagamento(id_parcela);
+
+    if (sucesso) {
+      await carregarDados();
+    } else {
+      alert("Erro ao desfazer pagamento.");
+    }
+  }
+
   function getBadge(status: ParcelaDTO["status_parcela"]) {
     switch (status) {
       case "PAGA":
@@ -152,12 +168,19 @@ function ParcelasDoCliente({ id_cliente }: Props) {
                         {p.status_parcela}
                       </span>
 
-                      {p.status_parcela !== "PAGA" && (
+                      {p.status_parcela !== "PAGA" ? (
                         <button
                           onClick={() => marcarComoPaga(p.id_parcela)}
                           className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg transition-all"
                         >
                           Dar baixa
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => desfazerPagamento(p.id_parcela)}
+                          className="text-xs bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-lg transition-all"
+                        >
+                          Desfazer
                         </button>
                       )}
                     </div>
