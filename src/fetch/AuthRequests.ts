@@ -74,6 +74,7 @@ class AuthRequests {
 
     /**
      * Remove as informações do localStorage
+     * CORRIGIDO: redireciona para "/" (raiz) em vez de "/login"
      */
     removeToken() {
         const keys = [
@@ -86,7 +87,8 @@ class AuthRequests {
         ];
 
         keys.map(key => localStorage.removeItem(key));
-        window.location.href = `/login`;
+        // CORREÇÃO: redireciona para a raiz, onde o login está
+        window.location.href = `/`;
     }
 
     /**
