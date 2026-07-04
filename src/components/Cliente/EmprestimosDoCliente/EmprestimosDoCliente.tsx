@@ -1,138 +1,105 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import EmprestimoRequests from "../../../fetch/EmprestimoRequests";
 import type EmprestimoDTO from "../../../interface/EmprestimoDTO";
 
 interface Props {
   id_cliente: number;
+  onRefresh: () => void;
 }
 
-function EmprestimosDoCliente({ id_cliente }: Props) {
+function EmprestimosDoCliente({ id_cliente, onRefresh }: Props) {
+  const navigate = useNavigate();
+
   const [emprestimos, setEmprestimos] = useState<EmprestimoDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
 
-  // -----------------------------
-  // CARREGAR EMPRÉSTIMOS
-  // -----------------------------
   async function carregarEmprestimos() {
     setLoading(true);
     setErro("");
 
-    const dados = await EmprestimoRequests.obterListaDeEmprestimos();
+    try {
+      const lista = await EmprestimoRequests.obterListaDeEmprestimos();
 
-    if (dados) {
-      const filtrados = dados.filter(
-        (emp) => emp.id_cliente === id_cliente
+      if (!lista) {
+        setErro("Erro ao carregar emprestimos.");
+        setLoading(false);
+        return;
+      }
+
+      const filtrados = lista.filter(
+        (emp: any) => emp.id_cliente === id_cliente
       );
 
       setEmprestimos(filtrados);
-    } else {
-      setErro("Erro ao carregar empréstimos.");
+    } catch (err) {
+      console.error(err);
+      setErro("Erro inesperado ao carregar emprestimos.");
     }
 
     setLoading(false);
   }
 
   useEffect(() => {
-    if (id_cliente) {
-      carregarEmprestimos();
-    }
+    carregarEmprestimos();
   }, [id_cliente]);
 
-  // -----------------------------
-  // STATUS SIMPLES (ajuste futuro depois)
-  // -----------------------------
-  function getStatus(emp: EmprestimoDTO) {
-    if (!emp.status_emprestimo) return "Quitado";
-    return "Ativo";
+  if (loading) {
+    return <p className="text-slate-500">Carregando emprestimos...</p>;
   }
 
-  // -----------------------------
-  // RENDER
-  // -----------------------------
+  if (erro) {
+    return <p className="text-red-500">{erro}</p>;
+  }
+
+  if (emprestimos.length === 0) {
+    return (
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 text-center">
+        <p className="text-slate-500">Nenhum emprestimo encontrado.</p>
+        <button
+          onClick={() => navigate(`/emprestimos/novo?cliente=${id_cliente}`)}
+          className="mt-4 text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl transition-all"
+        >
+          Criar Emprestimo
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="mt-6">
+    <div className="space-y-3">
+      <h2 className="text-xl font-bold text-slate-800">Emprestimos do Cliente</h2>
 
-      <h2 className="text-xl font-bold text-slate-800 mb-4">
-        Empréstimos do Cliente
-      </h2>
-
-      {/* STATES */}
-      {loading && (
-        <p className="text-slate-500">
-          Carregando empréstimos...
-        </p>
-      )}
-
-      {erro && (
-        <p className="text-red-500">
-          {erro}
-        </p>
-      )}
-
-      {/* EMPTY */}
-      {!loading && emprestimos.length === 0 && (
-        <p className="text-slate-500">
-          Nenhum empréstimo encontrado.
-        </p>
-      )}
-
-      {/* CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-
-        {emprestimos.map((emp) => (
-          <div
-            key={emp.id_emprestimo}
-            className="bg-white shadow-md rounded-xl p-4 border hover:shadow-lg transition"
-          >
-
-            {/* HEADER */}
-            <div className="flex justify-between items-center mb-3">
-
-              <span className="text-sm font-bold text-slate-600">
-                #{emp.id_emprestimo}
-              </span>
-
-              <span
-                className={`text-xs px-2 py-1 rounded-full font-bold ${
-                  getStatus(emp) === "Ativo"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-gray-200 text-gray-700"
-                }`}
-              >
-                {getStatus(emp)}
-              </span>
-
+      {emprestimos.map((emp) => (
+        <div
+          key={emp.id_emprestimo}
+          className="bg-white border rounded-xl p-4 shadow-sm hover:shadow-md transition-all cursor-pointer"
+          onClick={() => navigate(`/emprestimos/${emp.id_emprestimo}`)}
+        >
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="font-semibold text-slate-700">
+                Emprestimo #{emp.id_emprestimo}
+              </p>
+              <p className="text-sm text-slate-500">
+                R$ {emp.valor_emprestimo.toFixed(2)} - {emp.num_parcelas} parcelas
+              </p>
             </div>
 
-            {/* INFO */}
-            <p className="text-slate-700 font-bold text-lg">
-              R$ {Number(emp.valor_emprestimo).toFixed(2)}
-            </p>
-
-            <p className="text-slate-500 text-sm">
-              Parcelas: {emp.num_parcelas}
-            </p>
-
-            <p className="text-slate-500 text-sm">
-              Juros: {emp.juros}%
-            </p>
-
-            <p className="text-slate-500 text-sm">
-              Tipo: {emp.tipo_juros}
-            </p>
-
-            {/* DATA */}
-            <p className="text-slate-400 text-xs mt-2">
-              {new Date(emp.data_emprestimo).toLocaleDateString()}
-            </p>
-
+            <span
+              className={`text-xs px-3 py-1 rounded-full ${
+                emp.status_emprestimo
+                  ? "bg-green-100 text-green-700"
+                  : "bg-slate-100 text-slate-600"
+              }`}
+            >
+              {emp.status_emprestimo ? "Ativo" : "Liquidado"}
+            </span>
           </div>
-        ))}
-
-      </div>
-
+        </div>
+      ))}
     </div>
   );
 }

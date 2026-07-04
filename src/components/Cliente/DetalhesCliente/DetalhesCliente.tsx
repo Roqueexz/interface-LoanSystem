@@ -18,6 +18,11 @@ function DetalhesCliente({ id_cliente }: Props) {
   const [resumo, setResumo] = useState<ResumoClienteDTO | undefined>();
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleRefresh = () => {
+    setRefreshKey((prev) => prev + 1);
+  };
 
   async function carregarDados() {
     setLoading(true);
@@ -50,7 +55,7 @@ function DetalhesCliente({ id_cliente }: Props) {
     if (id_cliente) {
       carregarDados();
     }
-  }, [id_cliente]);
+  }, [id_cliente, refreshKey]);
 
   async function handleExcluir() {
     const confirmacao = confirm(
@@ -148,7 +153,10 @@ function DetalhesCliente({ id_cliente }: Props) {
             </div>
           )}
 
-          <ParcelasDoCliente id_cliente={id_cliente} />
+          <ParcelasDoCliente 
+            id_cliente={id_cliente} 
+            onRefresh={handleRefresh}
+          />
         </div>
       )}
     </div>

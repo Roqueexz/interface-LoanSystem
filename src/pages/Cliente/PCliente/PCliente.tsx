@@ -1,4 +1,4 @@
-import type { JSX } from "react";
+import { type JSX } from "react";
 import { useParams } from "react-router-dom";
 import Layout from "../../../components/Layout/Layout";
 import PainelCliente from "../../../components/Cliente/PainelCliente/PainelCliente";

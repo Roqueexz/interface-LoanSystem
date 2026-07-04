@@ -16,6 +16,11 @@ function PainelCliente({ id_cliente }: Props) {
   const [resumo, setResumo] = useState<ResumoClienteDTO | null>(null);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleRefresh = () => {
+    setRefreshKey((prev) => prev + 1);
+  };
 
   async function carregarResumo() {
     setLoading(true);
@@ -40,7 +45,7 @@ function PainelCliente({ id_cliente }: Props) {
     if (id_cliente) {
       carregarResumo();
     }
-  }, [id_cliente]);
+  }, [id_cliente, refreshKey]);
 
   const formatarMoeda = (v: number) =>
     v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -97,8 +102,15 @@ function PainelCliente({ id_cliente }: Props) {
             </div>
           </div>
 
-          <EmprestimosDoCliente id_cliente={id_cliente} />
-          <ParcelasDoCliente id_cliente={id_cliente} />
+          <EmprestimosDoCliente 
+            id_cliente={id_cliente} 
+            onRefresh={handleRefresh}
+          />
+          
+          <ParcelasDoCliente 
+            id_cliente={id_cliente} 
+            onRefresh={handleRefresh}
+          />
         </>
       )}
     </div>
