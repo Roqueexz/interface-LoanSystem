@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 
 import ClienteRequests from "../../../fetch/ClienteRequests";
 import type ClienteDTO from "../../../interface/ClienteDTO";
+import { useToast } from "../../../hooks/useToast";
 
 function FormCliente() {
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [formData, setFormData] = useState<ClienteDTO>({
     nome_cliente: "",
@@ -40,16 +42,19 @@ function FormCliente() {
 
     setLoading(true);
 
-    const sucesso =
-      await ClienteRequests.enviarFormularioCliente(formData);
+    const sucesso = await toast.promise(
+      ClienteRequests.enviarFormularioCliente(formData),
+      {
+        loading: 'Cadastrando cliente...',
+        success: '✅ Cliente cadastrado com sucesso!',
+        error: '❌ Erro ao cadastrar cliente.',
+      }
+    );
 
     setLoading(false);
 
     if (sucesso) {
-      alert("Cliente cadastrado com sucesso!");
       navigate("/clientes");
-    } else {
-      alert("Erro ao cadastrar cliente.");
     }
   }
 
@@ -69,7 +74,7 @@ function FormCliente() {
             {/* NOME */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block mb-2 font-medium">
+                <label className="block mb-2 font-medium text-slate-700">
                   Nome
                 </label>
 
@@ -79,12 +84,13 @@ function FormCliente() {
                   name="nome_cliente"
                   value={formData.nome_cliente}
                   onChange={handleChange}
-                  className="w-full border rounded-xl p-3"
+                  className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
+                  placeholder="Ex: João"
                 />
               </div>
 
               <div>
-                <label className="block mb-2 font-medium">
+                <label className="block mb-2 font-medium text-slate-700">
                   Sobrenome
                 </label>
 
@@ -94,14 +100,15 @@ function FormCliente() {
                   name="sobrenome_cliente"
                   value={formData.sobrenome_cliente}
                   onChange={handleChange}
-                  className="w-full border rounded-xl p-3"
+                  className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
+                  placeholder="Ex: Silva"
                 />
               </div>
             </div>
 
             {/* TELEFONE */}
             <div>
-              <label className="block mb-2 font-medium">
+              <label className="block mb-2 font-medium text-slate-700">
                 Telefone
               </label>
 
@@ -111,7 +118,7 @@ function FormCliente() {
                 name="telefone"
                 value={formData.telefone}
                 onChange={handleChange}
-                className="w-full border rounded-xl p-3"
+                className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
                 placeholder="(11) 99999-9999"
               />
             </div>
@@ -119,7 +126,7 @@ function FormCliente() {
             {/* CIDADE / ESTADO */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block mb-2 font-medium">
+                <label className="block mb-2 font-medium text-slate-700">
                   Cidade
                 </label>
 
@@ -129,12 +136,13 @@ function FormCliente() {
                   name="cidade"
                   value={formData.cidade}
                   onChange={handleChange}
-                  className="w-full border rounded-xl p-3"
+                  className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
+                  placeholder="Ex: São Paulo"
                 />
               </div>
 
               <div>
-                <label className="block mb-2 font-medium">
+                <label className="block mb-2 font-medium text-slate-700">
                   Estado
                 </label>
 
@@ -144,7 +152,7 @@ function FormCliente() {
                   name="estado"
                   value={formData.estado}
                   onChange={handleChange}
-                  className="w-full border rounded-xl p-3"
+                  className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
                   maxLength={2}
                   placeholder="SP"
                 />
@@ -157,7 +165,7 @@ function FormCliente() {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 disabled:opacity-50"
+              className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "SALVANDO..." : "CADASTRAR"}
             </button>
@@ -165,7 +173,7 @@ function FormCliente() {
             <button
               type="button"
               onClick={() => navigate("/clientes")}
-              className="flex-1 border py-3 rounded-xl font-bold"
+              className="flex-1 border border-slate-300 py-3 rounded-xl font-bold text-slate-700 hover:bg-slate-50 transition-all"
             >
               VOLTAR
             </button>
