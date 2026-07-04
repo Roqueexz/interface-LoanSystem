@@ -1,5 +1,5 @@
-import { AlertTriangle, X } from 'lucide-react';
-import ModalBase from './ModalBase';
+import { AlertTriangle } from "lucide-react";
+import ModalBase from "./ModalBase"; // ← CORRETO (mesma pasta)
 
 interface Props {
   isOpen: boolean;
