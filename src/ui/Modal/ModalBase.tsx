@@ -1,4 +1,4 @@
-import {  useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { X } from 'lucide-react';
 
 interface Props {
@@ -50,21 +50,21 @@ function ModalBase({ isOpen, onClose, title, children, maxWidth = 'lg' }: Props)
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
       <div
         ref={modalRef}
-        className={`bg-white rounded-2xl shadow-2xl w-full ${maxWidthClasses[maxWidth]} max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-200`}
+        className={`bg-card rounded-2xl shadow-2xl w-full ${maxWidthClasses[maxWidth]} max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-200 border border-border`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 sticky top-0 bg-white rounded-t-2xl z-10">
-          <h2 className="text-lg font-bold text-slate-800">{title}</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border sticky top-0 bg-card rounded-t-2xl z-10">
+          <h2 className="text-lg font-bold text-foreground">{title}</h2>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-slate-100 transition-colors text-slate-400 hover:text-slate-600"
+            className="p-1 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Body */}
-        <div className="px-6 py-4">{children}</div>
+        <div className="px-6 py-4 text-foreground">{children}</div>
       </div>
     </div>
   );
