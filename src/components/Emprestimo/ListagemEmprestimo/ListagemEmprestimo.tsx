@@ -10,6 +10,9 @@ import type ClienteDTO from "../../../interface/ClienteDTO";
 import { useToast } from "../../../hooks/useToast";
 import ModalConfirmacao from "../../../ui/Modal/ModalConfirmacao";
 import { SkeletonLista } from "../../../ui/Skeleton";
+import Avatar from "../../shared/Avatar/Avatar";
+import StatusBadge from "../../shared/StatusBadge/StatusBadge";
+import ActionButtons from "../../shared/ActionButtons/ActionButtons";
 
 function ListagemEmprestimo() {
   const navigate = useNavigate();
@@ -102,27 +105,12 @@ function ListagemEmprestimo() {
     return "EM DIA";
   }
 
-  function getStatusStyle(status: string) {
-    switch (status) {
-      case "EM DIA":
-        return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
-      case "ATRASADO":
-        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
-      default:
-        return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400";
-    }
-  }
-
-  function getStatusIcon(status: string) {
-    switch (status) {
-      case "EM DIA":
-        return "✅";
-      case "ATRASADO":
-        return "⚠️";
-      default:
-        return "⏳";
-    }
-  }
+  // Contagem de status
+  const statusCounts = {
+    "EM DIA": emprestimos.filter((e) => getStatus(e) === "EM DIA").length,
+    "EM ABERTO": emprestimos.filter((e) => getStatus(e) === "EM ABERTO").length,
+    ATRASADO: emprestimos.filter((e) => getStatus(e) === "ATRASADO").length,
+  };
 
   const emprestimosFiltrados = emprestimos.filter((emp) => {
     const status = getStatus(emp);
@@ -135,38 +123,67 @@ function ListagemEmprestimo() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Empréstimos</h1>
-          <p className="text-muted-foreground text-sm">Gerencie todos os empréstimos registrados</p>
+          <h1 className="text-2xl font-bold text-foreground">Empréstimos</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {emprestimos.length} empréstimos registrados
+          </p>
         </div>
 
         <button
           onClick={() => navigate("/emprestimos/novo")}
-          className="flex items-center gap-2 bg-indigo-600 dark:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-all shadow-lg shadow-indigo-500/25"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
+          style={{ background: "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)" }}
         >
-          <Plus size={18} />
+          <Plus size={15} />
           Novo Empréstimo
         </button>
       </div>
 
-      {/* FILTERS */}
-      <div className="flex flex-wrap items-center gap-2 mb-6">
-        <Filter size={18} className="text-muted-foreground mr-1" />
-        {["TODOS", "EM DIA", "ATRASADO", "EM ABERTO"].map((opcao) => (
+      {/* Status summary chips */}
+      <div className="grid grid-cols-3 gap-3 mb-5">
+        {Object.entries(statusCounts).map(([status, count]) => {
+          const colors: Record<string, string> = {
+            "EM DIA": "border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-900/20",
+            "EM ABERTO": "border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/20",
+            ATRASADO: "border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20",
+          };
+          const textColors: Record<string, string> = {
+            "EM DIA": "text-emerald-700 dark:text-emerald-400",
+            "EM ABERTO": "text-amber-700 dark:text-amber-400",
+            ATRASADO: "text-red-700 dark:text-red-400",
+          };
+          return (
+            <button
+              key={status}
+              onClick={() => setFiltro(status as typeof filtro)}
+              className={`p-3.5 rounded-xl border text-left transition-all ${colors[status]} ${
+                filtro === status ? "ring-2 ring-indigo-500/40" : ""
+              }`}
+            >
+              <p className={`text-xl font-bold ${textColors[status]}`}>{count}</p>
+              <p className={`text-xs font-semibold mt-0.5 ${textColors[status]} opacity-80`}>{status}</p>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Filter tabs */}
+      <div className="flex gap-2 mb-4 flex-wrap">
+        {["TODOS", "EM DIA", "EM ABERTO", "ATRASADO"].map((f) => (
           <button
-            key={opcao}
-            onClick={() => setFiltro(opcao as typeof filtro)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-              filtro === opcao
-                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/25"
-                : "bg-muted text-muted-foreground hover:bg-accent"
+            key={f}
+            onClick={() => setFiltro(f as typeof filtro)}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
+              filtro === f
+                ? "bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm"
+                : "bg-card border border-border text-muted-foreground hover:text-foreground"
             }`}
           >
-            {opcao === "TODOS" ? "Todos" : opcao}
+            {f === "TODOS" ? "Todos" : f}
           </button>
         ))}
       </div>
@@ -180,86 +197,81 @@ function ListagemEmprestimo() {
 
       {/* TABLE */}
       {!loading && emprestimosFiltrados.length > 0 && (
-        <div className="card overflow-hidden shadow-lg">
+        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-muted/50 border-b border-border">
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cliente</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Valor</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden sm:table-cell">Parcelas</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Parcela</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Ações</th>
+                <tr className="border-b border-border bg-muted/50">
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    Cliente
+                  </th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden sm:table-cell">
+                    Valor
+                  </th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden md:table-cell">
+                    Parcelas
+                  </th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden md:table-cell">
+                    Vl. Parcela
+                  </th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    Status
+                  </th>
+                  <th className="px-5 py-3.5 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    Ações
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {emprestimosFiltrados.map((emp) => {
                   const status = getStatus(emp);
+                  const nomeCliente = getNomeCliente(emp.id_cliente);
+                  const iniciais = nomeCliente
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .slice(0, 2);
 
                   return (
                     <tr
                       key={emp.id_emprestimo}
-                      className="table-row cursor-pointer hover:bg-accent/50"
+                      className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors cursor-pointer"
                       onClick={() => navigate(`/emprestimos/${emp.id_emprestimo}`)}
                     >
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm">
-                            {getNomeCliente(emp.id_cliente).charAt(0)}
-                          </div>
-                          <p className="font-medium text-foreground">
-                            {getNomeCliente(emp.id_cliente)}
+                          <Avatar initials={iniciais} size="sm" />
+                          <p className="font-semibold text-foreground text-sm">
+                            {nomeCliente}
                           </p>
                         </div>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-foreground">
-                        R$ {Number(emp.valor_emprestimo).toFixed(2)}
-                      </td>
-                      <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
-                        {emp.num_parcelas}
-                      </td>
-                      <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
-                        R$ {Number(emp.valor_parcela).toFixed(2)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusStyle(status)}`}>
-                          {getStatusIcon(status)} {status}
+                      <td className="px-5 py-4 hidden sm:table-cell">
+                        <span className="text-sm font-bold text-foreground">
+                          R$ {Number(emp.valor_emprestimo).toFixed(2)}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/emprestimos/${emp.id_emprestimo}`);
-                            }}
-                            className="p-2 rounded-lg text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all"
-                            title="Ver"
-                          >
-                            <Eye size={16} />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/editar-emprestimo/${emp.id_emprestimo}`);
-                            }}
-                            className="p-2 rounded-lg text-slate-400 hover:text-yellow-600 dark:hover:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-all"
-                            title="Editar"
-                          >
-                            <Pencil size={16} />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleExcluir(emp.id_emprestimo!);
-                            }}
-                            className="p-2 rounded-lg text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
-                            title="Excluir"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                      <td className="px-5 py-4 hidden md:table-cell">
+                        <div>
+                          <p className="text-sm text-foreground font-medium">
+                            {emp.num_parcelas}x
+                          </p>
                         </div>
+                      </td>
+                      <td className="px-5 py-4 hidden md:table-cell">
+                        <span className="text-sm text-foreground">
+                          R$ {Number(emp.valor_parcela).toFixed(2)}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4">
+                        <StatusBadge status={status} />
+                      </td>
+                      <td className="px-5 py-4 text-right">
+                        <ActionButtons
+                          onView={() => navigate(`/emprestimos/${emp.id_emprestimo}`)}
+                          onEdit={() => navigate(`/editar-emprestimo/${emp.id_emprestimo}`)}
+                          onDelete={() => handleExcluir(emp.id_emprestimo!)}
+                        />
                       </td>
                     </tr>
                   );
@@ -267,25 +279,34 @@ function ListagemEmprestimo() {
               </tbody>
             </table>
           </div>
+          {emprestimosFiltrados.length > 0 && (
+            <div className="px-5 py-3 border-t border-border bg-muted/20 flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">
+                Mostrando {emprestimosFiltrados.length} de {emprestimos.length} empréstimos
+              </p>
+            </div>
+          )}
         </div>
       )}
 
       {/* EMPTY STATE */}
       {!loading && emprestimosFiltrados.length === 0 && (
-        <div className="card p-12 text-center">
-          <CreditCard size={48} className="mx-auto text-muted-foreground/50 mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">Nenhum empréstimo encontrado</h3>
-          <p className="text-muted-foreground text-sm mb-4">
+        <div className="bg-card rounded-2xl border border-border shadow-sm p-12 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
+            <CreditCard size={28} className="text-muted-foreground/50" />
+          </div>
+          <p className="font-semibold text-foreground mb-1">Nenhum empréstimo encontrado</p>
+          <p className="text-sm text-muted-foreground mb-4">
             {filtro !== "TODOS"
               ? `Nenhum empréstimo com status "${filtro}" encontrado.`
               : "Comece cadastrando seu primeiro empréstimo."}
           </p>
           <button
             onClick={() => navigate("/emprestimos/novo")}
-            className="inline-flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white"
+            style={{ background: "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)" }}
           >
-            <Plus size={18} />
-            Novo Empréstimo
+            <Plus size={14} /> Novo Empréstimo
           </button>
         </div>
       )}
