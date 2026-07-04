@@ -12,6 +12,7 @@ import {
 
 import ClienteRequests from "../../../fetch/ClienteRequests";
 import EmprestimoRequests from "../../../fetch/EmprestimoRequests";
+import { useToast } from "../../../hooks/useToast";
 
 import type ClienteDTO from "../../../interface/ClienteDTO";
 import type EmprestimoDTO from "../../../interface/EmprestimoDTO";
@@ -25,6 +26,7 @@ const FORMAS_PAGAMENTO = [
 
 function FormEmprestimo() {
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [clientes, setClientes] = useState<ClienteDTO[]>([]);
   const [carregandoClientes, setCarregandoClientes] = useState(true);
@@ -60,25 +62,25 @@ function FormEmprestimo() {
     setCarregandoClientes(false);
   }
 
-useEffect(() => {
-  if (formData.valor_emprestimo <= 0 || formData.num_parcelas <= 0) return;
+  useEffect(() => {
+    if (formData.valor_emprestimo <= 0 || formData.num_parcelas <= 0) return;
 
-  let total = formData.valor_emprestimo;
+    let total = formData.valor_emprestimo;
 
-  if (formData.tipo_juros === "simples") {
-    total = formData.valor_emprestimo * (1 + (formData.juros / 100) * formData.num_parcelas);
-  } else {
-    total = formData.valor_emprestimo * Math.pow(1 + formData.juros / 100, formData.num_parcelas);
-  }
+    if (formData.tipo_juros === "simples") {
+      total = formData.valor_emprestimo * (1 + (formData.juros / 100) * formData.num_parcelas);
+    } else {
+      total = formData.valor_emprestimo * Math.pow(1 + formData.juros / 100, formData.num_parcelas);
+    }
 
-  const valorCalculado = Number((total / formData.num_parcelas).toFixed(2));
-  setValorParcela(valorCalculado);
-}, [
-  formData.valor_emprestimo,
-  formData.num_parcelas,
-  formData.juros,
-  formData.tipo_juros,
-]);
+    const valorCalculado = Number((total / formData.num_parcelas).toFixed(2));
+    setValorParcela(valorCalculado);
+  }, [
+    formData.valor_emprestimo,
+    formData.num_parcelas,
+    formData.juros,
+    formData.tipo_juros,
+  ]);
 
   useEffect(() => {
     if (!formData.data_emprestimo) return;
@@ -117,29 +119,37 @@ useEffect(() => {
   }
 
   async function handleSubmit(e: FormEvent) {
-  e.preventDefault();
-  setSalvando(true);
+    e.preventDefault();
+    setSalvando(true);
 
-  const payload: EmprestimoDTO = {
-    id_cliente: formData.id_cliente,
-    valor_emprestimo: formData.valor_emprestimo,
-    num_parcelas: formData.num_parcelas,
-    tipo_juros: formData.tipo_juros,
-    juros: formData.juros,
-    data_emprestimo: new Date(formData.data_emprestimo),
-    data_devolucao: formData.data_devolucao
-      ? new Date(formData.data_devolucao)
-      : undefined,
-    forma_pagamento: formData.forma_pagamento || undefined,
-  };
+    const payload: EmprestimoDTO = {
+      id_cliente: formData.id_cliente,
+      valor_emprestimo: formData.valor_emprestimo,
+      num_parcelas: formData.num_parcelas,
+      tipo_juros: formData.tipo_juros,
+      juros: formData.juros,
+      data_emprestimo: new Date(formData.data_emprestimo),
+      data_devolucao: formData.data_devolucao
+        ? new Date(formData.data_devolucao)
+        : undefined,
+      forma_pagamento: formData.forma_pagamento || undefined,
+    };
 
-  const sucesso = await EmprestimoRequests.enviarFormularioEmprestimo(payload);
-  setSalvando(false);
+    const sucesso = await toast.promise(
+      EmprestimoRequests.enviarFormularioEmprestimo(payload),
+      {
+        loading: 'Cadastrando empréstimo...',
+        success: '✅ Empréstimo cadastrado com sucesso!',
+        error: '❌ Erro ao cadastrar empréstimo.',
+      }
+    );
 
-  if (sucesso) {
-    navigate("/emprestimos");
+    setSalvando(false);
+
+    if (sucesso) {
+      navigate("/emprestimos");
+    }
   }
-}
 
   const formatarMoeda = (v: number) =>
     v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
