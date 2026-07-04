@@ -193,7 +193,7 @@ function ListagemCliente() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/clientes/editar/${cliente.id_cliente!}`);
+                          navigate(`/editar-cliente/${cliente.id_cliente!}`);
                         }}
                         className="px-3 py-1 bg-yellow-500 text-white rounded-lg text-sm"
                       >

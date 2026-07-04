@@ -264,7 +264,7 @@ function ListagemEmprestimo() {
 
                         <button
                           onClick={() =>
-                            navigate(`/emprestimos/editar-emprestimo/${emp.id_emprestimo}`)
+                            navigate(`/editar-emprestimo/${emp.id_emprestimo}`)
                           }
                           className="px-3 py-1 bg-yellow-500 text-white rounded-lg text-sm"
                         >

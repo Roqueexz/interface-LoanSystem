@@ -69,7 +69,7 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps) {
   }
 
   return (
-    <div className="py-8 px-4"> {/* Alterado de main para div limpa */}
+    <div className="py-8 px-4">
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8">
         <h1 className="text-3xl font-bold text-slate-800 mb-2">
           Empréstimo #{emprestimo.id_emprestimo}
@@ -80,7 +80,6 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps) {
         </p>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Dados Financeiros */}
           <div>
             <h2 className="text-xl font-bold mb-4 text-slate-800 border-b border-slate-100 pb-2">
               Dados Financeiros
@@ -101,7 +100,7 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps) {
                   Valor da Parcela
                 </span>
                 <p className="font-extrabold text-xl text-emerald-600">
-                  R$ {emprestimo.valor_parcela.toFixed(2)}
+                  R$ {emprestimo.valor_parcela ? emprestimo.valor_parcela.toFixed(2) : "N/A"}
                 </p>
               </div>
 
@@ -128,7 +127,6 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps) {
             </div>
           </div>
 
-          {/* Dados Gerais */}
           <div>
             <h2 className="text-xl font-bold mb-4 text-slate-800 border-b border-slate-100 pb-2">
               Dados Gerais
