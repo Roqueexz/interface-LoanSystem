@@ -1,3 +1,5 @@
+import { formatarMoeda } from "../../../services/Utilitario";
+
 interface DadoGrafico {
   mes: string;
   recebido: number;
@@ -22,9 +24,6 @@ function GraficoMensal({ dados, titulo = "Evolução Mensal" }: Props) {
     ...dados.flatMap((d) => [d.recebido, d.emprestado]),
     1
   );
-
-  const formatarMoeda = (v: number) =>
-    v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
