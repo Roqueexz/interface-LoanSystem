@@ -3,10 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import ClienteRequests from "../../../fetch/ClienteRequests";
 import type ClienteDTO from "../../../interface/ClienteDTO";
+import { useToast } from "../../../hooks/useToast";
 
 function FormEditarCliente() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const toast = useToast();
 
   const [loading, setLoading] = useState(true);
 
@@ -62,16 +64,17 @@ function FormEditarCliente() {
 
     if (!id) return;
 
-    const sucesso = await ClienteRequests.atualizarCliente(
-      Number(id),
-      formData
+    const sucesso = await toast.promise(
+      ClienteRequests.atualizarCliente(Number(id), formData),
+      {
+        loading: 'Atualizando cliente...',
+        success: '✅ Cliente atualizado com sucesso!',
+        error: '❌ Erro ao atualizar cliente.',
+      }
     );
 
     if (sucesso) {
-      alert("Cliente atualizado com sucesso!");
       navigate("/clientes");
-    } else {
-      alert("Erro ao atualizar cliente.");
     }
   }
 
@@ -112,8 +115,9 @@ function FormEditarCliente() {
                 name="nome_cliente"
                 value={formData.nome_cliente}
                 onChange={handleChange}
-                className="border rounded-xl p-3"
+                className="border rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 placeholder="Nome"
+                required
               />
 
               <input
@@ -121,8 +125,9 @@ function FormEditarCliente() {
                 name="sobrenome_cliente"
                 value={formData.sobrenome_cliente}
                 onChange={handleChange}
-                className="border rounded-xl p-3"
+                className="border rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 placeholder="Sobrenome"
+                required
               />
 
             </div>
@@ -133,8 +138,9 @@ function FormEditarCliente() {
               name="telefone"
               value={formData.telefone}
               onChange={handleChange}
-              className="w-full border rounded-xl p-3"
+              className="w-full border rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="Telefone"
+              required
             />
 
             {/* CIDADE / ESTADO */}
@@ -145,8 +151,9 @@ function FormEditarCliente() {
                 name="cidade"
                 value={formData.cidade}
                 onChange={handleChange}
-                className="border rounded-xl p-3"
+                className="border rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 placeholder="Cidade"
+                required
               />
 
               <input
@@ -154,8 +161,10 @@ function FormEditarCliente() {
                 name="estado"
                 value={formData.estado}
                 onChange={handleChange}
-                className="border rounded-xl p-3"
-                placeholder="Estado"
+                className="border rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="Estado (ex: SP)"
+                required
+                maxLength={2}
               />
 
             </div>
@@ -167,7 +176,7 @@ function FormEditarCliente() {
 
             <button
               type="submit"
-              className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold"
+              className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all"
             >
               SALVAR
             </button>
@@ -175,7 +184,7 @@ function FormEditarCliente() {
             <button
               type="button"
               onClick={() => navigate("/clientes")}
-              className="flex-1 border py-3 rounded-xl font-bold"
+              className="flex-1 border border-slate-300 py-3 rounded-xl font-bold text-slate-700 hover:bg-slate-50 transition-all"
             >
               CANCELAR
             </button>
