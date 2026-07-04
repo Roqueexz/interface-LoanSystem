@@ -264,16 +264,16 @@ function FormEditarEmprestimo() {
                 <label className="block mb-1.5 text-sm font-medium text-slate-600">
                   Taxa de Juros (% ao mês)
                 </label>
-                <input
-                  type="number"
-                  name="juros"
-                  step="0.01"
-                  min={0}
-                  required
-                  value={formData.juros || ""}
-                  onChange={handleChange}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
-                />
+              <input
+  type="number"
+  name="juros"
+  step="0.01"
+  min={0}
+  required
+  value={formData.juros ?? ""}
+  onChange={handleChange}
+  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
+/>
               </div>
 
               {/* Preview do valor da parcela */}
