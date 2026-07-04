@@ -6,9 +6,12 @@ import ClienteRequests from "../../../fetch/ClienteRequests";
 
 import type EmprestimoDTO from "../../../interface/EmprestimoDTO";
 import type ClienteDTO from "../../../interface/ClienteDTO";
+import { useToast } from "../../../hooks/useToast";
+import ModalConfirmacao from "../../../ui/Modal/ModalConfirmacao";
 
 function ListagemEmprestimo() {
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [emprestimos, setEmprestimos] = useState<EmprestimoDTO[]>([]);
   const [clientes, setClientes] = useState<ClienteDTO[]>([]);
@@ -19,6 +22,10 @@ function ListagemEmprestimo() {
   const [filtro, setFiltro] = useState<
     "TODOS" | "EM DIA" | "ATRASADO" | "EM ABERTO"
   >("TODOS");
+
+  // Estado para o modal de confirmacao
+  const [emprestimoParaExcluir, setEmprestimoParaExcluir] = useState<number | null>(null);
+  const [modalConfirmOpen, setModalConfirmOpen] = useState(false);
 
   // -----------------------------
   // LOAD DATA
@@ -52,25 +59,31 @@ function ListagemEmprestimo() {
   // -----------------------------
   // DELETE
   // -----------------------------
-  async function handleExcluir(id?: number) {
-    if (!id) return;
+  function handleExcluir(id: number) {
+    setEmprestimoParaExcluir(id);
+    setModalConfirmOpen(true);
+  }
 
-    const confirmacao = confirm(
-      "Tem certeza que deseja excluir este empréstimo?"
+  async function confirmarExclusao() {
+    if (!emprestimoParaExcluir) return;
+
+    const sucesso = await toast.promise(
+      EmprestimoRequests.excluirEmprestimo(emprestimoParaExcluir),
+      {
+        loading: 'Excluindo empréstimo...',
+        success: '✅ Empréstimo removido com sucesso!',
+        error: '❌ Erro ao remover empréstimo.',
+      }
     );
-
-    if (!confirmacao) return;
-
-    const sucesso = await EmprestimoRequests.excluirEmprestimo(id);
 
     if (sucesso) {
       setEmprestimos((prev) =>
-        prev.filter((e) => e.id_emprestimo !== id)
+        prev.filter((e) => e.id_emprestimo !== emprestimoParaExcluir)
       );
-      alert("Empréstimo removido com sucesso!");
-    } else {
-      alert("Erro ao remover empréstimo.");
     }
+
+    setEmprestimoParaExcluir(null);
+    setModalConfirmOpen(false);
   }
 
   // -----------------------------
@@ -257,7 +270,7 @@ function ListagemEmprestimo() {
                           onClick={() =>
                             navigate(`/emprestimos/${emp.id_emprestimo}`)
                           }
-                          className="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm"
+                          className="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-all"
                         >
                           Ver
                         </button>
@@ -266,16 +279,16 @@ function ListagemEmprestimo() {
                           onClick={() =>
                             navigate(`/editar-emprestimo/${emp.id_emprestimo}`)
                           }
-                          className="px-3 py-1 bg-yellow-500 text-white rounded-lg text-sm"
+                          className="px-3 py-1 bg-yellow-500 text-white rounded-lg text-sm hover:bg-yellow-600 transition-all"
                         >
                           Editar
                         </button>
 
                         <button
                           onClick={() =>
-                            handleExcluir(emp.id_emprestimo)
+                            handleExcluir(emp.id_emprestimo!)
                           }
-                          className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm"
+                          className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition-all"
                         >
                           Excluir
                         </button>
@@ -299,6 +312,20 @@ function ListagemEmprestimo() {
         </p>
       )}
 
+      {/* Modal de Confirmacao */}
+      <ModalConfirmacao
+        isOpen={modalConfirmOpen}
+        onClose={() => {
+          setModalConfirmOpen(false);
+          setEmprestimoParaExcluir(null);
+        }}
+        onConfirm={confirmarExclusao}
+        title="Excluir Empréstimo"
+        message="Tem certeza que deseja excluir este empréstimo? Esta ação não pode ser desfeita."
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        variant="danger"
+      />
     </div>
   );
 }
