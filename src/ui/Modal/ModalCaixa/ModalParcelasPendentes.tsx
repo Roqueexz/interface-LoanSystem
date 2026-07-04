@@ -1,7 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Wallet, User, Phone, Calendar, DollarSign } from 'lucide-react';
-import ModalBase from '../../ui/Modal/ModalBase';
-import { formatarMoeda, formatarDataBR } from '../../services/Utilitario';
+import { useState, useEffect } from "react";
+import { Wallet, User, Phone} from "lucide-react";
+import ModalBase from "../ModalBase"; // ← CORRIGIDO
+import { formatarMoeda, formatarDataBR } from "../../../services/Utilitario";
+
+
+
 
 interface ParcelaPendente {
   id_parcela: number;

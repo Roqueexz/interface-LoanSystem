@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
-import { TrendingUp, User, Calendar, DollarSign, CheckCircle } from 'lucide-react';
-import ModalBase from '../../ui/Modal/ModalBase';
-import { formatarMoeda, formatarDataBR } from '../../services/Utilitario';
+import { useState, useEffect } from "react";
+import { User, Calendar, CheckCircle } from "lucide-react";
+import ModalBase from "../ModalBase"; // ← CORRIGIDO
+import { formatarMoeda, formatarDataBR } from "../../../services/Utilitario";
+
 
 interface Pagamento {
   id_parcela: number;

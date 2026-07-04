@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
-import { AlertCircle, User, Phone, Calendar, DollarSign } from 'lucide-react';
-import ModalBase from '../Modal/ModalBase';
-import CaixaRequests from '../../../fetch/CaixaRequests';
-import { formatarMoeda, formatarDataBR } from '../../../services/Utilitario';
+import { useState, useEffect } from "react";
+import { AlertCircle, User, Phone} from "lucide-react";
+import ModalBase from "../ModalBase"; // ← CORRIGIDO
+import CaixaRequests from "../../../fetch/CaixaRequests";
+import { formatarMoeda, formatarDataBR } from "../../../services/Utilitario";
 
+// ... resto do componente
 interface ParcelaAtrasada {
   id_parcela: number;
   id_emprestimo: number;
