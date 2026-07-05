@@ -124,7 +124,7 @@ function ListagemCliente() {
         </div>
         <button
           onClick={() => navigate("/clientes/novo")}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-primary-foreground transition-all hover:opacity-90"
           style={{ background: "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)" }}
         >
           <Plus size={15} />
@@ -140,7 +140,7 @@ function ListagemCliente() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por nome ou cidade..."
-            className="w-full pl-9 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all"
+            className="w-full pl-9 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-primary transition-all"
           />
         </div>
         <div className="flex gap-2">
@@ -150,7 +150,7 @@ function ListagemCliente() {
               onClick={() => setStatusFilter(f)}
               className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
                 statusFilter === f
-                  ? "bg-indigo-600 dark:bg-indigo-500 text-white"
+                  ? "bg-primary text-primary-foreground"
                   : "bg-card border border-border text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -162,7 +162,7 @@ function ListagemCliente() {
 
       {/* Error */}
       {erro && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 text-red-600 dark:text-red-400 mb-6">
+        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl p-4 text-red-600 dark:text-red-400 mb-6">
           {erro}
         </div>
       )}
@@ -173,7 +173,7 @@ function ListagemCliente() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-border bg-muted/50">
+                <tr className="border-b border-border bg-muted/30">
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                     Cliente
                   </th>
@@ -202,7 +202,7 @@ function ListagemCliente() {
                   return (
                     <tr
                       key={cliente.id_cliente}
-                      className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors cursor-pointer"
+                      className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors cursor-pointer"
                       onClick={() => navigate(`/clientes/${cliente.id_cliente!}`)}
                     >
                       <td className="px-5 py-4">
@@ -269,7 +269,7 @@ function ListagemCliente() {
           </p>
           <button
             onClick={() => navigate("/clientes/novo")}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-primary-foreground"
             style={{ background: "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)" }}
           >
             <Plus size={14} /> Adicionar Cliente
