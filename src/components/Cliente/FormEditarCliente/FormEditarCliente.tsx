@@ -1,6 +1,6 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
 
 import ClienteRequests from "../../../fetch/ClienteRequests";
 import type ClienteDTO from "../../../interface/ClienteDTO";
@@ -77,7 +77,7 @@ function FormEditarCliente() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <div className="card shadow-sm p-8">
+      <div className="bg-card rounded-2xl shadow-sm border border-border p-8">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
           <button
@@ -106,7 +106,7 @@ function FormEditarCliente() {
                 name="nome_cliente"
                 value={formData.nome_cliente}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                 placeholder="Nome"
                 required
               />
@@ -121,7 +121,7 @@ function FormEditarCliente() {
                 name="sobrenome_cliente"
                 value={formData.sobrenome_cliente}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                 placeholder="Sobrenome"
                 required
               />
@@ -138,7 +138,7 @@ function FormEditarCliente() {
               name="telefone"
               value={formData.telefone}
               onChange={handleChange}
-              className="input"
+              className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
               placeholder="Telefone"
               required
             />
@@ -155,7 +155,7 @@ function FormEditarCliente() {
                 name="cidade"
                 value={formData.cidade}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                 placeholder="Cidade"
                 required
               />
@@ -170,7 +170,7 @@ function FormEditarCliente() {
                 name="estado"
                 value={formData.estado}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                 placeholder="Estado (ex: SP)"
                 required
                 maxLength={2}
@@ -182,7 +182,7 @@ function FormEditarCliente() {
           <div className="flex gap-4 pt-4 border-t border-border">
             <button
               type="submit"
-              className="btn-primary flex-1 justify-center"
+              className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-xl font-bold hover:opacity-90 transition-all"
             >
               <Save size={18} />
               SALVAR
@@ -191,7 +191,7 @@ function FormEditarCliente() {
             <button
               type="button"
               onClick={() => navigate("/clientes")}
-              className="btn-outline flex-1 justify-center"
+              className="flex-1 flex items-center justify-center gap-2 border border-border bg-card text-foreground py-3 rounded-xl font-bold hover:bg-muted transition-all"
             >
               CANCELAR
             </button>
