@@ -10,9 +10,6 @@ function ResumoClienteFinanceiro({ id_cliente }: Props) {
   const [emprestimos, setEmprestimos] = useState<EmprestimoDTO[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // -----------------------------
-  // CARREGAR DADOS
-  // -----------------------------
   async function carregar() {
     setLoading(true);
 
@@ -35,9 +32,6 @@ function ResumoClienteFinanceiro({ id_cliente }: Props) {
     }
   }, [id_cliente]);
 
-  // -----------------------------
-  // MÉTRICAS
-  // -----------------------------
   const totalEmprestado = emprestimos.reduce(
     (acc, emp) => acc + Number(emp.valor_emprestimo),
     0
@@ -51,58 +45,54 @@ function ResumoClienteFinanceiro({ id_cliente }: Props) {
     .filter((emp) => !emp.status_emprestimo)
     .reduce((acc, emp) => acc + Number(emp.valor_emprestimo), 0);
 
-  // -----------------------------
-  // RENDER
-  // -----------------------------
+  const formatarMoeda = (v: number) =>
+    v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
   return (
     <div className="mt-6">
-
-      <h2 className="text-xl font-bold text-slate-800 mb-4">
+      <h2 className="text-xl font-bold text-foreground mb-4">
         Resumo Financeiro
       </h2>
 
       {loading && (
-        <p className="text-slate-500">
+        <p className="text-muted-foreground">
           Calculando resumo...
         </p>
       )}
 
       {!loading && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
           {/* TOTAL EMPRESTADO */}
-          <div className="bg-white shadow-md rounded-xl p-4 border">
-            <p className="text-slate-500 text-sm">
+          <div className="bg-card shadow-sm rounded-xl p-4 border border-border">
+            <p className="text-muted-foreground text-sm font-medium uppercase tracking-wide">
               Total Emprestado
             </p>
-            <p className="text-2xl font-bold text-slate-800">
-              R$ {totalEmprestado.toFixed(2)}
+            <p className="text-2xl font-bold text-foreground">
+              {formatarMoeda(totalEmprestado)}
             </p>
           </div>
 
           {/* TOTAL ATIVO */}
-          <div className="bg-white shadow-md rounded-xl p-4 border">
-            <p className="text-slate-500 text-sm">
+          <div className="bg-card shadow-sm rounded-xl p-4 border border-border">
+            <p className="text-muted-foreground text-sm font-medium uppercase tracking-wide">
               Em Aberto
             </p>
-            <p className="text-2xl font-bold text-yellow-600">
-              R$ {totalAtivo.toFixed(2)}
+            <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+              {formatarMoeda(totalAtivo)}
             </p>
           </div>
 
           {/* TOTAL QUITADO */}
-          <div className="bg-white shadow-md rounded-xl p-4 border">
-            <p className="text-slate-500 text-sm">
+          <div className="bg-card shadow-sm rounded-xl p-4 border border-border">
+            <p className="text-muted-foreground text-sm font-medium uppercase tracking-wide">
               Quitado
             </p>
-            <p className="text-2xl font-bold text-green-600">
-              R$ {totalQuitado.toFixed(2)}
+            <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+              {formatarMoeda(totalQuitado)}
             </p>
           </div>
-
         </div>
       )}
-
     </div>
   );
 }
