@@ -105,7 +105,12 @@ function ListagemEmprestimo() {
     return "EM DIA";
   }
 
-  // Contagem de status
+  function getProgress(emp: EmprestimoDTO): number {
+    // Calcula progresso baseado em parcelas pagas (se disponivel)
+    // Placeholder: usa numero de parcelas como base
+    return 0;
+  }
+
   const statusCounts = {
     "EM DIA": emprestimos.filter((e) => getStatus(e) === "EM DIA").length,
     "EM ABERTO": emprestimos.filter((e) => getStatus(e) === "EM ABERTO").length,
@@ -147,9 +152,9 @@ function ListagemEmprestimo() {
       <div className="grid grid-cols-3 gap-3 mb-5">
         {Object.entries(statusCounts).map(([status, count]) => {
           const colors: Record<string, string> = {
-            "EM DIA": "border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-900/20",
-            "EM ABERTO": "border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/20",
-            ATRASADO: "border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20",
+            "EM DIA": "border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-900/30",
+            "EM ABERTO": "border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/30",
+            ATRASADO: "border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/30",
           };
           const textColors: Record<string, string> = {
             "EM DIA": "text-emerald-700 dark:text-emerald-400",
@@ -161,7 +166,7 @@ function ListagemEmprestimo() {
               key={status}
               onClick={() => setFiltro(status as typeof filtro)}
               className={`p-3.5 rounded-xl border text-left transition-all ${colors[status]} ${
-                filtro === status ? "ring-2 ring-indigo-500/40" : ""
+                filtro === status ? "ring-2 ring-accent/40" : ""
               }`}
             >
               <p className={`text-xl font-bold ${textColors[status]}`}>{count}</p>
@@ -179,7 +184,7 @@ function ListagemEmprestimo() {
             onClick={() => setFiltro(f as typeof filtro)}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
               filtro === f
-                ? "bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm"
+                ? "bg-accent text-accent-foreground shadow-sm"
                 : "bg-card border border-border text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -201,7 +206,7 @@ function ListagemEmprestimo() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-border bg-muted/50">
+                <tr className="border-b border-border bg-muted/30">
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                     Cliente
                   </th>
@@ -232,10 +237,13 @@ function ListagemEmprestimo() {
                     .join("")
                     .slice(0, 2);
 
+                  // Progresso da parcela (exemplo: se tivesse dados de pagamento)
+                  const progress = 0; // Placeholder - substituir com dados reais
+
                   return (
                     <tr
                       key={emp.id_emprestimo}
-                      className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors cursor-pointer"
+                      className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors cursor-pointer"
                       onClick={() => navigate(`/emprestimos/${emp.id_emprestimo}`)}
                     >
                       <td className="px-5 py-4">
@@ -256,6 +264,13 @@ function ListagemEmprestimo() {
                           <p className="text-sm text-foreground font-medium">
                             {emp.num_parcelas}x
                           </p>
+                          {/* Mini barra de progresso */}
+                          <div className="w-20 h-1.5 bg-muted rounded-full mt-1.5">
+                            <div
+                              className="h-full rounded-full bg-accent transition-all duration-300"
+                              style={{ width: `${Math.min(progress, 100)}%` }}
+                            />
+                          </div>
                         </div>
                       </td>
                       <td className="px-5 py-4 hidden md:table-cell">
