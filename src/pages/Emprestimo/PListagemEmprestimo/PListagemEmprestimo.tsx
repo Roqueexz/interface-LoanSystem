@@ -5,9 +5,7 @@ import ListagemEmprestimo from "../../../components/Emprestimo/ListagemEmprestim
 function PListagemEmprestimo(): JSX.Element {
   return (
     <Layout>
-      <div className="w-full min-h-full bg-slate-50">
         <ListagemEmprestimo />
-      </div>
     </Layout>
   );
 }

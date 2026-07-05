@@ -5,9 +5,7 @@ import ListagemCliente from "../../../components/Cliente/ListagemCliente/Listage
 function PListagemCliente(): JSX.Element {
   return (
     <Layout>
-      <div className="w-full min-h-full bg-slate-50">
         <ListagemCliente />
-      </div>
     </Layout>
   );
 }
