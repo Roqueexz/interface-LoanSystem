@@ -10,14 +10,8 @@ function PDetalhesEmprestimo(): JSX.Element {
 
   return (
     <Layout>
-      <div className="w-full min-h-full bg-slate-50">
-        <DetalhesEmprestimo id_emprestimo={id_emprestimo} />
-        
-        <div className="max-w-4xl mx-auto px-4 pb-8">
-          <h2 className="text-xl font-bold text-slate-800 mb-4">Parcelas do Empréstimo</h2>
-          <ListaParcelas id_emprestimo={id_emprestimo} />
-        </div>
-      </div>
+      <DetalhesEmprestimo id_emprestimo={id_emprestimo} />
+      <ListaParcelas id_emprestimo={id_emprestimo} />
     </Layout>
   );
 }
