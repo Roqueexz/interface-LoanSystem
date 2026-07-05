@@ -6,9 +6,7 @@ import FormEditarCliente from "../../../components/Cliente/FormEditarCliente/For
 function PEditarCliente(): JSX.Element {
   return (
     <Layout>
-      <div className="w-full min-h-full bg-slate-50">
         <FormEditarCliente />
-      </div>
     </Layout>
   );
 }
