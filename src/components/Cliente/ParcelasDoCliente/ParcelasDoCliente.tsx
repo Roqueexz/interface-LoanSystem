@@ -97,37 +97,37 @@ function ParcelasDoCliente({ id_cliente, onRefresh }: Props) {
   function getBadge(status: ParcelaDTO["status_parcela"]) {
     switch (status) {
       case "PAGA":
-        return "bg-green-100 text-green-700";
+        return "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20";
       case "ATRASADA":
-        return "bg-red-100 text-red-700";
+        return "bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/20";
       default:
-        return "bg-yellow-100 text-yellow-700";
+        return "bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20";
     }
   }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-slate-800">Parcelas</h2>
-        <span className="text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">
+        <h2 className="text-xl font-bold text-foreground">Parcelas</h2>
+        <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
           Controle financeiro
         </span>
       </div>
 
-      {loading && <p className="text-slate-500">Carregando parcelas...</p>}
-      {erro && <p className="text-red-500">{erro}</p>}
+      {loading && <p className="text-muted-foreground">Carregando parcelas...</p>}
+      {erro && <p className="text-red-500 dark:text-red-400">{erro}</p>}
 
       {!loading &&
         emprestimos.map((emp) => (
           <div
             key={emp.id_emprestimo}
-            className="bg-white border rounded-xl p-4 space-y-3 shadow-sm hover:shadow-md transition-all duration-200"
+            className="bg-card border border-border rounded-xl p-4 space-y-3 shadow-sm hover:shadow-md transition-all duration-200"
           >
             <div className="flex justify-between">
-              <h3 className="font-semibold text-slate-700">
-                Emprestimo #{emp.id_emprestimo}
+              <h3 className="font-semibold text-foreground">
+                Empréstimo #{emp.id_emprestimo}
               </h3>
-              <span className="text-sm text-slate-500">
+              <span className="text-sm text-muted-foreground">
                 R$ {Number(emp.valor_emprestimo).toFixed(2)}
               </span>
             </div>
@@ -137,38 +137,38 @@ function ParcelasDoCliente({ id_cliente, onRefresh }: Props) {
                 emp.parcelas.map((p) => (
                   <div
                     key={p.id_parcela}
-                    className="flex justify-between items-center bg-slate-50 p-3 rounded-lg hover:bg-slate-100 transition-all"
+                    className="flex justify-between items-center bg-muted/30 p-3 rounded-lg hover:bg-muted/50 transition-all"
                   >
                     <div>
-                      <p className="text-sm font-medium text-slate-700">
+                      <p className="text-sm font-medium text-foreground">
                         Parcela {p.numero_parcela} - R$ {p.valor_parcela.toFixed(2)}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-muted-foreground">
                         Venc: {new Date(p.data_vencimento).toLocaleDateString("pt-BR")}
                       </p>
                       {p.data_pagamento && (
-                        <p className="text-xs text-green-600">
+                        <p className="text-xs text-emerald-600 dark:text-emerald-400">
                           Pago em {new Date(p.data_pagamento).toLocaleDateString("pt-BR")}
                         </p>
                       )}
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <span className={`text-xs px-2 py-1 rounded-full ${getBadge(p.status_parcela)}`}>
+                      <span className={`text-xs px-2 py-1 rounded-full font-semibold ${getBadge(p.status_parcela)}`}>
                         {p.status_parcela}
                       </span>
 
                       {p.status_parcela !== "PAGA" ? (
                         <button
                           onClick={() => marcarComoPaga(p.id_parcela)}
-                          className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg transition-all"
+                          className="text-xs bg-primary text-primary-foreground hover:opacity-90 px-3 py-1 rounded-lg font-medium transition-all"
                         >
                           Dar baixa
                         </button>
                       ) : (
                         <button
                           onClick={() => desfazerPagamento(p.id_parcela)}
-                          className="text-xs bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-lg transition-all"
+                          className="text-xs bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/20 px-3 py-1 rounded-lg font-medium transition-all"
                         >
                           Desfazer
                         </button>
@@ -177,14 +177,14 @@ function ParcelasDoCliente({ id_cliente, onRefresh }: Props) {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-slate-400">Nenhuma parcela encontrada.</p>
+                <p className="text-sm text-muted-foreground">Nenhuma parcela encontrada.</p>
               )}
             </div>
           </div>
         ))}
 
       {!loading && emprestimos.length === 0 && (
-        <p className="text-slate-500">Nenhum emprestimo encontrado para este cliente.</p>
+        <p className="text-muted-foreground">Nenhum empréstimo encontrado para este cliente.</p>
       )}
     </div>
   );
