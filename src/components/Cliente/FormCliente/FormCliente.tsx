@@ -55,7 +55,7 @@ function FormCliente() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <div className="card shadow-sm p-8">
+      <div className="bg-card rounded-2xl shadow-sm border border-border p-8">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
           <button
@@ -85,7 +85,7 @@ function FormCliente() {
                 name="nome_cliente"
                 value={formData.nome_cliente}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                 placeholder="Ex: João"
               />
             </div>
@@ -100,7 +100,7 @@ function FormCliente() {
                 name="sobrenome_cliente"
                 value={formData.sobrenome_cliente}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                 placeholder="Ex: Silva"
               />
             </div>
@@ -117,7 +117,7 @@ function FormCliente() {
               name="telefone"
               value={formData.telefone}
               onChange={handleChange}
-              className="input"
+              className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
               placeholder="(11) 99999-9999"
             />
           </div>
@@ -134,7 +134,7 @@ function FormCliente() {
                 name="cidade"
                 value={formData.cidade}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                 placeholder="Ex: São Paulo"
               />
             </div>
@@ -149,7 +149,7 @@ function FormCliente() {
                 name="estado"
                 value={formData.estado}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                 maxLength={2}
                 placeholder="SP"
               />
@@ -161,7 +161,7 @@ function FormCliente() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary flex-1 justify-center"
+              className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-xl font-bold hover:opacity-90 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
@@ -179,7 +179,7 @@ function FormCliente() {
             <button
               type="button"
               onClick={() => navigate("/clientes")}
-              className="btn-outline flex-1 justify-center"
+              className="flex-1 flex items-center justify-center gap-2 border border-border bg-card text-foreground py-3 rounded-xl font-bold hover:bg-muted transition-all"
             >
               CANCELAR
             </button>
