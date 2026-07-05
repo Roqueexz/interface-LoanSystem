@@ -8,8 +8,6 @@ import {
   ArrowLeft,
   Save,
   Loader2,
-  Calendar,
-  DollarSign,
 } from "lucide-react";
 
 import ClienteRequests from "../../../fetch/ClienteRequests";
@@ -175,7 +173,7 @@ function FormEmprestimo() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Dados do Empréstimo */}
-        <div className="card shadow-sm p-6">
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
           <h2 className="text-base font-semibold text-foreground mb-5 pb-3 border-b border-border">
             Dados do Empréstimo
           </h2>
@@ -189,7 +187,7 @@ function FormEmprestimo() {
                 name="id_cliente"
                 value={formData.id_cliente}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
               >
                 <option value={0}>
                   {carregandoClientes ? "Carregando..." : "Selecione um cliente"}
@@ -215,7 +213,7 @@ function FormEmprestimo() {
                   name="valor_emprestimo"
                   value={formData.valor_emprestimo || ""}
                   onChange={handleChange}
-                  className="input"
+                  className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                   placeholder="Ex: 1000.00"
                 />
               </div>
@@ -231,7 +229,7 @@ function FormEmprestimo() {
                   name="num_parcelas"
                   value={formData.num_parcelas}
                   onChange={handleChange}
-                  className="input"
+                  className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                 />
               </div>
             </div>
@@ -245,7 +243,7 @@ function FormEmprestimo() {
                   name="tipo_juros"
                   value={formData.tipo_juros}
                   onChange={handleChange}
-                  className="input"
+                  className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                 >
                   <option value="simples">Juros Simples</option>
                   <option value="compostos">Juros Compostos</option>
@@ -264,17 +262,17 @@ function FormEmprestimo() {
                   name="juros"
                   value={formData.juros ?? ""}
                   onChange={handleChange}
-                  className="input"
+                  className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                   placeholder="Ex: 5"
                 />
               </div>
             </div>
 
-            <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-xl px-4 py-3">
-              <p className="text-xs text-indigo-400 dark:text-indigo-400 mb-0.5">
+            <div className="bg-muted border border-border rounded-xl px-4 py-3">
+              <p className="text-xs text-muted-foreground mb-0.5">
                 Valor por parcela (calculado automaticamente)
               </p>
-              <p className="text-lg font-bold text-indigo-700 dark:text-indigo-400">
+              <p className="text-lg font-bold text-foreground">
                 {valorParcela > 0 ? formatarMoeda(valorParcela) : "Aguardando dados..."}
               </p>
             </div>
@@ -282,7 +280,7 @@ function FormEmprestimo() {
         </div>
 
         {/* Datas */}
-        <div className="card shadow-sm p-6">
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
           <h2 className="text-base font-semibold text-foreground mb-5 pb-3 border-b border-border">
             Datas
           </h2>
@@ -297,7 +295,7 @@ function FormEmprestimo() {
                 name="data_emprestimo"
                 value={formData.data_emprestimo}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
               />
             </div>
             <div>
@@ -312,14 +310,14 @@ function FormEmprestimo() {
                     ? new Date(formData.data_devolucao).toLocaleDateString("pt-BR")
                     : "..."
                 }
-                className="input bg-muted cursor-default"
+                className="w-full px-4 py-2.5 text-sm bg-muted border border-border rounded-xl text-foreground cursor-default"
               />
             </div>
           </div>
         </div>
 
         {/* Forma de Pagamento */}
-        <div className="card shadow-sm p-6">
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
           <h2 className="text-base font-semibold text-foreground mb-5 pb-3 border-b border-border">
             Forma de Pagamento
           </h2>
@@ -338,8 +336,8 @@ function FormEmprestimo() {
                   }
                   className={`flex flex-col items-center gap-2.5 p-4 rounded-xl border-2 transition-all duration-150 cursor-pointer ${
                     selecionado
-                      ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 shadow-sm shadow-indigo-100 dark:shadow-indigo-900/30"
-                      : "border-border bg-muted/50 text-muted-foreground hover:border-indigo-300 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-muted/50 text-muted-foreground hover:border-primary/50 hover:bg-primary/5"
                   }`}
                 >
                   <Icon size={22} />
@@ -360,7 +358,7 @@ function FormEmprestimo() {
           <button
             type="submit"
             disabled={salvando || formData.id_cliente === 0}
-            className="btn-primary flex-1 justify-center disabled:opacity-60 disabled:cursor-not-allowed"
+            className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-xl font-bold hover:opacity-90 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {salvando ? (
               <>
@@ -378,7 +376,7 @@ function FormEmprestimo() {
           <button
             type="button"
             onClick={() => navigate("/emprestimos")}
-            className="btn-outline flex-1 justify-center"
+            className="flex-1 flex items-center justify-center gap-2 border border-border bg-card text-foreground py-3 rounded-xl font-bold hover:bg-muted transition-all"
           >
             CANCELAR
           </button>
