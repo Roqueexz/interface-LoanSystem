@@ -5,9 +5,7 @@ import FormEditarEmprestimo from "../../../components/Emprestimo/FormEditarEmpre
 function PEditarEmprestimo(): JSX.Element {
   return (
     <Layout>
-      <div className="w-full min-h-full bg-slate-50">
-        <FormEditarEmprestimo />
-      </div>
+      <FormEditarEmprestimo />
     </Layout>
   );
 }
