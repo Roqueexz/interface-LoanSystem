@@ -5,9 +5,7 @@ import FormEmprestimo from "../../../components/Emprestimo/FormEmprestimo/FormEm
 function PFormEmprestimo(): JSX.Element {
   return (
     <Layout>
-      <div className="w-full min-h-full bg-slate-50">
-        <FormEmprestimo />
-      </div>
+      <FormEmprestimo />
     </Layout>
   );
 }
