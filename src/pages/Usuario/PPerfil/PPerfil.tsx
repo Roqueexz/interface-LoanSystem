@@ -5,9 +5,7 @@ import PerfilUsuario from "../../../components/Usuario/PerfilUsuario/PerfilUsuar
 function PPerfil(): JSX.Element {
   return (
     <Layout>
-      <div className="w-full min-h-full bg-slate-50">
-        <PerfilUsuario />
-      </div>
+      <PerfilUsuario />
     </Layout>
   );
 }
