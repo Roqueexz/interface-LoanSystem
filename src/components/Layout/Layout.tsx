@@ -13,7 +13,6 @@ type Props = {
 function Layout({ children }: Props) {
   const navigate = useNavigate();
 
-  // Pega o nome do usuario do localStorage
   const nome = localStorage.getItem("nome") || "Usuário";
   const iniciais = nome
     .split(" ")
@@ -34,8 +33,8 @@ function Layout({ children }: Props) {
     <div className="min-h-screen w-full flex flex-col bg-background text-foreground transition-colors duration-300">
       <Navegacao />
 
-      <main className="flex-1 w-full">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 w-full bg-background">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-6 bg-background">
           {/* Header com avatar e acoes */}
           <div className="flex justify-end items-center gap-3 mb-4">
             <TemaToggle />
