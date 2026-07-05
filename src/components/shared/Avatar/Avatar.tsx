@@ -13,7 +13,7 @@ function Avatar({ initials, size = 'md' }: Props) {
 
   return (
     <div
-      className={`${sizes[size]} rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 font-bold flex items-center justify-center flex-shrink-0 select-none transition-colors`}
+      className={`${sizes[size]} rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-400 font-bold flex items-center justify-center flex-shrink-0 select-none transition-colors`}
     >
       {initials}
     </div>
