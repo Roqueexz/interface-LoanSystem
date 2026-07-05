@@ -2,7 +2,7 @@
    ESTILOS GLOBAIS - LOANSYSTEM
    ============================================ */
 
-@layer base {
+@layer components {
   /* Cards padrao */
   .card {
     background: var(--card);
@@ -17,7 +17,8 @@
   }
 
   .card-shadow-hover {
-    @apply card-shadow transition-shadow duration-200;
+    @apply card-shadow;
+    transition: box-shadow 0.2s ease;
   }
 
   .card-shadow-hover:hover {
