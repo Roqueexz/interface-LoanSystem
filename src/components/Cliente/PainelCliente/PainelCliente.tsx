@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Pencil } from "lucide-react";
 
 import ResumoRequests from "../../../fetch/ResumoRequests";
 import type ResumoClienteDTO from "../../../interface/ResumoClienteDTO";
@@ -50,69 +51,76 @@ function PainelCliente({ id_cliente }: Props) {
   const formatarMoeda = (v: number) =>
     v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-32 text-muted-foreground">
+        Carregando resumo...
+      </div>
+    );
+  }
+
+  if (erro) {
+    return (
+      <div className="text-red-500 dark:text-red-400">{erro}</div>
+    );
+  }
+
+  if (!resumo) {
+    return null;
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-slate-800">Resumo Financeiro</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h2 className="text-xl font-bold text-foreground">Resumo Financeiro</h2>
         <button
           onClick={() => navigate(`/editar-cliente/${id_cliente}`)}
-          className="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl transition-all"
+          className="inline-flex items-center gap-2 text-sm bg-primary text-primary-foreground hover:opacity-90 px-4 py-2 rounded-xl font-medium transition-all"
         >
+          <Pencil size={16} />
           Editar Cliente
         </button>
       </div>
 
-      {loading && (
-        <p className="text-slate-500">Carregando resumo...</p>
-      )}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-card rounded-xl shadow-sm border border-border p-4">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total Emprestado</p>
+          <p className="text-xl font-bold text-primary mt-1">
+            {formatarMoeda(resumo.totais.total_emprestado)}
+          </p>
+        </div>
 
-      {erro && (
-        <p className="text-red-500">{erro}</p>
-      )}
+        <div className="bg-card rounded-xl shadow-sm border border-border p-4">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total Recebido</p>
+          <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+            {formatarMoeda(resumo.totais.total_recebido)}
+          </p>
+        </div>
 
-      {!loading && resumo && (
-        <>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-              <p className="text-xs text-slate-500">Total Emprestado</p>
-              <p className="text-xl font-bold text-indigo-600">
-                {formatarMoeda(resumo.totais.total_emprestado)}
-              </p>
-            </div>
+        <div className="bg-card rounded-xl shadow-sm border border-border p-4">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total em Aberto</p>
+          <p className="text-xl font-bold text-amber-600 dark:text-amber-400 mt-1">
+            {formatarMoeda(resumo.totais.total_em_aberto)}
+          </p>
+        </div>
 
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-              <p className="text-xs text-slate-500">Total Recebido</p>
-              <p className="text-xl font-bold text-green-600">
-                {formatarMoeda(resumo.totais.total_recebido)}
-              </p>
-            </div>
+        <div className="bg-card rounded-xl shadow-sm border border-border p-4">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total Atrasado</p>
+          <p className="text-xl font-bold text-red-600 dark:text-red-400 mt-1">
+            {formatarMoeda(resumo.totais.total_atrasado)}
+          </p>
+        </div>
+      </div>
 
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-              <p className="text-xs text-slate-500">Total em Aberto</p>
-              <p className="text-xl font-bold text-yellow-600">
-                {formatarMoeda(resumo.totais.total_em_aberto)}
-              </p>
-            </div>
-
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-              <p className="text-xs text-slate-500">Total Atrasado</p>
-              <p className="text-xl font-bold text-red-600">
-                {formatarMoeda(resumo.totais.total_atrasado)}
-              </p>
-            </div>
-          </div>
-
-          <EmprestimosDoCliente 
-            id_cliente={id_cliente} 
-            onRefresh={handleRefresh}
-          />
-          
-          <ParcelasDoCliente 
-            id_cliente={id_cliente} 
-            onRefresh={handleRefresh}
-          />
-        </>
-      )}
+      <EmprestimosDoCliente 
+        id_cliente={id_cliente} 
+        onRefresh={handleRefresh}
+      />
+      
+      <ParcelasDoCliente 
+        id_cliente={id_cliente} 
+        onRefresh={handleRefresh}
+      />
     </div>
   );
 }
