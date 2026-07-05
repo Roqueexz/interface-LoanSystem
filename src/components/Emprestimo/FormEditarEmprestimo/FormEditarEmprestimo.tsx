@@ -187,7 +187,7 @@ function FormEditarEmprestimo() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Dados Financeiros */}
-        <div className="card shadow-sm p-6">
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
           <h2 className="text-base font-semibold text-foreground mb-5 pb-3 border-b border-border">
             Dados Financeiros
           </h2>
@@ -203,7 +203,7 @@ function FormEditarEmprestimo() {
                 required
                 value={formData.id_cliente || ""}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
               />
             </div>
 
@@ -219,7 +219,7 @@ function FormEditarEmprestimo() {
                 required
                 value={formData.valor_emprestimo || ""}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
               />
             </div>
 
@@ -234,7 +234,7 @@ function FormEditarEmprestimo() {
                 required
                 value={formData.num_parcelas}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
               />
             </div>
 
@@ -246,7 +246,7 @@ function FormEditarEmprestimo() {
                 name="tipo_juros"
                 value={formData.tipo_juros}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
               >
                 <option value="simples">Juros Simples</option>
                 <option value="compostos">Juros Compostos</option>
@@ -265,21 +265,21 @@ function FormEditarEmprestimo() {
                 required
                 value={formData.juros ?? ""}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
               />
             </div>
 
             <div className="flex items-end">
-              <div className="w-full bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-xl px-4 py-2.5">
-                <p className="text-xs text-indigo-400 dark:text-indigo-400 mb-0.5">Valor por parcela (calculado)</p>
-                <p className="text-lg font-bold text-indigo-700 dark:text-indigo-400">{formatarMoeda(valorParcela)}</p>
+              <div className="w-full bg-muted border border-border rounded-xl px-4 py-2.5">
+                <p className="text-xs text-muted-foreground mb-0.5">Valor por parcela (calculado)</p>
+                <p className="text-lg font-bold text-foreground">{formatarMoeda(valorParcela)}</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Datas */}
-        <div className="card shadow-sm p-6">
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
           <h2 className="text-base font-semibold text-foreground mb-5 pb-3 border-b border-border">
             Datas
           </h2>
@@ -294,7 +294,7 @@ function FormEditarEmprestimo() {
                 value={formData.data_emprestimo}
                 onChange={handleChange}
                 required
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
               />
             </div>
             <div>
@@ -306,14 +306,14 @@ function FormEditarEmprestimo() {
                 name="data_devolucao"
                 value={formData.data_devolucao}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
               />
             </div>
           </div>
         </div>
 
         {/* Forma de Pagamento */}
-        <div className="card shadow-sm p-6">
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
           <h2 className="text-base font-semibold text-foreground mb-5 pb-3 border-b border-border">
             Forma de Pagamento
           </h2>
@@ -332,8 +332,8 @@ function FormEditarEmprestimo() {
                   }
                   className={`flex flex-col items-center gap-2.5 p-4 rounded-xl border-2 transition-all duration-150 cursor-pointer ${
                     selecionado
-                      ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 shadow-sm shadow-indigo-100 dark:shadow-indigo-900/30"
-                      : "border-border bg-muted/50 text-muted-foreground hover:border-indigo-300 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-muted/50 text-muted-foreground hover:border-primary/50 hover:bg-primary/5"
                   }`}
                 >
                   <Icon size={22} />
@@ -348,7 +348,7 @@ function FormEditarEmprestimo() {
         </div>
 
         {/* Status do Empréstimo */}
-        <div className="card shadow-sm p-6">
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
           <h2 className="text-base font-semibold text-foreground mb-5 pb-3 border-b border-border">
             Status do Empréstimo
           </h2>
@@ -358,7 +358,7 @@ function FormEditarEmprestimo() {
               onClick={() => setFormData((prev) => ({ ...prev, status_emprestimo: true }))}
               className={`flex items-center justify-center gap-2.5 p-4 rounded-xl border-2 transition-all duration-150 ${
                 formData.status_emprestimo
-                  ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 shadow-sm shadow-emerald-100 dark:shadow-emerald-900/30"
+                  ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
                   : "border-border bg-muted/50 text-muted-foreground hover:border-emerald-300"
               }`}
             >
@@ -371,7 +371,7 @@ function FormEditarEmprestimo() {
               onClick={() => setFormData((prev) => ({ ...prev, status_emprestimo: false }))}
               className={`flex items-center justify-center gap-2.5 p-4 rounded-xl border-2 transition-all duration-150 ${
                 !formData.status_emprestimo
-                  ? "border-slate-500 bg-slate-100 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 shadow-sm"
+                  ? "border-slate-500 bg-slate-100 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300"
                   : "border-border bg-muted/50 text-muted-foreground hover:border-slate-400"
               }`}
             >
@@ -391,7 +391,7 @@ function FormEditarEmprestimo() {
           <button
             type="submit"
             disabled={salvando}
-            className="btn-primary flex-1 justify-center disabled:opacity-60 disabled:cursor-not-allowed"
+            className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-xl font-bold hover:opacity-90 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {salvando ? (
               <>
@@ -409,7 +409,7 @@ function FormEditarEmprestimo() {
           <button
             type="button"
             onClick={() => navigate("/emprestimos")}
-            className="btn-outline flex-1 justify-center"
+            className="flex-1 flex items-center justify-center gap-2 border border-border bg-card text-foreground py-3 rounded-xl font-bold hover:bg-muted transition-all"
           >
             CANCELAR
           </button>
