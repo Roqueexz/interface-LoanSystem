@@ -2,7 +2,7 @@ import SkeletonBase from './SkeletonBase';
 
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-4">
+    <div className="bg-card rounded-2xl shadow-sm border border-border p-6 space-y-4">
       <div className="flex items-center gap-3">
         <SkeletonBase width={48} height={48} rounded="rounded-xl" />
         <div className="flex-1">

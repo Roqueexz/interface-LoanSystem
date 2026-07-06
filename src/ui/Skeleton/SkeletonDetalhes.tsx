@@ -2,7 +2,7 @@ import SkeletonBase from './SkeletonBase';
 
 function SkeletonDetalhes() {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-6">
+    <div className="bg-card rounded-2xl shadow-sm border border-border p-6 space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div className="space-y-2">
@@ -32,7 +32,7 @@ function SkeletonDetalhes() {
       </div>
 
       {/* Botões */}
-      <div className="flex gap-4 pt-4 border-t border-slate-100">
+      <div className="flex gap-4 pt-4 border-t border-border">
         <SkeletonBase width="50%" height={48} rounded="rounded-xl" />
         <SkeletonBase width="50%" height={48} rounded="rounded-xl" />
       </div>

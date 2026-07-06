@@ -10,7 +10,7 @@ function SkeletonLista({ itens = 5 }: Props) {
       {Array.from({ length: itens }).map((_, index) => (
         <div
           key={index}
-          className="bg-white border rounded-xl p-4 space-y-2 shadow-sm"
+          className="bg-card border border-border rounded-xl p-4 space-y-2 shadow-sm"
         >
           <div className="flex justify-between items-center">
             <SkeletonBase width="40%" height={16} />

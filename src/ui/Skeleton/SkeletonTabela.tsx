@@ -7,9 +7,9 @@ interface Props {
 
 function SkeletonTabela({ linhas = 5, colunas = 4 }: Props) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
       {/* Header */}
-      <div className="bg-slate-50 px-6 py-3 border-b border-slate-100">
+      <div className="bg-muted/30 px-6 py-3 border-b border-border">
         <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${colunas}, 1fr)` }}>
           {Array.from({ length: colunas }).map((_, index) => (
             <SkeletonBase key={index} width="80%" height={14} />
@@ -18,7 +18,7 @@ function SkeletonTabela({ linhas = 5, colunas = 4 }: Props) {
       </div>
 
       {/* Body */}
-      <div className="divide-y divide-slate-100">
+      <div className="divide-y divide-border">
         {Array.from({ length: linhas }).map((_, rowIndex) => (
           <div key={rowIndex} className="px-6 py-4">
             <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${colunas}, 1fr)` }}>

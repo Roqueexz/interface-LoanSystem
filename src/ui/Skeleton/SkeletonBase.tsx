@@ -13,7 +13,7 @@ function SkeletonBase({ className = '', width, height, rounded = 'rounded-xl' }:
 
   return (
     <div
-      className={`animate-pulse bg-slate-200 ${rounded} ${className}`}
+      className={`animate-pulse bg-muted ${rounded} ${className}`}
       style={style}
     />
   );
