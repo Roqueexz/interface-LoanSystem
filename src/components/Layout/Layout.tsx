@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { LogOut} from "lucide-react";
 import AuthRequests from "../../fetch/AuthRequests";
 import Navegacao from "../Navegacao/Navegacao";
@@ -12,6 +13,21 @@ type Props = {
 
 function Layout({ children }: Props) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const prevChildrenRef = useRef<ReactNode>(children);
+  const [displayChildren, setDisplayChildren] = useState<ReactNode>(children);
+
+  useEffect(() => {
+    const previous = prevChildrenRef.current;
+    setDisplayChildren(previous);
+
+    const timer = requestAnimationFrame(() => {
+      setDisplayChildren(children);
+      prevChildrenRef.current = children;
+    });
+
+    return () => cancelAnimationFrame(timer);
+  }, [children, location.key]);
 
   const nome = localStorage.getItem("nome") || "Usuário";
   const iniciais = nome
@@ -35,7 +51,6 @@ function Layout({ children }: Props) {
 
       <main className="flex-1 w-full bg-background">
         <div className="w-full px-4 sm:px-6 lg:px-8 py-6 bg-background">
-          {/* Header com avatar e acoes */}
           <div className="flex justify-end items-center gap-3 mb-4">
             <TemaToggle />
 
@@ -43,9 +58,7 @@ function Layout({ children }: Props) {
               onClick={() => navigate("/perfil")}
               className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl hover:bg-muted transition-colors"
             >
-              <div className="avatar avatar-sm">
-                {iniciais || "U"}
-              </div>
+              <div className="avatar avatar-sm">{iniciais || "U"}</div>
               <span className="text-sm font-semibold text-foreground hidden sm:block">
                 {nome}
               </span>
@@ -60,7 +73,9 @@ function Layout({ children }: Props) {
             </button>
           </div>
 
-          {children}
+          <div className="transition-opacity duration-150">
+            {displayChildren}
+          </div>
         </div>
       </main>
 
