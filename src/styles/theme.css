@@ -3,64 +3,53 @@
    Paleta Dark Premium do Figma
    ============================================ */
 
-@layer base {
-  /* Modo Claro (Padrão) */
-  :root {
-    --background: #f8fafc;
-    --foreground: #0f172a;
-    --card: #ffffff;
-    --card-foreground: #0f172a;
-    --muted: #f1f5f9;
-    --muted-foreground: #64748b;
-    --accent: #4f46e5;
-    --accent-foreground: #ffffff;
-    --border: rgba(0, 0, 0, 0.08);
-    --ring: #4f46e5;
-    --radius: 0.75rem;
-    --primary: #4f46e5;
-    --primary-foreground: #ffffff;
-    --destructive: #dc2626;
-    --destructive-foreground: #ffffff;
-    --popover: #ffffff;
-    --popover-foreground: #0f172a;
-    --input: transparent;
-    --input-background: #f1f5f9;
-    --chart-1: #4f46e5;
-    --chart-2: #22c55e;
-    --chart-3: #f59e0b;
-    --chart-4: #ef4444;
-    --chart-5: #8b5cf6;
-  }
-
-  /* Modo Escuro (.dark) - Premium do Figma */
-  .dark {
-    --background: #0b111e;
-    --foreground: #f8fafc;
-    --card: #151f32;
-    --card-foreground: #e2e8f0;
-    --muted: #1e293b;
-    --muted-foreground: #94a3b8;
-    --accent: #6366f1;
-    --accent-foreground: #f8fafc;
-    --border: rgba(255, 255, 255, 0.06);
-    --ring: #6366f1;
-    --primary: #818cf8;
-    --primary-foreground: #1e1b4b;
-    --destructive: #ef4444;
-    --destructive-foreground: #ffffff;
-    --popover: #151f32;
-    --popover-foreground: #f8fafc;
-    --input: #1e293b;
-    --input-background: #1e293b;
-    --chart-1: #818cf8;
-    --chart-2: #4ade80;
-    --chart-3: #fbbf24;
-    --chart-4: #f87171;
-    --chart-5: #a78bfa;
-  }
+/* Modo Claro (Padrão) */
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #4f46e5;
+  --accent-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.08);
+  --ring: #4f46e5;
+  --radius: 0.75rem;
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --input: transparent;
+  --input-background: #f1f5f9;
 }
 
-@theme inline {
+/* Modo Escuro (.dark) - Premium do Figma */
+.dark {
+  --background: #0b111e;
+  --foreground: #f8fafc;
+  --card: #151f32;
+  --card-foreground: #e2e8f0;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #6366f1;
+  --accent-foreground: #f8fafc;
+  --border: rgba(255, 255, 255, 0.06);
+  --ring: #6366f1;
+  --primary: #818cf8;
+  --primary-foreground: #1e1b4b;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --popover: #151f32;
+  --popover-foreground: #f8fafc;
+  --input: #1e293b;
+  --input-background: #1e293b;
+}
+
+/* Tailwind CSS v4 - Mapeamento de variaveis */
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -78,11 +67,6 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-input: var(--input);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
