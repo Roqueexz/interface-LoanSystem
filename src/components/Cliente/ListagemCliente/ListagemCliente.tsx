@@ -67,7 +67,12 @@ function ListagemCliente() {
       {
         loading: 'Excluindo cliente...',
         success: '✅ Cliente removido com sucesso!',
-        error: '❌ Erro ao remover cliente.',
+        error: (err) => {
+          if (err?.message) {
+            return `❌ ${err.message}`;
+          }
+          return '❌ Erro ao remover cliente. Tente novamente.';
+        },
       }
     );
 
