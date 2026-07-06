@@ -39,11 +39,18 @@ function PerfilUsuario() {
     setModalLogoutOpen(true);
   };
 
-  const confirmarLogout = () => {
-    toast.success('👋 Até logo!');
-    AuthRequests.removeToken();
-    navigate("/");
-    setModalLogoutOpen(false);
+  const confirmarLogout = async () => {
+    try {
+      // Tenta fazer logout
+      AuthRequests.removeToken();
+      toast.success('👋 Até logo!');
+      navigate("/");
+    } catch (error) {
+      toast.error('❌ Erro ao sair do sistema. Tente novamente.');
+      console.error('[PerfilUsuario] Erro no logout:', error);
+    } finally {
+      setModalLogoutOpen(false);
+    }
   };
 
   const formatarRole = (role: string) => {
@@ -65,7 +72,7 @@ function PerfilUsuario() {
     .slice(0, 2)
     .toUpperCase() || "U";
 
-  // Stats do usuario (dados reais ou placeholders)
+  // Stats do usuario - TODO: buscar dados reais do backend
   const stats = [
     { label: "Clientes Gerenciados", value: "8" },
     { label: "Empréstimos Ativos", value: "8" },
@@ -81,6 +88,7 @@ function PerfilUsuario() {
     { label: "Último Acesso", value: new Date().toLocaleString("pt-BR") },
   ];
 
+  // TODO: Buscar atividades reais do backend
   const activity = [
     { action: "Novo empréstimo registrado", detail: "Felipe Augusto Nunes — R$ 1.000,00", time: "Hoje, 10:30", dot: "bg-indigo-500" },
     { action: "Pagamento recebido", detail: "Ana Carolina Ferreira — R$ 200,00", time: "Hoje, 09:15", dot: "bg-emerald-500" },
@@ -110,10 +118,10 @@ function PerfilUsuario() {
               {iniciais}
             </div>
             <div className="flex gap-2 pb-1">
-              <button className="px-3 py-1.5 border border-border rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
+              <button className="px-3 py-1.5 border border-border rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground hover:border-primary/50 dark:hover:border-primary/50 transition-colors">
                 Editar Perfil
               </button>
-              <button className="px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-semibold text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">
+              <button className="px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-xl text-xs font-semibold text-primary hover:bg-primary/20 transition-colors">
                 Alterar Senha
               </button>
             </div>
