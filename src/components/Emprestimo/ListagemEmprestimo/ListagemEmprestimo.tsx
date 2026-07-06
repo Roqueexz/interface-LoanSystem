@@ -70,7 +70,12 @@ function ListagemEmprestimo() {
       {
         loading: 'Excluindo empréstimo...',
         success: '✅ Empréstimo removido com sucesso!',
-        error: (err) => err?.message || '❌ Erro ao remover empréstimo.',
+        error: (err) => {
+          if (err?.message) {
+            return `❌ ${err.message}`;
+          }
+          return '❌ Erro ao remover empréstimo. Tente novamente.';
+        },
       }
     );
 
