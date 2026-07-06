@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogOut, User } from "lucide-react";
+import { LogOut} from "lucide-react";
 import AuthRequests from "../../fetch/AuthRequests";
 import Navegacao from "../Navegacao/Navegacao";
 import Rodape from "../Rodape/Rodape";
