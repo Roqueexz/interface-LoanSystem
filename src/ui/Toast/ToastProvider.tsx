@@ -21,8 +21,10 @@ function ToastProvider({ children }: Props) {
             fontSize: '14px',
             fontWeight: '500',
             boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+            border: '1px solid #334155',
           },
           success: {
+            duration: 4000,
             style: {
               background: '#0f172a',
               color: '#4ade80',
@@ -34,6 +36,7 @@ function ToastProvider({ children }: Props) {
             },
           },
           error: {
+            duration: 5000,
             style: {
               background: '#0f172a',
               color: '#f87171',
@@ -41,6 +44,18 @@ function ToastProvider({ children }: Props) {
             },
             iconTheme: {
               primary: '#f87171',
+              secondary: '#0f172a',
+            },
+          },
+          loading: {
+            duration: 3000,
+            style: {
+              background: '#0f172a',
+              color: '#94a3b8',
+              border: '1px solid #334155',
+            },
+            iconTheme: {
+              primary: '#94a3b8',
               secondary: '#0f172a',
             },
           },
