@@ -140,7 +140,12 @@ function FormEmprestimo() {
       {
         loading: 'Cadastrando empréstimo...',
         success: '✅ Empréstimo cadastrado com sucesso!',
-        error: '❌ Erro ao cadastrar empréstimo.',
+        error: (err) => {
+          if (err?.message) {
+            return `❌ ${err.message}`;
+          }
+          return '❌ Erro ao cadastrar empréstimo. Tente novamente.';
+        },
       }
     );
 
