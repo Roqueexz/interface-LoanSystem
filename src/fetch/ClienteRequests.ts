@@ -1,160 +1,73 @@
 import type ClienteDTO from "../interface/ClienteDTO";
+import { BaseRequests } from "./BaseRequests";
 
-class ClienteRequests {
-  private serverURL;
-  private endpointCliente;
-
-  constructor() {
-    this.serverURL = "http://localhost:3333";
-    this.endpointCliente = "/api/clientes";
-  }
+class ClienteRequests extends BaseRequests {
+  private endpointCliente = '/api/clientes';
 
   async obterListaDeClientes(): Promise<ClienteDTO[] | undefined> {
-    try {
-      const token = localStorage.getItem("token");
-
-      const respostaAPI = await fetch(
-        `${this.serverURL}${this.endpointCliente}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-access-token": `${token}`,
-          },
-        },
-      );
-
-      if (respostaAPI.ok) {
-        const listaClientes: ClienteDTO[] = await respostaAPI.json();
-
-        return listaClientes;
-      }
-
-      throw new Error("Não foi possível listar os clientes.");
-    } catch (error) {
-      console.error(`Erro ao consultar clientes. ${error}`);
-      return;
+    const resposta = await this.request<ClienteDTO[]>(this.endpointCliente);
+    
+    if (!resposta.sucesso) {
+      console.error('[ClienteRequests] Erro ao listar clientes:', resposta.erro);
+      return undefined;
     }
+
+    return resposta.dados;
   }
 
   async obterClientePorId(id_cliente: number): Promise<ClienteDTO | undefined> {
-    try {
-      const token = localStorage.getItem("token");
-
-      const respostaAPI = await fetch(
-        `${this.serverURL}${this.endpointCliente}/${id_cliente}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-access-token": `${token}`,
-          },
-        },
-      );
-
-      if (respostaAPI.ok) {
-        const cliente: ClienteDTO = await respostaAPI.json();
-
-        return cliente;
-      }
-
-      throw new Error("Não foi possível buscar o cliente.");
-    } catch (error) {
-      console.error(`Erro ao consultar cliente por ID. ${error}`);
-      return;
+    const resposta = await this.request<ClienteDTO>(`${this.endpointCliente}/${id_cliente}`);
+    
+    if (!resposta.sucesso) {
+      console.error(`[ClienteRequests] Erro ao buscar cliente ${id_cliente}:`, resposta.erro);
+      return undefined;
     }
+
+    return resposta.dados;
   }
 
   async enviarFormularioCliente(formCliente: ClienteDTO): Promise<boolean> {
-    try {
-      const token = localStorage.getItem("token");
+    const resposta = await this.request<{ mensagem: string }>(this.endpointCliente, {
+      method: 'POST',
+      body: JSON.stringify(formCliente),
+    });
 
-      const respostaAPI = await fetch(
-        `${this.serverURL}${this.endpointCliente}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-access-token": `${token}`,
-          },
-          body: JSON.stringify(formCliente),
-        },
-      );
-
-      if (!respostaAPI.ok) {
-        throw new Error(
-          `Erro ${respostaAPI.status}: ${respostaAPI.statusText}`,
-        );
-      }
-
-      console.info(`${respostaAPI.status}: ${respostaAPI.statusText}`);
-
-      return true;
-    } catch (error) {
-      console.error(`Erro ao cadastrar cliente. ${error}`);
-
+    if (!resposta.sucesso) {
+      console.error('[ClienteRequests] Erro ao cadastrar cliente:', resposta.erro);
       return false;
     }
+
+    return true;
   }
 
   async atualizarCliente(
     id_cliente: number,
     cliente: ClienteDTO,
   ): Promise<boolean> {
-    try {
-      const token = localStorage.getItem("token");
+    const resposta = await this.request<{ mensagem: string }>(`${this.endpointCliente}/${id_cliente}`, {
+      method: 'PUT',
+      body: JSON.stringify(cliente),
+    });
 
-      const respostaAPI = await fetch(
-        `${this.serverURL}${this.endpointCliente}/${id_cliente}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "x-access-token": `${token}`,
-          },
-          body: JSON.stringify(cliente),
-        },
-      );
-
-      if (!respostaAPI.ok) {
-        throw new Error(
-          `Erro ${respostaAPI.status}: ${respostaAPI.statusText}`,
-        );
-      }
-
-      return true;
-    } catch (error) {
-      console.error(`Erro ao atualizar cliente. ${error}`);
-
+    if (!resposta.sucesso) {
+      console.error(`[ClienteRequests] Erro ao atualizar cliente ${id_cliente}:`, resposta.erro);
       return false;
     }
+
+    return true;
   }
 
   async excluirCliente(id_cliente: number): Promise<boolean> {
-    try {
-      const token = localStorage.getItem("token");
+    const resposta = await this.request<{ mensagem: string }>(`${this.endpointCliente}/${id_cliente}`, {
+      method: 'DELETE',
+    });
 
-      const respostaAPI = await fetch(
-        `${this.serverURL}${this.endpointCliente}/${id_cliente}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            "x-access-token": `${token}`,
-          },
-        },
-      );
-
-      if (!respostaAPI.ok) {
-        throw new Error(
-          `Erro ${respostaAPI.status}: ${respostaAPI.statusText}`,
-        );
-      }
-
-      return true;
-    } catch (error) {
-      console.error(`Erro ao excluir cliente. ${error}`);
-
+    if (!resposta.sucesso) {
+      console.error(`[ClienteRequests] Erro ao excluir cliente ${id_cliente}:`, resposta.erro);
       return false;
     }
+
+    return true;
   }
 }
 
