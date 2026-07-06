@@ -42,7 +42,13 @@ function FormCliente() {
       {
         loading: 'Cadastrando cliente...',
         success: '✅ Cliente cadastrado com sucesso!',
-        error: '❌ Erro ao cadastrar cliente.',
+        error: (err) => {
+          // Se o erro tiver uma mensagem especifica, usa ela
+          if (err?.message) {
+            return `❌ ${err.message}`;
+          }
+          return '❌ Erro ao cadastrar cliente. Tente novamente.';
+        },
       }
     );
 
