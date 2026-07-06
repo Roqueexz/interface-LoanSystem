@@ -68,7 +68,12 @@ function ParcelasDoCliente({ id_cliente, onRefresh }: Props) {
       {
         loading: 'Processando pagamento...',
         success: '✅ Parcela paga com sucesso!',
-        error: '❌ Erro ao pagar parcela.',
+        error: (err) => {
+          if (err?.message) {
+            return `❌ ${err.message}`;
+          }
+          return '❌ Erro ao pagar parcela. Tente novamente.';
+        },
       }
     );
 
@@ -84,7 +89,12 @@ function ParcelasDoCliente({ id_cliente, onRefresh }: Props) {
       {
         loading: 'Desfazendo pagamento...',
         success: '✅ Pagamento desfeito com sucesso!',
-        error: '❌ Erro ao desfazer pagamento.',
+        error: (err) => {
+          if (err?.message) {
+            return `❌ ${err.message}`;
+          }
+          return '❌ Erro ao desfazer pagamento. Tente novamente.';
+        },
       }
     );
 
