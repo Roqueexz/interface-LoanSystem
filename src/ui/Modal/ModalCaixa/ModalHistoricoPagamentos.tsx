@@ -4,6 +4,7 @@ import ModalBase from "../ModalBase";
 import { formatarMoeda, formatarDataBR } from "../../../services/Utilitario";
 import ParcelaRequests from "../../../fetch/ParcelaRequests";
 import EmprestimoRequests from "../../../fetch/EmprestimoRequests";
+import ClienteRequests from "../../../fetch/ClienteRequests";
 
 interface Pagamento {
   id_parcela: number;
@@ -36,25 +37,36 @@ function ModalHistoricoPagamentos({ isOpen, onClose }: Props) {
     setErro(null);
 
     try {
-      const emprestimos = await EmprestimoRequests.obterListaDeEmprestimos();
-      if (!emprestimos) {
+      // Busca todos os empréstimos e clientes
+      const [emprestimos, clientes] = await Promise.all([
+        EmprestimoRequests.obterListaDeEmprestimos(),
+        ClienteRequests.obterListaDeClientes(),
+      ]);
+
+      if (!emprestimos || !clientes) {
         setErro("Erro ao carregar dados.");
         setCarregando(false);
         return;
       }
 
+      // Busca as parcelas pagas via endpoint de status
       const dados = await ParcelaRequests.listarPorStatus('pagas');
       if (dados && dados.length > 0) {
-        const pagamentosComCliente = dados.map((p: any) => {
+        // Mapeia para incluir dados do cliente
+        const pagamentosComCliente: Pagamento[] = dados.map((p: any) => {
           const emprestimo = emprestimos.find(e => e.id_emprestimo === p.id_emprestimo);
+          const cliente = emprestimo ? clientes.find(c => c.id_cliente === emprestimo.id_cliente) : null;
+          
           return {
             id_parcela: p.id_parcela,
             id_emprestimo: p.id_emprestimo,
             numero_parcela: p.numero_parcela,
             valor_pago: p.valor_parcela,
             data_pagamento: p.data_pagamento || new Date().toISOString(),
-            cliente_nome: emprestimo ? `Cliente #${emprestimo.id_cliente}` : "N/A",
-            cliente_telefone: "N/A",
+            cliente_nome: cliente 
+              ? `${cliente.nome_cliente} ${cliente.sobrenome_cliente}` 
+              : `Cliente #${emprestimo?.id_cliente || 'N/A'}`,
+            cliente_telefone: cliente?.telefone || "N/A",
           };
         });
         setPagamentos(pagamentosComCliente);
