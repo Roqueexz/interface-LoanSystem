@@ -1,15 +1,20 @@
 import { useEffect, useState } from "react";
 import ParcelaRequests from "../../../fetch/ParcelaRequests";
 import type ParcelaDTO from "../../../interface/ParcelaDTO";
+import { useToast } from "../../../hooks/useToast";
+import ModalConfirmacao from "../../../ui/Modal/ModalConfirmacao";
 
 interface Props {
   id_emprestimo: number;
 }
 
 function ListaParcelas({ id_emprestimo }: Props) {
+  const toast = useToast();
   const [parcelas, setParcelas] = useState<ParcelaDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
+  const [parcelaAction, setParcelaAction] = useState<{ id: number; action: 'pagar' | 'desfazer' } | null>(null);
+  const [modalConfirmOpen, setModalConfirmOpen] = useState(false);
 
   async function carregarParcelas() {
     setLoading(true);
@@ -36,87 +41,113 @@ function ListaParcelas({ id_emprestimo }: Props) {
     }
   }, [id_emprestimo]);
 
-  async function marcarComoPaga(id_parcela: number) {
-    const sucesso = await ParcelaRequests.pagar(id_parcela);
-    if (sucesso) {
-      await carregarParcelas();
-    } else {
-      alert("Erro ao pagar parcela.");
-    }
+  function handlePagar(id_parcela: number) {
+    setParcelaAction({ id: id_parcela, action: 'pagar' });
+    setModalConfirmOpen(true);
   }
 
-  async function desfazerPagamento(id_parcela: number) {
-    const confirmacao = confirm("Tem certeza que deseja desfazer o pagamento?");
-    if (!confirmacao) return;
+  function handleDesfazer(id_parcela: number) {
+    setParcelaAction({ id: id_parcela, action: 'desfazer' });
+    setModalConfirmOpen(true);
+  }
 
-    const sucesso = await ParcelaRequests.desfazerPagamento(id_parcela);
-    if (sucesso) {
-      await carregarParcelas();
+  async function confirmarAcao() {
+    if (!parcelaAction) return;
+
+    const { id, action } = parcelaAction;
+
+    if (action === 'pagar') {
+      const sucesso = await toast.promise(
+        ParcelaRequests.pagar(id),
+        {
+          loading: 'Processando pagamento...',
+          success: '✅ Parcela paga com sucesso!',
+          error: '❌ Erro ao pagar parcela.',
+        }
+      );
+
+      if (sucesso) {
+        await carregarParcelas();
+      }
     } else {
-      alert("Erro ao desfazer pagamento.");
+      const sucesso = await toast.promise(
+        ParcelaRequests.desfazerPagamento(id),
+        {
+          loading: 'Desfazendo pagamento...',
+          success: '✅ Pagamento desfeito com sucesso!',
+          error: '❌ Erro ao desfazer pagamento.',
+        }
+      );
+
+      if (sucesso) {
+        await carregarParcelas();
+      }
     }
+
+    setParcelaAction(null);
+    setModalConfirmOpen(false);
   }
 
   function getBadge(status: ParcelaDTO["status_parcela"]) {
     switch (status) {
       case "PAGA":
-        return "bg-green-100 text-green-700";
+        return "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20";
       case "ATRASADA":
-        return "bg-red-100 text-red-700";
+        return "bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/20";
       default:
-        return "bg-yellow-100 text-yellow-700";
+        return "bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20";
     }
   }
 
   if (loading) {
-    return <p className="text-slate-500">Carregando parcelas...</p>;
+    return <p className="text-muted-foreground">Carregando parcelas...</p>;
   }
 
   if (erro) {
-    return <p className="text-red-500">{erro}</p>;
+    return <p className="text-red-500 dark:text-red-400">{erro}</p>;
   }
 
   if (parcelas.length === 0) {
-    return <p className="text-slate-400">Nenhuma parcela encontrada para este emprestimo.</p>;
+    return <p className="text-muted-foreground">Nenhuma parcela encontrada para este empréstimo.</p>;
   }
 
   return (
-    <div className="bg-white border rounded-xl p-4 space-y-3 shadow-sm">
+    <div className="bg-card border border-border rounded-xl p-4 space-y-3 shadow-sm">
       {parcelas.map((p) => (
         <div
           key={p.id_parcela}
-          className="flex justify-between items-center bg-slate-50 p-3 rounded-lg hover:bg-slate-100 transition-all"
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-muted/30 p-3 rounded-lg hover:bg-muted/50 transition-all"
         >
           <div>
-            <p className="text-sm font-medium text-slate-700">
+            <p className="text-sm font-medium text-foreground">
               Parcela {p.numero_parcela} - R$ {p.valor_parcela.toFixed(2)}
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               Venc: {new Date(p.data_vencimento).toLocaleDateString("pt-BR")}
             </p>
             {p.data_pagamento && (
-              <p className="text-xs text-green-600">
+              <p className="text-xs text-emerald-600 dark:text-emerald-400">
                 Pago em: {new Date(p.data_pagamento).toLocaleDateString("pt-BR")}
               </p>
             )}
           </div>
 
           <div className="flex items-center gap-3">
-            <span className={`text-xs px-2 py-1 rounded-full ${getBadge(p.status_parcela)}`}>
+            <span className={`text-xs px-2 py-1 rounded-full font-semibold ${getBadge(p.status_parcela)}`}>
               {p.status_parcela}
             </span>
 
             {p.status_parcela !== "PAGA" ? (
               <button
-                onClick={() => marcarComoPaga(p.id_parcela)}
-                className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg transition-all"
+                onClick={() => handlePagar(p.id_parcela)}
+                className="text-xs bg-primary text-primary-foreground hover:opacity-90 px-3 py-1 rounded-lg font-medium transition-all"
               >
                 Dar baixa
               </button>
             ) : (
               <button
-                onClick={() => desfazerPagamento(p.id_parcela)}
-                className="text-xs bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-lg transition-all"
+                onClick={() => handleDesfazer(p.id_parcela)}
+                className="text-xs bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/20 px-3 py-1 rounded-lg font-medium transition-all"
               >
                 Desfazer
               </button>
@@ -124,6 +155,23 @@ function ListaParcelas({ id_emprestimo }: Props) {
           </div>
         </div>
       ))}
+
+      {/* Modal de Confirmacao */}
+      <ModalConfirmacao
+        isOpen={modalConfirmOpen}
+        onClose={() => {
+          setModalConfirmOpen(false);
+          setParcelaAction(null);
+        }}
+        onConfirm={confirmarAcao}
+        title={parcelaAction?.action === 'pagar' ? "Confirmar Pagamento" : "Desfazer Pagamento"}
+        message={parcelaAction?.action === 'pagar' 
+          ? "Tem certeza que deseja marcar esta parcela como paga?" 
+          : "Tem certeza que deseja desfazer o pagamento desta parcela?"}
+        confirmText={parcelaAction?.action === 'pagar' ? "Pagar" : "Desfazer"}
+        cancelText="Cancelar"
+        variant={parcelaAction?.action === 'pagar' ? "info" : "danger"}
+      />
     </div>
   );
 }
