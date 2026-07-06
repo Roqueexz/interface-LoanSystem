@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { LogOut} from "lucide-react";
+import { LogOut } from "lucide-react";
 import AuthRequests from "../../fetch/AuthRequests";
 import Navegacao from "../Navegacao/Navegacao";
 import Rodape from "../Rodape/Rodape";
 import TemaToggle from "../../ui/Tema/TemaToggle";
+import ModalConfirmacao from "../../ui/Modal/ModalConfirmacao";
+import { useToast } from "../../hooks/useToast";
 
 type Props = {
   children: ReactNode;
@@ -14,8 +16,10 @@ type Props = {
 function Layout({ children }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
+  const toast = useToast();
   const prevChildrenRef = useRef<ReactNode>(children);
   const [displayChildren, setDisplayChildren] = useState<ReactNode>(children);
+  const [modalLogoutOpen, setModalLogoutOpen] = useState(false);
 
   useEffect(() => {
     const previous = prevChildrenRef.current;
@@ -38,10 +42,19 @@ function Layout({ children }: Props) {
     .toUpperCase();
 
   const handleLogout = () => {
-    const confirmacao = confirm("Tem certeza que deseja sair?");
-    if (confirmacao) {
+    setModalLogoutOpen(true);
+  };
+
+  const confirmarLogout = () => {
+    try {
       AuthRequests.removeToken();
+      toast.success('👋 Até logo!');
       navigate("/");
+    } catch (error) {
+      toast.error('❌ Erro ao sair do sistema. Tente novamente.');
+      console.error('[Layout] Erro no logout:', error);
+    } finally {
+      setModalLogoutOpen(false);
     }
   };
 
@@ -80,6 +93,18 @@ function Layout({ children }: Props) {
       </main>
 
       <Rodape />
+
+      {/* Modal de Confirmacao para Logout */}
+      <ModalConfirmacao
+        isOpen={modalLogoutOpen}
+        onClose={() => setModalLogoutOpen(false)}
+        onConfirm={confirmarLogout}
+        title="Sair do Sistema"
+        message="Tem certeza que deseja sair? Você será redirecionado para a tela de login."
+        confirmText="Sair"
+        cancelText="Cancelar"
+        variant="warning"
+      />
     </div>
   );
 }
