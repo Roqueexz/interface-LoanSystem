@@ -1,10 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="light">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>interface-loansystem</title>
+    <title>LoanSystem</title>
+    <script>
+      (function() {
+        const saved = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = saved === 'dark' || saved === 'light' ? saved : (prefersDark ? 'dark' : 'light');
+        document.documentElement.className = theme;
+        document.documentElement.style.backgroundColor = theme === 'dark' ? '#0b111e' : '#f8fafc';
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
