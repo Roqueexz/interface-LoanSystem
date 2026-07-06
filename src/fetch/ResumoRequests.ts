@@ -1,50 +1,18 @@
 import type ResumoClienteDTO from "../interface/ResumoClienteDTO";
-import AuthRequests from "./AuthRequests";
+import { BaseRequests } from "./BaseRequests";
 
-class ResumoRequests {
-  private serverURL: string;
-  private endpointClientes: string;
-
-  constructor() {
-    this.serverURL = "http://localhost:3333";
-    this.endpointClientes = "/api/clientes";
-  }
+class ResumoRequests extends BaseRequests {
+  private endpointClientes = '/api/clientes';
 
   async obterResumoCliente(id_cliente: number): Promise<ResumoClienteDTO | undefined> {
-    try {
-      const token = localStorage.getItem("token");
-
-      const respostaAPI = await fetch(
-        `${this.serverURL}${this.endpointClientes}/${id_cliente}/resumo`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-access-token": token || "",
-          },
-        },
-      );
-
-      if (respostaAPI.status === 401) {
-        console.warn("Token expirado. Redirecionando para login...");
-        AuthRequests.removeToken();
-        return undefined;
-      }
-
-      if (respostaAPI.status === 404) {
-        console.warn(`Cliente ${id_cliente} nao encontrado.`);
-        return undefined;
-      }
-
-      if (respostaAPI.ok) {
-        const resumo: ResumoClienteDTO = await respostaAPI.json();
-        return resumo;
-      }
-
-      throw new Error(`Nao foi possivel obter o resumo do cliente. Status: ${respostaAPI.status}`);
-    } catch (error) {
-      console.error(`Erro ao consultar resumo do cliente ${id_cliente}.`, error);
+    const resposta = await this.request<ResumoClienteDTO>(`${this.endpointClientes}/${id_cliente}/resumo`);
+    
+    if (!resposta.sucesso) {
+      console.error(`[ResumoRequests] Erro ao obter resumo do cliente ${id_cliente}:`, resposta.erro);
       return undefined;
     }
+
+    return resposta.dados;
   }
 }
 
