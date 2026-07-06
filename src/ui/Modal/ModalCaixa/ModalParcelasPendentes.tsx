@@ -4,6 +4,7 @@ import ModalBase from "../ModalBase";
 import { formatarMoeda, formatarDataBR } from "../../../services/Utilitario";
 import ParcelaRequests from "../../../fetch/ParcelaRequests";
 import EmprestimoRequests from "../../../fetch/EmprestimoRequests";
+import ClienteRequests from "../../../fetch/ClienteRequests";
 
 interface ParcelaPendente {
   id_parcela: number;
@@ -36,25 +37,36 @@ function ModalParcelasPendentes({ isOpen, onClose }: Props) {
     setErro(null);
 
     try {
-      const emprestimos = await EmprestimoRequests.obterListaDeEmprestimos();
-      if (!emprestimos) {
+      // Busca todos os empréstimos e clientes
+      const [emprestimos, clientes] = await Promise.all([
+        EmprestimoRequests.obterListaDeEmprestimos(),
+        ClienteRequests.obterListaDeClientes(),
+      ]);
+
+      if (!emprestimos || !clientes) {
         setErro("Erro ao carregar dados.");
         setCarregando(false);
         return;
       }
 
+      // Busca as parcelas pendentes via endpoint de status
       const dados = await ParcelaRequests.listarPorStatus('pendentes');
       if (dados && dados.length > 0) {
-        const parcelasComCliente = dados.map((p: any) => {
+        // Mapeia para incluir dados do cliente
+        const parcelasComCliente: ParcelaPendente[] = dados.map((p: any) => {
           const emprestimo = emprestimos.find(e => e.id_emprestimo === p.id_emprestimo);
+          const cliente = emprestimo ? clientes.find(c => c.id_cliente === emprestimo.id_cliente) : null;
+          
           return {
             id_parcela: p.id_parcela,
             id_emprestimo: p.id_emprestimo,
             numero_parcela: p.numero_parcela,
             valor_parcela: p.valor_parcela,
             data_vencimento: p.data_vencimento,
-            cliente_nome: emprestimo ? `Cliente #${emprestimo.id_cliente}` : "N/A",
-            cliente_telefone: "N/A",
+            cliente_nome: cliente 
+              ? `${cliente.nome_cliente} ${cliente.sobrenome_cliente}` 
+              : `Cliente #${emprestimo?.id_cliente || 'N/A'}`,
+            cliente_telefone: cliente?.telefone || "N/A",
           };
         });
         setParcelas(parcelasComCliente);
