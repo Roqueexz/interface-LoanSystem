@@ -136,7 +136,12 @@ function FormEditarEmprestimo() {
       {
         loading: 'Atualizando empréstimo...',
         success: '✅ Empréstimo atualizado com sucesso!',
-        error: '❌ Erro ao atualizar empréstimo.',
+        error: (err) => {
+          if (err?.message) {
+            return `❌ ${err.message}`;
+          }
+          return '❌ Erro ao atualizar empréstimo. Tente novamente.';
+        },
       }
     );
 
@@ -161,7 +166,7 @@ function FormEditarEmprestimo() {
         <p className="font-semibold text-red-600 dark:text-red-400">{erro}</p>
         <button
           onClick={() => navigate("/emprestimos")}
-          className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+          className="text-sm text-primary hover:underline"
         >
           Voltar para lista
         </button>
