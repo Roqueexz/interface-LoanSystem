@@ -7,7 +7,6 @@ import {
   Clock,
   XCircle,
   ArrowLeft,
-  TrendingDown,
 } from "lucide-react";
 
 import CaixaRequests from "../../../fetch/CaixaRequests";
@@ -47,12 +46,12 @@ function ResumoCaixa() {
 
   if (erro || !resumo) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-64 gap-3 text-red-500">
+      <div className="flex flex-col items-center justify-center min-h-64 gap-3 text-red-500 dark:text-red-400">
         <XCircle size={32} />
         <p className="font-semibold">{erro}</p>
         <button
           onClick={() => navigate("/")}
-          className="text-sm text-indigo-600 hover:underline"
+          className="text-sm text-primary hover:underline"
         >
           Voltar para o Início
         </button>
@@ -81,10 +80,9 @@ function ResumoCaixa() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total Emprestado */}
         <div className="bg-card rounded-2xl border border-border p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
               <Landmark size={18} />
             </div>
           </div>
@@ -94,10 +92,9 @@ function ResumoCaixa() {
           </p>
         </div>
 
-        {/* Total Recebido */}
         <div className="bg-card rounded-2xl border border-border p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
               <TrendingUp size={18} />
             </div>
           </div>
@@ -107,10 +104,9 @@ function ResumoCaixa() {
           </p>
         </div>
 
-        {/* A Receber */}
         <div className="bg-card rounded-2xl border border-border p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
               <Wallet size={18} />
             </div>
           </div>
@@ -120,10 +116,9 @@ function ResumoCaixa() {
           </p>
         </div>
 
-        {/* Em Atraso */}
         <div className="bg-card rounded-2xl border border-border p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center">
               <Clock size={18} />
             </div>
           </div>
@@ -137,7 +132,7 @@ function ResumoCaixa() {
       {/* Relatorio Diario - Placeholder para futura implementacao */}
       <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
         <div className="flex items-center gap-1 p-4 border-b border-border bg-muted/30">
-          <button className="px-4 py-2 rounded-xl text-sm font-semibold text-white shadow-sm" style={{ background: "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)" }}>
+          <button className="px-4 py-2 rounded-xl text-sm font-semibold text-primary-foreground shadow-sm" style={{ background: "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)" }}>
             Relatório Diário
           </button>
           <button className="px-4 py-2 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
@@ -153,9 +148,7 @@ function ResumoCaixa() {
             <TrendingUp size={28} className="text-muted-foreground/50" />
           </div>
           <p className="font-semibold text-foreground mb-1">Movimentações do Dia</p>
-          <p className="text-sm">
-            Em breve você poderá ver todas as movimentações do dia aqui.
-          </p>
+          <p className="text-sm">Em breve você poderá ver todas as movimentações do dia aqui.</p>
         </div>
       </div>
     </div>
