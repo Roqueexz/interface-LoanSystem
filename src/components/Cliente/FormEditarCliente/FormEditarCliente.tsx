@@ -1,6 +1,6 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Loader2 } from "lucide-react";
 
 import ClienteRequests from "../../../fetch/ClienteRequests";
 import type ClienteDTO from "../../../interface/ClienteDTO";
@@ -13,6 +13,7 @@ function FormEditarCliente() {
   const toast = useToast();
 
   const [loading, setLoading] = useState(true);
+  const [salvando, setSalvando] = useState(false);
 
   const [formData, setFormData] = useState<ClienteDTO>({
     nome_cliente: "",
@@ -57,14 +58,23 @@ function FormEditarCliente() {
 
     if (!id) return;
 
+    setSalvando(true);
+
     const sucesso = await toast.promise(
       ClienteRequests.atualizarCliente(Number(id), formData),
       {
         loading: 'Atualizando cliente...',
         success: '✅ Cliente atualizado com sucesso!',
-        error: '❌ Erro ao atualizar cliente.',
+        error: (err) => {
+          if (err?.message) {
+            return `❌ ${err.message}`;
+          }
+          return '❌ Erro ao atualizar cliente. Tente novamente.';
+        },
       }
     );
+
+    setSalvando(false);
 
     if (sucesso) {
       navigate("/clientes");
@@ -182,10 +192,20 @@ function FormEditarCliente() {
           <div className="flex gap-4 pt-4 border-t border-border">
             <button
               type="submit"
-              className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-xl font-bold hover:opacity-90 transition-all"
+              disabled={salvando}
+              className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-xl font-bold hover:opacity-90 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <Save size={18} />
-              SALVAR
+              {salvando ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  SALVANDO...
+                </>
+              ) : (
+                <>
+                  <Save size={18} />
+                  SALVAR
+                </>
+              )}
             </button>
 
             <button
