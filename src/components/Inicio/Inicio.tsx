@@ -12,7 +12,6 @@ import {
   Bell,
   Shield,
   Activity,
-  DollarSign,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import CaixaRequests from "../../fetch/CaixaRequests";
