@@ -40,7 +40,10 @@ function Navegacao() {
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 }`}
               >
-                {label}
+                <span className="inline-flex items-center gap-2">
+                  <Icon size={14} />
+                  <span>{label}</span>
+                </span>
               </Link>
             ))}
           </div>
