@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Mail, Shield, LogOut, Calendar, ArrowLeft, Activity } from "lucide-react";
+import { LogOut, ArrowLeft } from "lucide-react";
 import AuthRequests from "../../../fetch/AuthRequests";
 import { useToast } from "../../../hooks/useToast";
 import ModalConfirmacao from "../../../ui/Modal/ModalConfirmacao";
