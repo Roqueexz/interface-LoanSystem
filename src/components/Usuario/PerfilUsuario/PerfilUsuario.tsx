@@ -53,6 +53,16 @@ function PerfilUsuario() {
     }
   };
 
+  const copiarId = async () => {
+    try {
+      const id = usuario?.id_usuario ? `#${usuario.id_usuario}` : '';
+      await navigator.clipboard.writeText(id);
+      toast.success('ID copiado para área de transferência');
+    } catch (e) {
+      toast.error('Não foi possível copiar ID');
+    }
+  };
+
   const formatarRole = (role: string) => {
     switch (role) {
       case "admin":
@@ -155,7 +165,12 @@ function PerfilUsuario() {
           {userInfo.map((item) => (
             <div key={item.label} className="p-3.5 bg-muted/30 rounded-xl border border-border/50">
               <p className="text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wide">{item.label}</p>
-              <p className="text-sm font-semibold text-foreground">{item.value}</p>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-foreground">{item.value}</p>
+                {item.label === 'ID do Usuário' && (
+                  <button onClick={copiarId} className="text-xs px-2 py-1 border rounded-lg hover:bg-muted">Copiar</button>
+                )}
+              </div>
             </div>
           ))}
         </div>
