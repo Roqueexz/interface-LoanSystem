@@ -16,7 +16,7 @@ export interface ResumoCaixaPessoalDTO {
 
 // Sprint 2 — Controle do cofre físico
 export interface CedulaCofreDTO {
-  valor: number; // 2 | 5 | 10 | 20 | 50 | 100 | 200
+  valor_cedula: number; // 2 | 5 | 10 | 20 | 50 | 100 | 200
   quantidade: number;
 }
 
