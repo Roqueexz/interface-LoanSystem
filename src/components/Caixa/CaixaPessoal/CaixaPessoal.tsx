@@ -1,23 +1,25 @@
-import HeaderCaixa from "./HeaderCaixa";
-import CardSaldo from "./CardSaldo";
-import GridResumo from "./GridResumo";
-import ListaHistorico from "./ListaHistorico";
-import type { ResumoCaixaPessoalDTO, MovimentacaoCaixaPessoalDTO } from "../../../interface/CaixaPessoalDTO";
+import { useCofre } from '../../../hooks/useCofre';
+import HeaderCaixa from './HeaderCaixa';
+import CardSaldo from './CardSaldo';
+import GridResumo from './GridResumo';
+import ControleCofre from './ControleCofre';
+import ListaHistorico from './ListaHistorico';
+import type { ResumoCaixaPessoalDTO, MovimentacaoCaixaPessoalDTO } from '../../../interface/CaixaPessoalDTO';
 
 // ============================================================
 // CaixaPessoal — orquestrador principal do módulo
-// Responsabilidade: montar o layout e compor os blocos.
+// Responsabilidade: compor os blocos e distribuir dados.
 // NÃO possui lógica financeira — apenas orquestra.
 //
-// Sprint 1: dados estáticos zerados (sem API ainda).
-// Sprint 2: receberá bloco do Cofre Físico.
-// Sprint 3: receberá filtros e movimentações reais.
-// Sprint 4: receberá blocos de Contas e Reservas.
-// Sprint 5: receberá Metas e Projeções.
+// Sprint 1: estrutura base ✅
+// Sprint 2: cofre físico com persistência ✅
+// Sprint 3: movimentações reais (hook useMovimentacoes)
+// Sprint 4: contas e reservas (hook useContas)
+// Sprint 5: metas e projeções (hook useMetas)
 // ============================================================
 
-// Dados iniciais zerados — Sprint 1
-// Sprint 3: virão de hook useCaixaPessoal()
+// Sprint 1-2: resumo ainda estático
+// Sprint 3: virá de hook useMovimentacoes()
 const resumoInicial: ResumoCaixaPessoalDTO = {
   saldoAtual: 0,
   entradas: 0,
@@ -29,28 +31,35 @@ const resumoInicial: ResumoCaixaPessoalDTO = {
 const movimentacoesIniciais: MovimentacaoCaixaPessoalDTO[] = [];
 
 function CaixaPessoal() {
+  const cofre = useCofre();
+
+  // Saldo = total do cofre físico (Sprint 2)
+  // Sprint 3: saldo = cofre + entradas - saídas
+  const saldoAtual = cofre.total;
+
   return (
     <div className="space-y-6">
 
       {/* Cabeçalho do módulo */}
       <HeaderCaixa />
 
-      {/* Card de saldo em destaque */}
-      <CardSaldo saldo={resumoInicial.saldoAtual} />
+      {/* Card de saldo — atualizado com total do cofre */}
+      <CardSaldo saldo={saldoAtual} />
 
       {/* Grid com 4 cards de resumo */}
-      <GridResumo resumo={resumoInicial} />
+      <GridResumo resumo={{ ...resumoInicial, saldoAtual }} />
 
-      {/* Sprint 2: <ControleCofre /> será adicionado aqui */}
+      {/* Cofre físico — Sprint 2 */}
+      <ControleCofre cofre={cofre} />
 
-      {/* Sprint 3: <FiltrosHistorico /> será adicionado aqui */}
+      {/* Sprint 3: <FiltrosHistorico /> e movimentações reais */}
 
       {/* Histórico de movimentações */}
       <ListaHistorico movimentacoes={movimentacoesIniciais} />
 
-      {/* Sprint 4: <ContasAPagar /> e <Reservas /> serão adicionados aqui */}
+      {/* Sprint 4: <ContasAPagar /> e <Reservas /> */}
 
-      {/* Sprint 5: <MetasFinanceiras /> e <ProjecaoSaldo /> serão adicionados aqui */}
+      {/* Sprint 5: <MetasFinanceiras /> e <ProjecaoSaldo /> */}
 
     </div>
   );
