@@ -1,4 +1,4 @@
-import type { CofreFisicoDTO, CedulaCofreDTO } from '../interface/CaixaPessoalDTO';
+import type { CofreFisicoDTO, CedulaCofreDTO, ContaCaixaPessoalDTO } from '../interface/CaixaPessoalDTO';
 import { BaseRequests } from './BaseRequests';
 
 // ============================================================
@@ -42,6 +42,78 @@ class CaixaPessoalRequests extends BaseRequests {
     }
 
     return resposta.dados;
+  }
+
+  // ─── CONTAS: LISTAR ───────────────────────────────────────────────
+  async listarContas(): Promise<ContaCaixaPessoalDTO[] | undefined> {
+    const resposta = await this.request<any[]>(`${this.endpoint}/contas`);
+
+    if (!resposta.sucesso) {
+      console.error('[CaixaPessoalRequests] Erro ao listar contas:', resposta.erro);
+      return undefined;
+    }
+
+    // Mapeia o formato do backend para os DTOs do frontend
+    const dados = resposta.dados || [];
+    return dados.map((d: any) => ({
+      id: String(d.id_conta ?? d.id),
+      tipo: d.tipo,
+      descricao: d.descricao,
+      valor: Number(d.valor),
+      vencimento: d.vencimento,
+      pago: Boolean(d.pago),
+    }));
+  }
+
+  // ─── CONTAS: CRIAR ───────────────────────────────────────────────
+  async criarConta(payload: { tipo: string; descricao: string; valor: number; vencimento: string }) {
+    const resposta = await this.request<any>(`${this.endpoint}/contas`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+
+    if (!resposta.sucesso) {
+      console.error('[CaixaPessoalRequests] Erro ao criar conta:', resposta.erro);
+      return undefined;
+    }
+
+    const d = resposta.dados;
+    return {
+      id: String(d.id_conta ?? d.id),
+      tipo: d.tipo,
+      descricao: d.descricao,
+      valor: Number(d.valor),
+      vencimento: d.vencimento,
+      pago: Boolean(d.pago),
+    };
+  }
+
+  // ─── CONTAS: PAGAR ───────────────────────────────────────────────
+  async pagarConta(id_conta: string): Promise<boolean> {
+    const resposta = await this.request(`${this.endpoint}/contas/${id_conta}/pagar`, {
+      method: 'PATCH',
+    });
+
+    if (!resposta.sucesso) {
+      console.error('[CaixaPessoalRequests] Erro ao pagar conta:', resposta.erro);
+      return false;
+    }
+
+    return true;
+  }
+
+  // ─── CONTAS: REMOVER ─────────────────────────────────────────────
+  async removerConta(id_conta: string): Promise<boolean> {
+    const resposta = await this.request(`${this.endpoint}/contas/${id_conta}`, {
+      method: 'DELETE',
+    });
+
+    if (!resposta.sucesso) {
+      console.error('[CaixaPessoalRequests] Erro ao remover conta:', resposta.erro);
+      return false;
+    }
+
+    return true;
   }
 }
 
