@@ -4,6 +4,7 @@ import CardSaldo from './CardSaldo';
 import GridResumo from './GridResumo';
 import ControleCofre from './ControleCofre';
 import ListaHistorico from './ListaHistorico';
+import ListaContas from './ListaContas';
 import type { ResumoCaixaPessoalDTO, MovimentacaoCaixaPessoalDTO } from '../../../interface/CaixaPessoalDTO';
 
 // ============================================================
@@ -57,7 +58,8 @@ function CaixaPessoal() {
       {/* Histórico de movimentações */}
       <ListaHistorico movimentacoes={movimentacoesIniciais} />
 
-      {/* Sprint 4: <ContasAPagar /> e <Reservas /> */}
+      {/* Sprint 4: Contas e Reservas */}
+      <ListaContas />
 
       {/* Sprint 5: <MetasFinanceiras /> e <ProjecaoSaldo /> */}
 
