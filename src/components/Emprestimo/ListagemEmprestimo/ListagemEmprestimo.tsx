@@ -111,7 +111,7 @@ function ListagemEmprestimo() {
   }
 
   // Placeholder para progresso - futuramente virá do backend
-  function getProgress(emp: EmprestimoDTO): number {
+  function getProgress(_: EmprestimoDTO): number {
     return 0;
   }
 
