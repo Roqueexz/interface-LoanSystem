@@ -1,52 +1,57 @@
-import { Wallet, Plus } from "lucide-react";
+import HeaderCaixa from "./HeaderCaixa";
+import CardSaldo from "./CardSaldo";
+import GridResumo from "./GridResumo";
+import ListaHistorico from "./ListaHistorico";
+import type { ResumoCaixaPessoalDTO, MovimentacaoCaixaPessoalDTO } from "../../../interface/CaixaPessoalDTO";
+
+// ============================================================
+// CaixaPessoal — orquestrador principal do módulo
+// Responsabilidade: montar o layout e compor os blocos.
+// NÃO possui lógica financeira — apenas orquestra.
+//
+// Sprint 1: dados estáticos zerados (sem API ainda).
+// Sprint 2: receberá bloco do Cofre Físico.
+// Sprint 3: receberá filtros e movimentações reais.
+// Sprint 4: receberá blocos de Contas e Reservas.
+// Sprint 5: receberá Metas e Projeções.
+// ============================================================
+
+// Dados iniciais zerados — Sprint 1
+// Sprint 3: virão de hook useCaixaPessoal()
+const resumoInicial: ResumoCaixaPessoalDTO = {
+  saldoAtual: 0,
+  entradas: 0,
+  saidas: 0,
+  reservado: 0,
+  disponivel: 0,
+};
+
+const movimentacoesIniciais: MovimentacaoCaixaPessoalDTO[] = [];
 
 function CaixaPessoal() {
-  // FUTURO: Implementar com categorias dinâmicas
-  // - Adicionar movimentações (entrada/saída)
-  // - Criar categorias personalizadas
-  // - Ver saldo total
-  // - Histórico de transações
-
   return (
-    <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-lg font-bold text-foreground">Caixa Pessoal</h2>
-          <p className="text-sm text-muted-foreground">
-            Gerencie suas finanças pessoais
-          </p>
-        </div>
-        <button
-          disabled
-          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold opacity-50 cursor-not-allowed"
-        >
-          <Plus size={18} />
-          Nova Movimentação
-        </button>
-      </div>
+    <div className="space-y-6">
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <div className="bg-muted/50 rounded-xl p-4 text-center">
-          <p className="text-xs font-medium text-muted-foreground mb-1">Saldo Total</p>
-          <p className="text-xl font-bold text-foreground">R$ 0,00</p>
-        </div>
-        <div className="bg-emerald-50 dark:bg-emerald-500/10 rounded-xl p-4 text-center">
-          <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 mb-1">Entradas</p>
-          <p className="text-xl font-bold text-emerald-700 dark:text-emerald-400">R$ 0,00</p>
-        </div>
-        <div className="bg-red-50 dark:bg-red-500/10 rounded-xl p-4 text-center">
-          <p className="text-xs font-medium text-red-600 dark:text-red-400 mb-1">Saídas</p>
-          <p className="text-xl font-bold text-red-700 dark:text-red-400">R$ 0,00</p>
-        </div>
-      </div>
+      {/* Cabeçalho do módulo */}
+      <HeaderCaixa />
 
-      <div className="text-center py-8 text-muted-foreground border-2 border-dashed border-border rounded-xl">
-        <Wallet size={32} className="mx-auto mb-2 opacity-50" />
-        <p className="text-sm">Funcionalidade em desenvolvimento</p>
-        <p className="text-xs mt-1">
-          Em breve você poderá gerenciar suas finanças pessoais aqui.
-        </p>
-      </div>
+      {/* Card de saldo em destaque */}
+      <CardSaldo saldo={resumoInicial.saldoAtual} />
+
+      {/* Grid com 4 cards de resumo */}
+      <GridResumo resumo={resumoInicial} />
+
+      {/* Sprint 2: <ControleCofre /> será adicionado aqui */}
+
+      {/* Sprint 3: <FiltrosHistorico /> será adicionado aqui */}
+
+      {/* Histórico de movimentações */}
+      <ListaHistorico movimentacoes={movimentacoesIniciais} />
+
+      {/* Sprint 4: <ContasAPagar /> e <Reservas /> serão adicionados aqui */}
+
+      {/* Sprint 5: <MetasFinanceiras /> e <ProjecaoSaldo /> serão adicionados aqui */}
+
     </div>
   );
 }

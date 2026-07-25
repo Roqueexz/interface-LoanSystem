@@ -21,24 +21,29 @@ export class BaseRequests {
     this.serverURL = import.meta.env.VITE_API_URL || 'http://localhost:3333';
   }
 
-  protected async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<RespostaBase<T>> {
-    try {
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch(`${this.serverURL}${endpoint}`, {
-        ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': token || '',
-          ...options.headers,
-        },
-      });
+protected async request<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<RespostaBase<T>> {
+  try {
+    const token = localStorage.getItem('token');
+    
+    console.log('[BaseRequests] Enviando requisicao para:', `${this.serverURL}${endpoint}`);
+    console.log('[BaseRequests] Token:', token ? 'Presente' : 'Ausente');
 
-      // Se a resposta nao for ok, tenta extrair a mensagem de erro
-      if (!response.ok) {
+    const response = await fetch(`${this.serverURL}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': token || '',
+        ...options.headers,
+      },
+    });
+
+    console.log('[BaseRequests] Status:', response.status);
+    console.log('[BaseRequests] OK:', response.ok);
+
+    if (!response.ok) {
         let mensagemErro = `Erro ${response.status}: ${response.statusText}`;
         
         try {
