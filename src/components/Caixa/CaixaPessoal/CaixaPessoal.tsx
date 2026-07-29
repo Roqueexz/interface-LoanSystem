@@ -23,8 +23,8 @@ import type { ResumoCaixaPessoalDTO } from '../../../interface/CaixaPessoalDTO';
 
 function CaixaPessoal() {
   const cofre = useCofre();
-  const { contas } = useContas();
-  const { movimentacoes, entradas, saidas, carregando: carregandoMov } = useMovimentacoes();
+  const { contas, proximasContas, contasAtrasadas, vencendoHoje } = useContas();
+  const { movimentacoes, entradas, saidas } = useMovimentacoes();
 
   // Calcula reservado a partir das contas não pagas do tipo 'pagar'
   const reservado = contas
@@ -53,6 +53,35 @@ function CaixaPessoal() {
 
       {/* Card de saldo — atualizado com saldoAtual calculado */}
       <CardSaldo saldo={saldoAtual} />
+
+      {/* Hoje — resumo rápido para ação imediata (mobile-first) */}
+      <div className="bg-card rounded-2xl border border-border p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h3 className="text-sm font-semibold text-foreground">Hoje</h3>
+          <p className="text-xs text-muted-foreground">O que precisa de atenção agora</p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <div className="px-3 py-2 bg-muted rounded-lg text-sm">
+            <div className="font-semibold">{vencendoHoje.length}</div>
+            <div className="text-xs text-muted-foreground">Vencem hoje</div>
+          </div>
+
+          <div className="px-3 py-2 bg-muted rounded-lg text-sm">
+            <div className="font-semibold">{contasAtrasadas.length}</div>
+            <div className="text-xs text-muted-foreground">Atrasadas</div>
+          </div>
+
+          <div className="px-3 py-2 bg-muted rounded-lg text-sm">
+            <div className="font-semibold">{proximasContas.length}</div>
+            <div className="text-xs text-muted-foreground">Próximos 7 dias</div>
+          </div>
+
+          <div className="px-3 py-2 bg-muted rounded-lg text-sm">
+            <div className="font-semibold">R$ {reservado.toFixed(2)}</div>
+            <div className="text-xs text-muted-foreground">Reservado</div>
+          </div>
+        </div>
+      </div>
 
       {/* Grid com 4 cards de resumo */}
       <GridResumo resumo={resumo} />
