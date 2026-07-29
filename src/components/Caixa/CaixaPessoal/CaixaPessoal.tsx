@@ -5,7 +5,9 @@ import GridResumo from './GridResumo';
 import ControleCofre from './ControleCofre';
 import ListaHistorico from './ListaHistorico';
 import ListaContas from './ListaContas';
-import type { ResumoCaixaPessoalDTO, MovimentacaoCaixaPessoalDTO } from '../../../interface/CaixaPessoalDTO';
+import { useContas } from '../../../hooks/useContas';
+import useMovimentacoes from '../../../hooks/useMovimentacoes';
+import type { ResumoCaixaPessoalDTO } from '../../../interface/CaixaPessoalDTO';
 
 // ============================================================
 // CaixaPessoal — orquestrador principal do módulo
@@ -19,24 +21,29 @@ import type { ResumoCaixaPessoalDTO, MovimentacaoCaixaPessoalDTO } from '../../.
 // Sprint 5: metas e projeções (hook useMetas)
 // ============================================================
 
-// Sprint 1-2: resumo ainda estático
-// Sprint 3: virá de hook useMovimentacoes()
-const resumoInicial: ResumoCaixaPessoalDTO = {
-  saldoAtual: 0,
-  entradas: 0,
-  saidas: 0,
-  reservado: 0,
-  disponivel: 0,
-};
-
-const movimentacoesIniciais: MovimentacaoCaixaPessoalDTO[] = [];
-
 function CaixaPessoal() {
   const cofre = useCofre();
+  const { contas } = useContas();
+  const { movimentacoes, entradas, saidas, carregando: carregandoMov } = useMovimentacoes();
 
-  // Saldo = total do cofre físico (Sprint 2)
-  // Sprint 3: saldo = cofre + entradas - saídas
-  const saldoAtual = cofre.total;
+  // Calcula reservado a partir das contas não pagas do tipo 'pagar'
+  const reservado = contas
+    .filter((c) => c.tipo === 'pagar' && !c.pago)
+    .reduce((acc, c) => acc + Number(c.valor || 0), 0);
+
+  // saldoAtual considera cofre + entradas - saídas
+  const saldoAtual = cofre.total + entradas - saidas;
+
+  // disponivel = saldoAtual menos o reservado
+  const disponivel = saldoAtual - reservado;
+
+  const resumo: ResumoCaixaPessoalDTO = {
+    saldoAtual,
+    entradas,
+    saidas,
+    reservado,
+    disponivel,
+  };
 
   return (
     <div className="space-y-6">
@@ -44,24 +51,22 @@ function CaixaPessoal() {
       {/* Cabeçalho do módulo */}
       <HeaderCaixa />
 
-      {/* Card de saldo — atualizado com total do cofre */}
+      {/* Card de saldo — atualizado com saldoAtual calculado */}
       <CardSaldo saldo={saldoAtual} />
 
       {/* Grid com 4 cards de resumo */}
-      <GridResumo resumo={{ ...resumoInicial, saldoAtual }} />
+      <GridResumo resumo={resumo} />
 
       {/* Cofre físico — Sprint 2 */}
       <ControleCofre cofre={cofre} />
 
-      {/* Sprint 3: <FiltrosHistorico /> e movimentações reais */}
+      {/* Histórico de movimentações (Sprint 3) */}
+      <ListaHistorico movimentacoes={movimentacoes} />
 
-      {/* Histórico de movimentações */}
-      <ListaHistorico movimentacoes={movimentacoesIniciais} />
-
-      {/* Sprint 4: Contas e Reservas */}
+      {/* Contas e Reservas (Sprint 4) */}
       <ListaContas />
 
-      {/* Sprint 5: <MetasFinanceiras /> e <ProjecaoSaldo /> */}
+      {/* Futuro: metas, projeções e filtros (Sprint 5+) */}
 
     </div>
   );
