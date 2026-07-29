@@ -1,4 +1,4 @@
-import type { CofreFisicoDTO, CedulaCofreDTO, ContaCaixaPessoalDTO } from '../interface/CaixaPessoalDTO';
+import type { CofreFisicoDTO, CedulaCofreDTO, ContaCaixaPessoalDTO, MovimentacaoCaixaPessoalDTO } from '../interface/CaixaPessoalDTO';
 import { BaseRequests } from './BaseRequests';
 
 // ============================================================
@@ -110,6 +110,63 @@ class CaixaPessoalRequests extends BaseRequests {
 
     if (!resposta.sucesso) {
       console.error('[CaixaPessoalRequests] Erro ao remover conta:', resposta.erro);
+      return false;
+    }
+
+    return true;
+  }
+
+  // ─── MOVIMENTAÇÕES: LISTAR ───────────────────────────────────────
+  async listarMovimentacoes(): Promise<MovimentacaoCaixaPessoalDTO[] | undefined> {
+    const resposta = await this.request<any[]>(`${this.endpoint}/movimentacoes`);
+
+    if (!resposta.sucesso) {
+      console.error('[CaixaPessoalRequests] Erro ao listar movimentações:', resposta.erro);
+      return undefined;
+    }
+
+    const dados = resposta.dados || [];
+    return dados.map((d: any) => ({
+      id: String(d.id_movimentacao ?? d.id),
+      tipo: d.tipo,
+      valor: Number(d.valor),
+      categoria: d.categoria,
+      descricao: d.descricao || '',
+      data: d.data,
+    }));
+  }
+
+  // ─── MOVIMENTAÇÕES: CRIAR ────────────────────────────────────────
+  async criarMovimentacao(payload: { tipo: string; valor: number; categoria: string; descricao?: string; data?: string }) {
+    const resposta = await this.request<any>(`${this.endpoint}/movimentacoes`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+
+    if (!resposta.sucesso) {
+      console.error('[CaixaPessoalRequests] Erro ao criar movimentação:', resposta.erro);
+      return undefined;
+    }
+
+    const d = resposta.dados;
+    return {
+      id: String(d.id_movimentacao ?? d.id),
+      tipo: d.tipo,
+      valor: Number(d.valor),
+      categoria: d.categoria,
+      descricao: d.descricao || '',
+      data: d.data,
+    };
+  }
+
+  // ─── MOVIMENTAÇÕES: REMOVER ──────────────────────────────────────
+  async removerMovimentacao(id_movimentacao: string): Promise<boolean> {
+    const resposta = await this.request(`${this.endpoint}/movimentacoes/${id_movimentacao}`, {
+      method: 'DELETE',
+    });
+
+    if (!resposta.sucesso) {
+      console.error('[CaixaPessoalRequests] Erro ao remover movimentação:', resposta.erro);
       return false;
     }
 
