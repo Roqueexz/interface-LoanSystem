@@ -62,11 +62,16 @@ class CaixaPessoalRequests extends BaseRequests {
       valor: Number(d.valor),
       vencimento: d.vencimento,
       pago: Boolean(d.pago),
+      categoria: d.categoria ?? undefined,
+      recorrencia: d.recorrencia ?? 'nenhuma',
+      lembreteDiasAntes: d.lembrete_dias_antes !== undefined ? Number(d.lembrete_dias_antes) : undefined,
+      observacao: d.observacao ?? undefined,
+      status: d.status ?? (d.pago ? 'paga' : 'pendente'),
     }));
   }
 
   // ─── CONTAS: CRIAR ───────────────────────────────────────────────
-  async criarConta(payload: { tipo: string; descricao: string; valor: number; vencimento: string }) {
+  async criarConta(payload: { tipo: string; descricao: string; valor: number; vencimento: string; categoria?: string; recorrencia?: string; lembrete_dias_antes?: number; observacao?: string; status?: string }) {
     const resposta = await this.request<any>(`${this.endpoint}/contas`, {
       method: 'POST',
       body: JSON.stringify(payload),
@@ -85,6 +90,11 @@ class CaixaPessoalRequests extends BaseRequests {
       valor: Number(d.valor),
       vencimento: d.vencimento,
       pago: Boolean(d.pago),
+      categoria: d.categoria ?? undefined,
+      recorrencia: d.recorrencia ?? 'nenhuma',
+      lembreteDiasAntes: d.lembrete_dias_antes !== undefined ? Number(d.lembrete_dias_antes) : undefined,
+      observacao: d.observacao ?? undefined,
+      status: d.status ?? (d.pago ? 'paga' : 'pendente'),
     };
   }
 
