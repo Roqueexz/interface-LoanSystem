@@ -47,6 +47,13 @@ export interface ContaCaixaPessoalDTO {
   valor: number;
   vencimento: string; // ISO string
   pago: boolean;
+
+  // Sprint 6 — novos campos
+  categoria?: string;
+  recorrencia?: 'nenhuma' | 'diaria' | 'semanal' | 'mensal' | 'anual';
+  lembreteDiasAntes?: number;
+  observacao?: string;
+  status?: 'pendente' | 'paga' | 'programada' | 'cancelada';
 }
 
 export interface ReservaDTO {
