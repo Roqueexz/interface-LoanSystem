@@ -14,9 +14,11 @@ function NovaContaModal({ isOpen, onClose }: Props) {
   const [valor, setValor] = useState('');
   const [vencimento, setVencimento] = useState('');
   const [categoria, setCategoria] = useState('Aluguel');
-  const [recorrencia, setRecorrencia] = useState<'nenhuma' | 'diaria' | 'semanal' | 'mensal' | 'anual'>('nenhuma');
+  const [recorrencia, setRecorrencia] = useState<'unica' | 'diaria' | 'semanal' | 'quinzenal' | 'mensal' | 'bimestral' | 'trimestral' | 'semestral' | 'anual'>('unica');
+  const [prioridade, setPrioridade] = useState<'alta' | 'media' | 'baixa'>('media');
   const [lembreteDias, setLembreteDias] = useState<string>('3');
   const [observacao, setObservacao] = useState('');
+  const [tags, setTags] = useState('');
   const [salvando, setSalvando] = useState(false);
 
   const CATEGORIAS_INICIAIS = ['Aluguel', 'Energia', 'Internet', 'Funcionários', 'Impostos'];
@@ -32,8 +34,13 @@ function NovaContaModal({ isOpen, onClose }: Props) {
       vencimento,
       categoria,
       recorrencia,
+      prioridade,
       lembrete_dias_antes: Number(lembreteDias) || undefined,
       observacao: observacao.trim() || undefined,
+      tags: tags
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter((tag) => tag.length > 0),
     });
     setSalvando(false);
     onClose();
@@ -80,12 +87,32 @@ function NovaContaModal({ isOpen, onClose }: Props) {
           <div>
             <label className="block text-xs text-muted-foreground mb-1">Recorrência</label>
             <select value={recorrencia} onChange={(e) => setRecorrencia(e.target.value as any)} className="w-full p-2 rounded-lg border border-border bg-input">
-              <option value="nenhuma">Nenhuma</option>
+              <option value="unica">Única</option>
               <option value="diaria">Diária</option>
               <option value="semanal">Semanal</option>
+              <option value="quinzenal">Quinzenal</option>
               <option value="mensal">Mensal</option>
+              <option value="bimestral">Bimestral</option>
+              <option value="trimestral">Trimestral</option>
+              <option value="semestral">Semestral</option>
               <option value="anual">Anual</option>
             </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs text-muted-foreground mb-1">Prioridade</label>
+            <select value={prioridade} onChange={(e) => setPrioridade(e.target.value as any)} className="w-full p-2 rounded-lg border border-border bg-input">
+              <option value="alta">Alta</option>
+              <option value="media">Média</option>
+              <option value="baixa">Baixa</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs text-muted-foreground mb-1">Tags (separadas por vírgula)</label>
+            <input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="Casa, Mercado" className="w-full p-2 rounded-lg border border-border bg-input" />
           </div>
         </div>
 

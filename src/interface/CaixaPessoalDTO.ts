@@ -50,10 +50,12 @@ export interface ContaCaixaPessoalDTO {
 
   // Sprint 6 — novos campos
   categoria?: string;
-  recorrencia?: 'nenhuma' | 'diaria' | 'semanal' | 'mensal' | 'anual';
+  recorrencia?: 'unica' | 'diaria' | 'semanal' | 'quinzenal' | 'mensal' | 'bimestral' | 'trimestral' | 'semestral' | 'anual';
+  prioridade?: 'alta' | 'media' | 'baixa';
   lembreteDiasAntes?: number;
   observacao?: string;
-  status?: 'pendente' | 'paga' | 'programada' | 'cancelada';
+  tags?: string[];
+  status?: 'programada' | 'pendente' | 'paga' | 'atrasada' | 'cancelada';
 }
 
 export interface ReservaDTO {

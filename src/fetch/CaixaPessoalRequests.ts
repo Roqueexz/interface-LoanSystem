@@ -45,15 +45,24 @@ class CaixaPessoalRequests extends BaseRequests {
   }
 
   // ─── CONTAS: LISTAR ───────────────────────────────────────────────
-  async listarContas(): Promise<ContaCaixaPessoalDTO[] | undefined> {
-    const resposta = await this.request<any[]>(`${this.endpoint}/contas`);
+  async listarContas(filters?: { status?: string; categoria?: string; recorrencia?: string; prioridade?: string; q?: string; dias?: number }): Promise<ContaCaixaPessoalDTO[] | undefined> {
+    const query = new URLSearchParams();
+
+    if (filters?.status) query.append('status', filters.status);
+    if (filters?.categoria) query.append('categoria', filters.categoria);
+    if (filters?.recorrencia) query.append('recorrencia', filters.recorrencia);
+    if (filters?.prioridade) query.append('prioridade', filters.prioridade);
+    if (filters?.q) query.append('q', filters.q);
+    if (filters?.dias !== undefined) query.append('dias', String(filters.dias));
+
+    const url = `${this.endpoint}/contas${query.toString() ? `?${query.toString()}` : ''}`;
+    const resposta = await this.request<any[]>(url);
 
     if (!resposta.sucesso) {
       console.error('[CaixaPessoalRequests] Erro ao listar contas:', resposta.erro);
       return undefined;
     }
 
-    // Mapeia o formato do backend para os DTOs do frontend
     const dados = resposta.dados || [];
     return dados.map((d: any) => ({
       id: String(d.id_conta ?? d.id),
@@ -63,15 +72,17 @@ class CaixaPessoalRequests extends BaseRequests {
       vencimento: d.vencimento,
       pago: Boolean(d.pago),
       categoria: d.categoria ?? undefined,
-      recorrencia: d.recorrencia ?? 'nenhuma',
+      recorrencia: d.recorrencia ?? 'unica',
+      prioridade: d.prioridade ?? 'media',
       lembreteDiasAntes: d.lembrete_dias_antes !== undefined ? Number(d.lembrete_dias_antes) : undefined,
       observacao: d.observacao ?? undefined,
+      tags: Array.isArray(d.tags) ? d.tags.map((tag: any) => String(tag)) : [],
       status: d.status ?? (d.pago ? 'paga' : 'pendente'),
     }));
   }
 
   // ─── CONTAS: CRIAR ───────────────────────────────────────────────
-  async criarConta(payload: { tipo: string; descricao: string; valor: number; vencimento: string; categoria?: string; recorrencia?: string; lembrete_dias_antes?: number; observacao?: string; status?: string }) {
+  async criarConta(payload: { tipo: string; descricao: string; valor: number; vencimento: string; categoria?: string; recorrencia?: string; prioridade?: string; lembrete_dias_antes?: number; observacao?: string; tags?: string[]; status?: string }) {
     const resposta = await this.request<any>(`${this.endpoint}/contas`, {
       method: 'POST',
       body: JSON.stringify(payload),
@@ -91,9 +102,11 @@ class CaixaPessoalRequests extends BaseRequests {
       vencimento: d.vencimento,
       pago: Boolean(d.pago),
       categoria: d.categoria ?? undefined,
-      recorrencia: d.recorrencia ?? 'nenhuma',
+      recorrencia: d.recorrencia ?? 'unica',
+      prioridade: d.prioridade ?? 'media',
       lembreteDiasAntes: d.lembrete_dias_antes !== undefined ? Number(d.lembrete_dias_antes) : undefined,
       observacao: d.observacao ?? undefined,
+      tags: Array.isArray(d.tags) ? d.tags.map((tag: any) => String(tag)) : [],
       status: d.status ?? (d.pago ? 'paga' : 'pendente'),
     };
   }
