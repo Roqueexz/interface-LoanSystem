@@ -1,14 +1,22 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Home, Users, CreditCard, Wallet, DollarSign } from 'lucide-react';
+import { Link, useLocation } from "react-router-dom";
+import {
+  Home,
+  Users,
+  CreditCard,
+  Wallet,
+  DollarSign,
+  BarChart2,
+} from "lucide-react";
 
 function Navegacao() {
   const location = useLocation();
 
   const links = [
-    { to: '/', icon: Home, label: 'Início' },
-    { to: '/clientes', icon: Users, label: 'Clientes' },
-    { to: '/emprestimos', icon: CreditCard, label: 'Empréstimos' },
-    { to: '/caixa', icon: Wallet, label: 'Caixa' },
+    { to: "/", icon: Home, label: "Início" },
+    { to: "/dashboard", icon: BarChart2, label: "Dashboard" },
+    { to: "/clientes", icon: Users, label: "Clientes" },
+    { to: "/emprestimos", icon: CreditCard, label: "Empréstimos" },
+    { to: "/caixa", icon: Wallet, label: "Caixa" },
   ];
 
   return (
@@ -19,7 +27,9 @@ function Navegacao() {
           <Link to="/" className="flex items-center gap-2.5 group">
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
-              style={{ background: "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)" }}
+              style={{
+                background: "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)",
+              }}
             >
               <DollarSign size={16} className="text-white" />
             </div>
@@ -36,8 +46,8 @@ function Navegacao() {
                 to={to}
                 className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-all ${
                   location.pathname === to
-                    ? 'bg-secondary/50 text-primary'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    ? "bg-secondary/50 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}
               >
                 <span className="inline-flex items-center gap-2">
@@ -56,8 +66,8 @@ function Navegacao() {
                 to={to}
                 className={`p-2 rounded-xl text-sm font-medium transition-all ${
                   location.pathname === to
-                    ? 'bg-secondary/50 text-primary'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    ? "bg-secondary/50 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}
               >
                 <Icon size={18} />
