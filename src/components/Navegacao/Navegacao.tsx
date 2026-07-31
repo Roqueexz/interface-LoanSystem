@@ -6,6 +6,7 @@ import {
   Wallet,
   DollarSign,
   BarChart2,
+  Calendar,
 } from "lucide-react";
 
 function Navegacao() {
@@ -14,6 +15,7 @@ function Navegacao() {
   const links = [
     { to: "/", icon: Home, label: "Início" },
     { to: "/dashboard", icon: BarChart2, label: "Dashboard" },
+    { to: "/calendario", icon: Calendar, label: "Calendário" },
     { to: "/clientes", icon: Users, label: "Clientes" },
     { to: "/emprestimos", icon: CreditCard, label: "Empréstimos" },
     { to: "/caixa", icon: Wallet, label: "Caixa" },
