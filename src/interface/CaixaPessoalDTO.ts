@@ -71,6 +71,8 @@ export interface MetaFinanceiraDTO {
   nome: string;
   valorAlvo: number;
   valorAtual: number;
-  prazo: string; // ISO string
-  descricao: string;
+  prazo?: string; // ISO string
+  descricao?: string;
+  percentual: number;
+  diasRestantes?: number;
 }
