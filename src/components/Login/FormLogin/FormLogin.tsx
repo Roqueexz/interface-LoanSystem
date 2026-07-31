@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, LogIn, Loader2, AlertCircle } from "lucide-react";
+import { Mail, Lock, LogIn, Loader2, AlertCircle, Eye } from "lucide-react";
 import AuthRequests from "../../../fetch/AuthRequests";
 
 interface FormLoginProps {
@@ -13,6 +13,7 @@ function FormLogin({ onLoginSuccess }: FormLoginProps) {
   // Estados restaurados!
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [mostrarSenha, setMostrarSenha] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(false);
 
@@ -68,7 +69,7 @@ function FormLogin({ onLoginSuccess }: FormLoginProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="admin@sistema.com"
-              className="w-full border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 transition-all"
+              className="w-full border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 transition-all"
             />
           </div>
         </div>
@@ -82,13 +83,25 @@ function FormLogin({ onLoginSuccess }: FormLoginProps) {
               <Lock size={18} />
             </div>
             <input
-              type="password"
+              type={mostrarSenha ? 'text' : 'password'}
               required
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               placeholder="••••••••"
-              className="w-full border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 transition-all"
+              className="w-full border border-slate-200 rounded-xl pl-11 pr-16 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 transition-all"
             />
+            <button
+              type="button"
+              aria-label="Mostrar senha"
+              onMouseDown={() => setMostrarSenha(true)}
+              onMouseUp={() => setMostrarSenha(false)}
+              onMouseLeave={() => setMostrarSenha(false)}
+              onTouchStart={() => setMostrarSenha(true)}
+              onTouchEnd={() => setMostrarSenha(false)}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-700"
+            >
+              <Eye size={18} />
+            </button>
           </div>
         </div>
 
