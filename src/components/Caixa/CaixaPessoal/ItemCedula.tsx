@@ -1,4 +1,5 @@
 import { Minus, Plus, Loader2 } from 'lucide-react';
+import { useEffect, useState, type ChangeEvent, type KeyboardEvent } from 'react';
 import { formatarMoeda } from '../../../services/Utilitario';
 import type { EstadoCedula } from '../../../hooks/useCofre';
 
@@ -6,6 +7,7 @@ interface ItemCedulaProps {
   cedula: EstadoCedula;
   onIncrementar: (valor: number) => void;
   onDecrementar: (valor: number) => void;
+  onQuantidadeChange: (valor: number, quantidade: number) => void;
 }
 
 // ============================================================
@@ -15,9 +17,35 @@ interface ItemCedulaProps {
 // O componente é puro — recebe tudo via props do useCofre.
 // ============================================================
 
-function ItemCedula({ cedula, onIncrementar, onDecrementar }: ItemCedulaProps) {
+function ItemCedula({ cedula, onIncrementar, onDecrementar, onQuantidadeChange }: ItemCedulaProps) {
+  const [quantidadeInput, setQuantidadeInput] = useState(String(cedula.quantidade));
   const subtotal = cedula.valor_cedula * cedula.quantidade;
   const temQuantidade = cedula.quantidade > 0;
+
+  function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+    const value = event.target.value.replace(/\D/g, '');
+    setQuantidadeInput(value === '' ? '' : String(Number(value)));
+  }
+
+  async function handleCommitQuantidade() {
+    const novaQuantidade = quantidadeInput === '' ? 0 : Number(quantidadeInput);
+    if (Number.isNaN(novaQuantidade) || novaQuantidade < 0) return;
+    if (novaQuantidade !== cedula.quantidade) {
+      await onQuantidadeChange(cedula.valor_cedula, novaQuantidade);
+    } else {
+      setQuantidadeInput(String(cedula.quantidade));
+    }
+  }
+
+  function handleInputKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter') {
+      void handleCommitQuantidade();
+    }
+  }
+
+  useEffect(() => {
+    setQuantidadeInput(String(cedula.quantidade));
+  }, [cedula.quantidade]);
 
   return (
     <div
@@ -53,17 +81,21 @@ function ItemCedula({ cedula, onIncrementar, onDecrementar }: ItemCedulaProps) {
         </button>
 
         {/* Quantidade ou spinner */}
-        <div className="w-8 text-center">
+        <div className="w-20 text-center">
           {cedula.salvando ? (
             <Loader2 size={16} className="animate-spin text-indigo-500 mx-auto" />
           ) : (
-            <span
-              className={`text-sm font-bold ${
-                temQuantidade ? 'text-foreground' : 'text-muted-foreground'
-              }`}
-            >
-              {cedula.quantidade}
-            </span>
+            <input
+              type="number"
+              min="0"
+              value={quantidadeInput}
+              onChange={handleInputChange}
+              onBlur={handleCommitQuantidade}
+              onKeyDown={handleInputKeyDown}
+              disabled={cedula.salvando}
+              className="w-full px-2 py-1 rounded-lg border border-border bg-card text-center text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-ring/50 focus:border-primary"
+              aria-label={`Quantidade de notas de ${formatarMoeda(cedula.valor_cedula)}`}
+            />
           )}
         </div>
 
