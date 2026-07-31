@@ -93,25 +93,36 @@ function Inicio() {
 
   const quickActions = [
     {
+      path: "/dashboard",
+      icon: BarChart2,
+      title: "Dashboard Inteligente",
+      desc: "Visualize todos os indicadores financeiros",
+      iconBg:
+        "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400",
+    },
+    {
       path: "/clientes",
       icon: Users,
       title: "Clientes",
       desc: `${resumo.totalClientes} clientes cadastrados`,
-      iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400",
+      iconBg:
+        "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400",
     },
     {
       path: "/emprestimos",
       icon: CreditCard,
       title: "Empréstimos",
       desc: `${resumo.totalEmprestimos} empréstimos ativos`,
-      iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400",
+      iconBg:
+        "bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400",
     },
     {
       path: "/caixa",
       icon: Wallet,
       title: "Caixa",
       desc: "Ver relatórios financeiros",
-      iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400",
+      iconBg:
+        "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400",
     },
   ];
 
@@ -160,17 +171,24 @@ function Inicio() {
       <div
         className="relative rounded-2xl overflow-hidden p-8 md:p-12"
         style={{
-          background: "linear-gradient(135deg, #4338ca 0%, #4f46e5 40%, #2563eb 100%)",
+          background:
+            "linear-gradient(135deg, #4338ca 0%, #4f46e5 40%, #2563eb 100%)",
         }}
       >
         <div className="absolute inset-0 overflow-hidden">
           <div
             className="absolute -top-10 -right-10 w-80 h-80 rounded-full opacity-10"
-            style={{ background: "radial-gradient(circle, #ffffff 0%, transparent 70%)" }}
+            style={{
+              background:
+                "radial-gradient(circle, #ffffff 0%, transparent 70%)",
+            }}
           />
           <div
             className="absolute bottom-0 left-1/2 w-64 h-64 rounded-full opacity-[0.06]"
-            style={{ background: "radial-gradient(circle, #a5b4fc 0%, transparent 70%)" }}
+            style={{
+              background:
+                "radial-gradient(circle, #a5b4fc 0%, transparent 70%)",
+            }}
           />
         </div>
         <div className="relative z-10 max-w-2xl">
@@ -185,13 +203,25 @@ function Inicio() {
             Bem-vindo ao LoanSystem
           </h1>
           <p className="text-indigo-200 text-lg mb-8 leading-relaxed">
-            Gerencie seus empréstimos com segurança e eficiência. Controle clientes, parcelas e fluxo de caixa em um só lugar.
+            Gerencie seus empréstimos com segurança e eficiência. Controle
+            clientes, parcelas e fluxo de caixa em um só lugar.
           </p>
           <div className="flex flex-wrap gap-3">
             <button
-              onClick={() => navigate("/emprestimos/novo")}
+              onClick={() => navigate("/dashboard")}
               className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:scale-105"
               style={{ background: "#ffffff", color: "#4338ca" }}
+            >
+              📊 Dashboard Inteligente
+            </button>
+            <button
+              onClick={() => navigate("/emprestimos/novo")}
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:scale-105"
+              style={{
+                background: "rgba(255,255,255,0.12)",
+                color: "#ffffff",
+                borderColor: "rgba(255,255,255,0.3)",
+              }}
             >
               + Novo Empréstimo
             </button>
@@ -241,7 +271,9 @@ function Inicio() {
 
       {/* Quick access cards */}
       <div>
-        <h2 className="text-base font-bold text-foreground mb-4">Acesso Rápido</h2>
+        <h2 className="text-base font-bold text-foreground mb-4">
+          Acesso Rápido
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {quickActions.map((item) => (
             <button
@@ -249,12 +281,16 @@ function Inicio() {
               onClick={() => navigate(item.path)}
               className="bg-card rounded-2xl border border-border shadow-sm p-6 text-left hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md transition-all group"
             >
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${item.iconBg}`}>
+              <div
+                className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${item.iconBg}`}
+              >
                 <item.icon size={22} />
               </div>
               <div className="flex items-end justify-between">
                 <div>
-                  <h3 className="font-bold text-foreground mb-1">{item.title}</h3>
+                  <h3 className="font-bold text-foreground mb-1">
+                    {item.title}
+                  </h3>
                   <p className="text-sm text-muted-foreground">{item.desc}</p>
                 </div>
                 <ChevronRight
@@ -269,7 +305,9 @@ function Inicio() {
 
       {/* Features grid */}
       <div>
-        <h2 className="text-base font-bold text-foreground mb-4">Funcionalidades do Sistema</h2>
+        <h2 className="text-base font-bold text-foreground mb-4">
+          Funcionalidades do Sistema
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {features.map((f) => (
             <div
@@ -279,8 +317,12 @@ function Inicio() {
               <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4">
                 <f.icon size={20} />
               </div>
-              <h3 className="font-bold text-foreground text-sm mb-2">{f.title}</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
+              <h3 className="font-bold text-foreground text-sm mb-2">
+                {f.title}
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {f.desc}
+              </p>
             </div>
           ))}
         </div>
