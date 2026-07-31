@@ -7,9 +7,10 @@ import { SkeletonDetalhes } from "../../../ui/Skeleton";
 
 interface DetalhesEmprestimoProps {
   id_emprestimo: number;
+  refreshTrigger?: number;
 }
 
-function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps) {
+function DetalhesEmprestimo({ id_emprestimo, refreshTrigger }: DetalhesEmprestimoProps) {
   const navigate = useNavigate();
 
   const [emprestimo, setEmprestimo] = useState<EmprestimoDTO | null>(null);
@@ -37,7 +38,7 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps) {
     }
 
     carregarEmprestimo();
-  }, [id_emprestimo]);
+  }, [id_emprestimo, refreshTrigger]);
 
   const formatarData = (data: string | Date | undefined) => {
     if (!data) return "Não informada";
