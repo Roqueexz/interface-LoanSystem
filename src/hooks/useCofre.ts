@@ -29,6 +29,7 @@ interface UseCofre {
   erro: string | null;
   incrementar: (valor_cedula: number) => Promise<void>;
   decrementar: (valor_cedula: number) => Promise<void>;
+  atualizarQuantidade: (valor_cedula: number, quantidade: number) => Promise<void>;
 }
 
 export function useCofre(): UseCofre {
@@ -137,5 +138,14 @@ export function useCofre(): UseCofre {
     [cedulas, atualizarCedula]
   );
 
-  return { cedulas, total, carregando, erro, incrementar, decrementar };
+  const atualizarQuantidade = useCallback(
+    async (valor_cedula: number, quantidade: number) => {
+      const cedula = cedulas.find((c) => c.valor_cedula === valor_cedula);
+      if (!cedula || cedula.salvando) return;
+      await atualizarCedula(valor_cedula, Math.max(0, quantidade));
+    },
+    [cedulas, atualizarCedula]
+  );
+
+  return { cedulas, total, carregando, erro, incrementar, decrementar, atualizarQuantidade };
 }
