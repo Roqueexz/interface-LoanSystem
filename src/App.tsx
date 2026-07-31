@@ -8,15 +8,32 @@ import PLogin from "./pages/Login/PLogin";
 
 // Lazy Loading das paginas
 const PHome = lazy(() => import("./pages/Inicio/PInicio"));
-const PListagemCliente = lazy(() => import("./pages/Cliente/PListagemCliente/PListagemCliente"));
+const PListagemCliente = lazy(
+  () => import("./pages/Cliente/PListagemCliente/PListagemCliente"),
+);
 const PCliente = lazy(() => import("./pages/Cliente/PCliente/PCliente"));
-const PEditarCliente = lazy(() => import("./pages/Cliente/PEditarCliente/PEditarCliente"));
-const PFormCliente = lazy(() => import("./pages/Cliente/PFormCliente/PFormCliente"));
-const PListagemEmprestimo = lazy(() => import("./pages/Emprestimo/PListagemEmprestimo/PListagemEmprestimo"));
-const PDetalhesEmprestimo = lazy(() => import("./pages/Emprestimo/PDetalhesEmprestimo/PDetalhesEmprestimo"));
-const PEditarEmprestimo = lazy(() => import("./pages/Emprestimo/PEditarEmprestimo/PEditarEmprestimo"));
-const PFormEmprestimo = lazy(() => import("./pages/Emprestimo/PFormEmprestimo/PFormEmprestimo"));
+const PEditarCliente = lazy(
+  () => import("./pages/Cliente/PEditarCliente/PEditarCliente"),
+);
+const PFormCliente = lazy(
+  () => import("./pages/Cliente/PFormCliente/PFormCliente"),
+);
+const PListagemEmprestimo = lazy(
+  () => import("./pages/Emprestimo/PListagemEmprestimo/PListagemEmprestimo"),
+);
+const PDetalhesEmprestimo = lazy(
+  () => import("./pages/Emprestimo/PDetalhesEmprestimo/PDetalhesEmprestimo"),
+);
+const PEditarEmprestimo = lazy(
+  () => import("./pages/Emprestimo/PEditarEmprestimo/PEditarEmprestimo"),
+);
+const PFormEmprestimo = lazy(
+  () => import("./pages/Emprestimo/PFormEmprestimo/PFormEmprestimo"),
+);
 const PCaixa = lazy(() => import("./pages/Caixa/PCaixa"));
+const PDashboardInteligente = lazy(
+  () => import("./pages/Dashboard/PDashboardInteligente"),
+);
 const PPerfil = lazy(() => import("./pages/Usuario/PPerfil/PPerfil"));
 
 // Componente de loading global
@@ -135,6 +152,16 @@ function App() {
             element={
               <ProtectedRoute isAuth={isAuth}>
                 <PDetalhesEmprestimo />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* DASHBOARD INTELIGENTE */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute isAuth={isAuth}>
+                <PDashboardInteligente />
               </ProtectedRoute>
             }
           />
