@@ -5,6 +5,7 @@ import GridResumo from './GridResumo';
 import ControleCofre from './ControleCofre';
 import ListaHistorico from './ListaHistorico';
 import ListaContas from './ListaContas';
+import ListaMetas from './ListaMetas';
 import { useContas } from '../../../hooks/useContas';
 import useMovimentacoes from '../../../hooks/useMovimentacoes';
 import type { ResumoCaixaPessoalDTO } from '../../../interface/CaixaPessoalDTO';
@@ -95,7 +96,8 @@ function CaixaPessoal() {
       {/* Contas e Reservas (Sprint 4) */}
       <ListaContas />
 
-      {/* Futuro: metas, projeções e filtros (Sprint 5+) */}
+      {/* Metas Financeiras (Sprint 7) */}
+      <ListaMetas />
 
     </div>
   );
