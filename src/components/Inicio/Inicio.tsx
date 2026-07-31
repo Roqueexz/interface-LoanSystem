@@ -12,6 +12,7 @@ import {
   Bell,
   Shield,
   Activity,
+  Calendar,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import CaixaRequests from "../../fetch/CaixaRequests";
@@ -99,6 +100,14 @@ function Inicio() {
       desc: "Visualize todos os indicadores financeiros",
       iconBg:
         "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400",
+    },
+    {
+      path: "/calendario",
+      icon: Calendar,
+      title: "Calendário Financeiro",
+      desc: "Visualize parcelas, contas e metas no calendário",
+      iconBg:
+        "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400",
     },
     {
       path: "/clientes",
