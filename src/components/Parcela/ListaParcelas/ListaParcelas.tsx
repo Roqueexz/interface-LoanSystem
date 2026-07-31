@@ -6,9 +6,10 @@ import ModalConfirmacao from "../../../ui/Modal/ModalConfirmacao";
 
 interface Props {
   id_emprestimo: number;
+  onAtualizar?: () => void;
 }
 
-function ListaParcelas({ id_emprestimo }: Props) {
+function ListaParcelas({ id_emprestimo, onAtualizar }: Props) {
   const toast = useToast();
   const [parcelas, setParcelas] = useState<ParcelaDTO[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,6 +69,7 @@ function ListaParcelas({ id_emprestimo }: Props) {
 
       if (sucesso) {
         await carregarParcelas();
+        onAtualizar?.();
       }
     } else {
       const sucesso = await toast.promise(
@@ -81,6 +83,7 @@ function ListaParcelas({ id_emprestimo }: Props) {
 
       if (sucesso) {
         await carregarParcelas();
+        onAtualizar?.();
       }
     }
 
