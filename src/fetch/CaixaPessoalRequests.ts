@@ -1,4 +1,4 @@
-import type { CofreFisicoDTO, CedulaCofreDTO, ContaCaixaPessoalDTO, MovimentacaoCaixaPessoalDTO } from '../interface/CaixaPessoalDTO';
+import type { CofreFisicoDTO, CedulaCofreDTO, ContaCaixaPessoalDTO, MovimentacaoCaixaPessoalDTO, MetaFinanceiraDTO } from '../interface/CaixaPessoalDTO';
 import { BaseRequests } from './BaseRequests';
 
 // ============================================================
@@ -133,6 +133,104 @@ class CaixaPessoalRequests extends BaseRequests {
 
     if (!resposta.sucesso) {
       console.error('[CaixaPessoalRequests] Erro ao remover conta:', resposta.erro);
+      return false;
+    }
+
+    return true;
+  }
+
+  // ─── METAS: LISTAR ───────────────────────────────────────────────
+  async listarMetas(): Promise<MetaFinanceiraDTO[] | undefined> {
+    const resposta = await this.request<any[]>(`${this.endpoint}/metas`);
+
+    if (!resposta.sucesso) {
+      console.error('[CaixaPessoalRequests] Erro ao listar metas:', resposta.erro);
+      return undefined;
+    }
+
+    const dados = resposta.dados || [];
+    return dados.map((d: any) => ({
+      id: String(d.id_meta ?? d.id),
+      nome: d.nome,
+      descricao: d.descricao ?? undefined,
+      valorAlvo: Number(d.valor_alvo ?? d.valorAlvo ?? 0),
+      valorAtual: Number(d.valor_atual ?? d.valorAtual ?? 0),
+      prazo: d.prazo ?? undefined,
+      percentual: Number(d.percentual ?? 0),
+      diasRestantes: d.dias_restantes !== undefined ? Number(d.dias_restantes) : undefined,
+    }));
+  }
+
+  // ─── METAS: CRIAR ───────────────────────────────────────────────
+  async criarMeta(payload: {
+    nome: string;
+    descricao?: string;
+    valorAlvo: number;
+    valorAtual?: number;
+    prazo?: string;
+  }): Promise<MetaFinanceiraDTO | undefined> {
+    const resposta = await this.request<any>(`${this.endpoint}/metas`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+
+    if (!resposta.sucesso) {
+      console.error('[CaixaPessoalRequests] Erro ao criar meta:', resposta.erro);
+      return undefined;
+    }
+
+    const d = resposta.dados;
+    return {
+      id: String(d.id_meta ?? d.id),
+      nome: d.nome,
+      descricao: d.descricao ?? undefined,
+      valorAlvo: Number(d.valor_alvo ?? d.valorAlvo ?? 0),
+      valorAtual: Number(d.valor_atual ?? d.valorAtual ?? 0),
+      prazo: d.prazo ?? undefined,
+      percentual: Number(d.percentual ?? 0),
+      diasRestantes: d.dias_restantes !== undefined ? Number(d.dias_restantes) : undefined,
+    };
+  }
+
+  // ─── METAS: ATUALIZAR ───────────────────────────────────────────
+  async atualizarMeta(id_meta: string, payload: {
+    nome?: string;
+    descricao?: string;
+    valorAlvo?: number;
+    valorAtual?: number;
+    prazo?: string;
+  }): Promise<MetaFinanceiraDTO | undefined> {
+    const resposta = await this.request<any>(`${this.endpoint}/metas/${id_meta}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+
+    if (!resposta.sucesso) {
+      console.error('[CaixaPessoalRequests] Erro ao atualizar meta:', resposta.erro);
+      return undefined;
+    }
+
+    const d = resposta.dados;
+    return {
+      id: String(d.id_meta ?? d.id),
+      nome: d.nome,
+      descricao: d.descricao ?? undefined,
+      valorAlvo: Number(d.valor_alvo ?? d.valorAlvo ?? 0),
+      valorAtual: Number(d.valor_atual ?? d.valorAtual ?? 0),
+      prazo: d.prazo ?? undefined,
+      percentual: Number(d.percentual ?? 0),
+      diasRestantes: d.dias_restantes !== undefined ? Number(d.dias_restantes) : undefined,
+    };
+  }
+
+  // ─── METAS: REMOVER ─────────────────────────────────────────────
+  async removerMeta(id_meta: string): Promise<boolean> {
+    const resposta = await this.request(`${this.endpoint}/metas/${id_meta}`, {
+      method: 'DELETE',
+    });
+
+    if (!resposta.sucesso) {
+      console.error('[CaixaPessoalRequests] Erro ao remover meta:', resposta.erro);
       return false;
     }
 
