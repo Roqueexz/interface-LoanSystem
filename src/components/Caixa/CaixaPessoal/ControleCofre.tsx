@@ -17,6 +17,7 @@ interface CofreProps {
   erro: string | null;
   incrementar: (valor: number) => Promise<void>;
   decrementar: (valor: number) => Promise<void>;
+  atualizarQuantidade: (valor: number, quantidade: number) => Promise<void>;
 }
 
 interface Props {
@@ -24,7 +25,7 @@ interface Props {
 }
 
 function ControleCofre({ cofre }: Props) {
-  const { cedulas, total, carregando, erro, incrementar, decrementar } = cofre;
+  const { cedulas, total, carregando, erro, incrementar, decrementar, atualizarQuantidade } = cofre;
 
   return (
     <div className="bg-card rounded-2xl border border-border shadow-sm">
@@ -81,6 +82,7 @@ function ControleCofre({ cofre }: Props) {
                   cedula={cedula}
                   onIncrementar={incrementar}
                   onDecrementar={decrementar}
+                  onQuantidadeChange={atualizarQuantidade}
                 />
               ))}
             </div>
