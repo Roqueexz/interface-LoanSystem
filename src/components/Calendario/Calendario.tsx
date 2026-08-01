@@ -17,7 +17,7 @@ import {
 import { Badge } from "../../ui/Badge";
 
 type VisaoCalendario = "mes" | "semana" | "dia";
-type TipoEventoCalendario = "recebimento" | "conta" | "meta";
+type TipoEventoCalendario = "parcela" | "conta" | "meta";
 
 interface EventoCalendario {
   tipo_evento: string;

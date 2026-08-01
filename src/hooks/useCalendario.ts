@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import CalendarioRequests from '../fetch/CalendarioRequests';
 import { formatarMoeda } from '../services/Utilitario';
 
+function formatarReferenciaMes(data: Date): string {
+    return `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}`;
+}
+
 export function useCalendario() {
     const [eventos, setEventos] = useState<any[]>([]);
     const [previsualizacao, setPrevisualizacao] = useState<any[]>([]);
@@ -13,7 +17,7 @@ export function useCalendario() {
         try {
             setCarregando(true);
             setErro(null);
-            
+
             const dados = await CalendarioRequests.obterEventos(tipo, data);
             if (dados) {
                 setEventos(dados);
@@ -30,7 +34,7 @@ export function useCalendario() {
         try {
             setCarregando(true);
             setErro(null);
-            
+
             const dados = await CalendarioRequests.previsualizarMes(anoMes);
             if (dados) {
                 setPrevisualizacao(dados);
@@ -47,10 +51,10 @@ export function useCalendario() {
         try {
             setCarregando(true);
             setErro(null);
-            
+
             const resultado = await CalendarioRequests.criarEvento(eventoData);
             if (resultado) {
-                await carregarEventos();
+                await carregarEventos(undefined, `${mesAtual.getFullYear()}-${String(mesAtual.getMonth() + 1).padStart(2, '0')}`);
                 return resultado;
             }
         } catch (error) {
@@ -65,7 +69,7 @@ export function useCalendario() {
         try {
             setCarregando(true);
             setErro(null);
-            
+
             const resultado = await CalendarioRequests.atualizarRegra(tipo, dataKey, hasRule);
             return resultado;
         } catch (error) {
@@ -92,22 +96,22 @@ export function useCalendario() {
 
     const agruparEventosPorData = () => {
         const eventosAgrupados: Record<string, any[]> = {};
-        
-        eventos.forEach(evento => {
+
+        eventos.forEach((evento) => {
             const data = evento.data_evento;
             if (!eventosAgrupados[data]) {
                 eventosAgrupados[data] = [];
             }
             eventosAgrupados[data].push(evento);
         });
-        
+
         return eventosAgrupados;
     };
 
     useEffect(() => {
-        carregarEventos();
-        const anoMes = `${mesAtual.getFullYear()}-${String(mesAtual.getMonth() + 1).padStart(2, '0')}`;
-        previsualizarMes(anoMes);
+        const referenciaMes = formatarReferenciaMes(mesAtual);
+        void carregarEventos(undefined, referenciaMes);
+        void previsualizarMes(referenciaMes);
     }, [mesAtual]);
 
     return {
@@ -122,6 +126,6 @@ export function useCalendario() {
         atualizarRegra,
         navegarMes,
         formatarValor,
-        agruparEventosPorData
+        agruparEventosPorData,
     };
 }

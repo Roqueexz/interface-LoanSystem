@@ -5,6 +5,11 @@ import { Alert, AlertDescription, AlertTitle } from '../../ui/Alert';
 import { AlertCircle, TrendingUp, TrendingDown, DollarSign, Users, Clock, BarChart2 } from 'lucide-react';
 import { Chart } from 'primereact/chart';
 
+interface DadosGraficoReceita {
+    data: string;
+    valor: number;
+}
+
 export default function DashboardInteligente() {
     const {
         dashboardData,
@@ -12,19 +17,18 @@ export default function DashboardInteligente() {
         carregando,
         erro,
         formatarValor,
-        formatarPorcentagem,
         prepararDadosGraficoReceitas
     } = useDashboard();
 
     // Dados para o gráfico de receitas
-    const dadosGrafico = prepararDadosGraficoReceitas();
+    const dadosGrafico = prepararDadosGraficoReceitas() as DadosGraficoReceita[];
     
     const chartData = {
-        labels: dadosGrafico.map(item => item.data),
+        labels: dadosGrafico.map((item: DadosGraficoReceita) => item.data),
         datasets: [
             {
                 label: 'Receitas Diárias',
-                data: dadosGrafico.map(item => item.valor),
+                data: dadosGrafico.map((item: DadosGraficoReceita) => item.valor),
                 backgroundColor: 'rgba(59, 130, 246, 0.5)',
                 borderColor: 'rgba(59, 130, 246, 1)',
                 borderWidth: 2,
