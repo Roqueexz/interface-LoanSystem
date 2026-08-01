@@ -1,17 +1,51 @@
+import { useMemo, useState } from "react";
 import { useCalendario } from "../../hooks/useCalendario";
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../../ui/Card";
 import { Skeleton } from "../../ui/Skeleton";
 import { Alert, AlertDescription, AlertTitle } from "../../ui/Alert";
 import {
   AlertCircle,
   Calendar,
+  CalendarDays,
   ChevronLeft,
   ChevronRight,
+  CircleDollarSign,
   DollarSign,
-  Users,
+  Filter,
   Target,
 } from "lucide-react";
 import { Badge } from "../../ui/Badge";
+
+type VisaoCalendario = "mes" | "semana" | "dia";
+type TipoEventoCalendario = "recebimento" | "conta" | "meta";
+
+interface EventoCalendario {
+  tipo_evento: string;
+  data_evento: string;
+  valor: number;
+  descricao: string;
+  color: string;
+  categoria?: string;
+  prioridade?: string;
+  metadata?: Record<string, unknown>;
+}
+
+const meses = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+];
+
+const diasDaSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
 export default function Calendario() {
   const {
@@ -22,51 +56,97 @@ export default function Calendario() {
     mesAtual,
     navegarMes,
     formatarValor,
-    agruparEventosPorData,
   } = useCalendario();
 
-  const eventosAgrupados = agruparEventosPorData();
+  const [visao, setVisao] = useState<VisaoCalendario>("mes");
+  const [filtros, setFiltros] = useState<Record<TipoEventoCalendario, boolean>>({
+    recebimento: true,
+    conta: true,
+    meta: true,
+  });
+  const [dataSelecionada, setDataSelecionada] = useState(() => new Date().toISOString().slice(0, 10));
 
-  const meses = [
-    "Janeiro",
-    "Fevereiro",
-    "Março",
-    "Abril",
-    "Maio",
-    "Junho",
-    "Julho",
-    "Agosto",
-    "Setembro",
-    "Outubro",
-    "Novembro",
-    "Dezembro",
-  ];
+  const eventosFiltrados = useMemo(() => {
+    const lista = eventos as EventoCalendario[];
+    return lista.filter((evento) => filtros[evento.tipo_evento as TipoEventoCalendario] ?? true);
+  }, [eventos, filtros]);
 
-  const diasDaSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+  const eventosPorData = useMemo(() => {
+    const agrupado: Record<string, EventoCalendario[]> = {};
+    eventosFiltrados.forEach((evento) => {
+      const chave = evento.data_evento;
+      if (!agrupado[chave]) {
+        agrupado[chave] = [];
+      }
+      agrupado[chave].push(evento);
+    });
+    return agrupado;
+  }, [eventosFiltrados]);
 
-  // Obter o primeiro dia do mês e o último dia do mês
-  const primeiroDia = new Date(mesAtual.getFullYear(), mesAtual.getMonth(), 1);
-  const ultimoDia = new Date(
-    mesAtual.getFullYear(),
-    mesAtual.getMonth() + 1,
-    0,
-  );
-  const diasNoMes = ultimoDia.getDate();
-  const primeiroDiaSemana = primeiroDia.getDay();
+  const dataSelecionadaLocal = useMemo(() => new Date(`${dataSelecionada}T00:00:00`), [dataSelecionada]);
 
-  // Gerar dias do calendário
-  const dias = [];
-  for (let i = 0; i < primeiroDiaSemana; i++) {
-    dias.push(null);
-  }
-  for (let i = 1; i <= diasNoMes; i++) {
-    dias.push(i);
-  }
+  const diasDoMes = useMemo(() => {
+    const primeiroDia = new Date(mesAtual.getFullYear(), mesAtual.getMonth(), 1);
+    const ultimoDia = new Date(mesAtual.getFullYear(), mesAtual.getMonth() + 1, 0);
+    const offset = (primeiroDia.getDay() + 6) % 7;
+    const dias = [] as Array<number | null>;
+
+    for (let index = 0; index < offset; index += 1) {
+      dias.push(null);
+    }
+
+    for (let index = 1; index <= ultimoDia.getDate(); index += 1) {
+      dias.push(index);
+    }
+
+    return dias;
+  }, [mesAtual]);
+
+  const diasDaSemanaAtual = useMemo(() => {
+    const inicioSemana = new Date(dataSelecionadaLocal);
+    const dia = inicioSemana.getDay();
+    const diferenca = dia === 0 ? -6 : 1 - dia;
+    inicioSemana.setDate(inicioSemana.getDate() + diferenca);
+
+    return Array.from({ length: 7 }, (_, index) => {
+      const diaSemana = new Date(inicioSemana);
+      diaSemana.setDate(inicioSemana.getDate() + index);
+      return diaSemana;
+    });
+  }, [dataSelecionadaLocal]);
+
+  const detalhesDoDia = useMemo(() => {
+    return (eventosPorData[dataSelecionada] ?? []).sort((a, b) => a.valor - b.valor);
+  }, [dataSelecionada, eventosPorData]);
+
+  const alterarFiltro = (tipo: TipoEventoCalendario) => {
+    setFiltros((atual) => ({ ...atual, [tipo]: !atual[tipo] }));
+  };
+
+  const selecionarDia = (dia: number, irParaDia = true) => {
+    const proximaData = `${mesAtual.getFullYear()}-${String(mesAtual.getMonth() + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
+    setDataSelecionada(proximaData);
+    if (irParaDia) {
+      setVisao("dia");
+    }
+  };
+
+  const irParaDiaAnterior = () => {
+    const proximo = new Date(dataSelecionadaLocal);
+    proximo.setDate(proximo.getDate() - 1);
+    setDataSelecionada(proximo.toISOString().slice(0, 10));
+  };
+
+  const irParaDiaProximo = () => {
+    const proximo = new Date(dataSelecionadaLocal);
+    proximo.setDate(proximo.getDate() + 1);
+    setDataSelecionada(proximo.toISOString().slice(0, 10));
+  };
 
   const getIconePorTipo = (tipo: string) => {
     switch (tipo) {
-      case "parcela":
-        return <DollarSign className="h-3 w-3" />;
+      case "recebimento":
+        return <CircleDollarSign className="h-3 w-3" />;
       case "conta":
         return <AlertCircle className="h-3 w-3" />;
       case "meta":
@@ -78,7 +158,7 @@ export default function Calendario() {
 
   const getCorPorTipo = (tipo: string) => {
     switch (tipo) {
-      case "parcela":
+      case "recebimento":
         return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
       case "conta":
         return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
@@ -89,9 +169,12 @@ export default function Calendario() {
     }
   };
 
+  const totalEventos = (previsualizacao || []).reduce((soma, item) => soma + Number(item.total_eventos ?? 0), 0);
+  const totalValor = (previsualizacao || []).reduce((soma, item) => soma + Number(item.total_valor ?? 0), 0);
+
   if (erro) {
     return (
-      <Alert variant="destructive" className="max-w-md mx-auto mt-8">
+      <Alert variant="destructive" className="mx-auto mt-8 max-w-md">
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Erro</AlertTitle>
         <AlertDescription>{erro}</AlertDescription>
@@ -100,210 +183,254 @@ export default function Calendario() {
   }
 
   return (
-    <div className="w-full min-h-full bg-background py-8 px-4 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl font-bold text-foreground mb-6">
-          Calendário Financeiro
-        </h1>
+    <div className="min-h-full w-full bg-background px-4 py-8 transition-colors duration-300">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Calendário Financeiro</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Organize contas, recebimentos e metas em uma visão unificada.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {(["recebimento", "conta", "meta"] as TipoEventoCalendario[]).map((tipo) => (
+              <button
+                key={tipo}
+                onClick={() => alterarFiltro(tipo)}
+                className={`rounded-full border px-3 py-1 text-sm transition ${filtros[tipo] ? getCorPorTipo(tipo) : "border-border bg-muted text-muted-foreground"}`}
+              >
+                {getIconePorTipo(tipo)}
+                <span className="ml-1 capitalize">{tipo === "recebimento" ? "Recebimentos" : tipo}</span>
+              </button>
+            ))}
+          </div>
+        </div>
 
-        {/* Navegação do mês */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navegarMes("anterior")}
-              className="p-2 rounded-full hover:bg-muted transition-colors"
-            >
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm">
+          <div className="flex items-center gap-2">
+            <button onClick={() => navegarMes("anterior")} className="rounded-full p-2 transition hover:bg-muted">
               <ChevronLeft className="h-5 w-5" />
             </button>
             <h2 className="text-xl font-semibold">
               {meses[mesAtual.getMonth()]} {mesAtual.getFullYear()}
             </h2>
-            <button
-              onClick={() => navegarMes("proximo")}
-              className="p-2 rounded-full hover:bg-muted transition-colors"
-            >
+            <button onClick={() => navegarMes("proximo")} className="rounded-full p-2 transition hover:bg-muted">
               <ChevronRight className="h-5 w-5" />
             </button>
           </div>
+
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <DollarSign className="h-3 w-3" /> Parcelas
-            </Badge>
-            <Badge variant="destructive" className="flex items-center gap-1">
-              <AlertCircle className="h-3 w-3" /> Contas
-            </Badge>
-            <Badge variant="success" className="flex items-center gap-1">
-              <Target className="h-3 w-3" /> Metas
-            </Badge>
+            <div className="flex rounded-full border border-border p-1">
+              {(["mes", "semana", "dia"] as VisaoCalendario[]).map((item) => (
+                <button
+                  key={item}
+                  onClick={() => setVisao(item)}
+                  className={`rounded-full px-3 py-1 text-sm capitalize transition ${visao === item ? "bg-foreground text-background" : "text-muted-foreground"}`}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2 rounded-full border border-border px-3 py-1 text-sm text-muted-foreground">
+              <Filter className="h-4 w-4" />
+              Filtros ativos
+            </div>
           </div>
         </div>
 
-        {/* Calendário */}
-        <div className="grid grid-cols-7 gap-1 mb-6">
-          {diasDaSemana.map((dia, index) => (
-            <div
-              key={index}
-              className="text-center text-sm font-medium text-muted-foreground p-2"
-            >
-              {dia}
-            </div>
-          ))}
-          {dias.map((dia, index) => (
-            <div
-              key={index}
-              className={`min-h-[100px] border border-border rounded-lg p-2 ${dia ? "hover:bg-muted/50 transition-colors" : "bg-muted"}`}
-            >
-              {dia ? (
-                <div className="flex flex-col h-full">
-                  <div className="text-sm font-medium mb-1">{dia}</div>
-                  <div className="flex-1 space-y-1">
-                    {eventosAgrupados[
-                      `${mesAtual.getFullYear()}-${String(mesAtual.getMonth() + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`
-                    ]?.map((evento, eventoIndex) => (
-                      <div
-                        key={eventoIndex}
-                        className={`text-xs ${getCorPorTipo(evento.tipo_evento)} p-1 rounded flex items-center gap-1`}
-                      >
+        <div className="mb-6 grid gap-4 md:grid-cols-3">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Eventos do mês</CardTitle>
+              <CalendarDays className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {carregando ? <Skeleton className="h-8 w-24" /> : <div className="text-2xl font-bold">{totalEventos}</div>}
+              <p className="mt-2 text-xs text-muted-foreground">Compromissos financeiros</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Valor total</CardTitle>
+              <DollarSign className="h-4 w-4 text-blue-600" />
+            </CardHeader>
+            <CardContent>
+              {carregando ? <Skeleton className="h-8 w-24" /> : <div className="text-2xl font-bold text-blue-600">{formatarValor(totalValor)}</div>}
+              <p className="mt-2 text-xs text-muted-foreground">Soma dos eventos do mês</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Dia selecionado</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dataSelecionadaLocal.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}</div>
+              <p className="mt-2 text-xs text-muted-foreground">Visualize detalhes do dia em foco</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {visao === "mes" && (
+          <div className="mb-6 grid grid-cols-7 gap-2">
+            {diasDaSemana.map((dia) => (
+              <div key={dia} className="rounded-lg border border-border p-2 text-center text-sm font-medium text-muted-foreground">
+                {dia}
+              </div>
+            ))}
+            {diasDoMes.map((dia, index) => {
+              if (dia === null) {
+                return <div key={`empty-${index}`} className="min-h-[110px] rounded-lg border border-dashed border-border bg-muted/50" />;
+              }
+
+              const chave = `${mesAtual.getFullYear()}-${String(mesAtual.getMonth() + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
+              const eventosDia = eventosPorData[chave] ?? [];
+              const hoje = dataSelecionada === chave;
+
+              return (
+                <button
+                  key={dia}
+                  onClick={() => selecionarDia(dia)}
+                  className={`min-h-[110px] rounded-lg border p-2 text-left transition ${hoje ? "border-foreground bg-foreground/5" : "border-border hover:bg-muted/50"}`}
+                >
+                  <div className="mb-2 flex items-center justify-between text-sm font-semibold">
+                    <span>{dia}</span>
+                    {eventosDia.length > 0 && <Badge variant="secondary">{eventosDia.length}</Badge>}
+                  </div>
+                  <div className="space-y-1">
+                    {eventosDia.slice(0, 3).map((evento, eventoIndex) => (
+                      <div key={`${chave}-${eventoIndex}`} className={`flex items-center gap-1 rounded px-2 py-1 text-[11px] ${getCorPorTipo(evento.tipo_evento)}`}>
                         {getIconePorTipo(evento.tipo_evento)}
                         <span>{formatarValor(evento.valor)}</span>
                       </div>
                     ))}
                   </div>
-                </div>
-              ) : null}
-            </div>
-          ))}
-        </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
-        {/* Resumo do mês */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total de Eventos
-              </CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+        {visao === "semana" && (
+          <div className="mb-6 grid grid-cols-1 gap-2 md:grid-cols-7">
+            {diasDaSemanaAtual.map((dia, index) => {
+              const chave = `${dia.getFullYear()}-${String(dia.getMonth() + 1).padStart(2, "0")}-${String(dia.getDate()).padStart(2, "0")}`;
+              const eventosDia = eventosPorData[chave] ?? [];
+              return (
+                <button
+                  key={chave}
+                  onClick={() => setDataSelecionada(chave)}
+                  className={`rounded-xl border p-3 text-left ${dataSelecionada === chave ? "border-foreground bg-foreground/5" : "border-border hover:bg-muted/50"}`}
+                >
+                  <div className="mb-2 flex items-center justify-between text-sm font-semibold">
+                    <span>{diasDaSemana[index]}</span>
+                    {eventosDia.length > 0 && <Badge variant="secondary">{eventosDia.length}</Badge>}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {dia.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
+                  </div>
+                  <div className="mt-2 space-y-1">
+                    {eventosDia.slice(0, 3).map((evento, eventoIndex) => (
+                      <div key={`${chave}-${eventoIndex}`} className={`rounded px-2 py-1 text-[11px] ${getCorPorTipo(evento.tipo_evento)}`}>
+                        {evento.descricao}
+                      </div>
+                    ))}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {visao === "dia" && (
+          <Card className="mb-6">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Detalhes do dia</CardTitle>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {dataSelecionadaLocal.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={irParaDiaAnterior} className="rounded-full border border-border p-2">
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={irParaDiaProximo} className="rounded-full border border-border p-2">
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
             </CardHeader>
             <CardContent>
-              {carregando ? (
-                <Skeleton className="h-8 w-32" />
-              ) : (
-                <div className="text-2xl font-bold">
-                  {previsualizacao?.length || 0}
-                </div>
-              )}
-              <p className="text-xs text-muted-foreground mt-2">
-                Eventos neste mês
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total a Receber
-              </CardTitle>
-              <DollarSign className="h-4 w-4 text-blue-500" />
-            </CardHeader>
-            <CardContent>
-              {carregando ? (
-                <Skeleton className="h-8 w-32" />
-              ) : (
-                <div className="text-2xl font-bold text-blue-600">
-                  {formatarValor(
-                    (previsualizacao || []).reduce(
-                      (sum, item) => sum + item.total_valor,
-                      0,
-                    ),
-                  )}
-                </div>
-              )}
-              <p className="text-xs text-muted-foreground mt-2">
-                Soma de todos os eventos
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Dias com Eventos
-              </CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              {carregando ? (
-                <Skeleton className="h-8 w-32" />
-              ) : (
-                <div className="text-2xl font-bold">
-                  {(previsualizacao || []).length}
-                </div>
-              )}
-              <p className="text-xs text-muted-foreground mt-2">
-                Dias com eventos neste mês
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Lista de eventos */}
-        <div className="mb-6">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle>Eventos do Mês</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {carregando ? (
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              ) : (
+              {detalhesDoDia.length > 0 ? (
                 <div className="space-y-3">
-                  {(previsualizacao || []).map((item, index) => {
-                    const data = new Date(item.data_evento);
-                    const tipos = item.tipos || [];
-
-                    return (
-                      <div key={index} className="border-b border-border pb-3">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="font-medium">
-                            {data.toLocaleDateString("pt-BR", {
-                              day: "2-digit",
-                              month: "long",
-                            })}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {tipos.map((tipo: string, tipoIndex: number) => (
-                              <Badge
-                                key={tipoIndex}
-                                variant="secondary"
-                                className="flex items-center gap-1"
-                              >
-                                {getIconePorTipo(tipo)}
-                                {tipo}
-                              </Badge>
-                            ))}
-                          </div>
+                  {detalhesDoDia.map((evento, index) => (
+                    <div key={`${evento.data_evento}-${index}`} className="flex flex-col gap-2 rounded-lg border border-border p-3 md:flex-row md:items-center md:justify-between">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className={`rounded-full px-2 py-1 text-xs ${getCorPorTipo(evento.tipo_evento)}`}>
+                            {evento.tipo_evento === "recebimento" ? "Recebimento" : evento.tipo_evento}
+                          </span>
+                          <span className="text-sm font-semibold">{evento.descricao}</span>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">
-                            {item.total_eventos} evento
-                            {item.total_eventos > 1 ? "s" : ""}
-                          </span>
-                          <span className="text-sm font-medium">
-                            {formatarValor(item.total_valor)}
-                          </span>
+                        {evento.categoria && <p className="mt-1 text-sm text-muted-foreground">Categoria: {evento.categoria}</p>}
+                      </div>
+                      <div className="text-right">
+                        <div className="font-semibold">{formatarValor(evento.valor)}</div>
+                        {evento.prioridade && <p className="text-xs text-muted-foreground">Prioridade: {evento.prioridade}</p>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+                  Nenhum compromisso financeiro para este dia.
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Resumo do mês</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {carregando ? (
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {(previsualizacao || []).map((item, index) => {
+                  const data = new Date(item.data_evento);
+                  const tipos = item.tipos || [];
+                  return (
+                    <div key={`${item.data_evento}-${index}`} className="flex flex-col gap-2 border-b border-border pb-3 md:flex-row md:items-center md:justify-between">
+                      <div>
+                        <div className="font-medium">{data.toLocaleDateString("pt-BR", { day: "2-digit", month: "long" })}</div>
+                        <div className="mt-1 flex flex-wrap gap-2">
+                          {tipos.map((tipo: string, tipoIndex: number) => (
+                            <Badge key={`${tipo}-${tipoIndex}`} variant="secondary" className="flex items-center gap-1">
+                              {getIconePorTipo(tipo)}
+                              <span>{tipo}</span>
+                            </Badge>
+                          ))}
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                      <div className="text-sm text-muted-foreground">
+                        {item.total_eventos} evento{item.total_eventos > 1 ? "s" : ""} • {formatarValor(item.total_valor)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
