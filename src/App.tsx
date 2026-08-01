@@ -35,6 +35,7 @@ const PDashboardInteligente = lazy(
   () => import("./pages/Dashboard/PDashboardInteligente"),
 );
 const PCalendario = lazy(() => import("./pages/Calendario/PCalendario"));
+const PNotificacoes = lazy(() => import("./pages/Notificacoes/PNotificacoes"));
 const PPerfil = lazy(() => import("./pages/Usuario/PPerfil/PPerfil"));
 
 // Componente de loading global
@@ -173,6 +174,16 @@ function App() {
             element={
               <ProtectedRoute isAuth={isAuth}>
                 <PCalendario />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* NOTIFICAÇÕES */}
+          <Route
+            path="/notificacoes"
+            element={
+              <ProtectedRoute isAuth={isAuth}>
+                <PNotificacoes />
               </ProtectedRoute>
             }
           />
