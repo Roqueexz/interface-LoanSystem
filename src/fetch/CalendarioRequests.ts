@@ -51,11 +51,10 @@ class CalendarioRequests extends BaseRequests {
   }
 
   async criarEvento(data: any): Promise<any | undefined> {
-    const resposta = await this.request<any>(
-      this.endpointCriarEvento,
-      "POST",
-      data,
-    );
+    const resposta = await this.request<any>(this.endpointCriarEvento, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
 
     if (!resposta.sucesso) {
       console.error(
@@ -73,11 +72,10 @@ class CalendarioRequests extends BaseRequests {
     dataKey: string,
     hasRule: boolean,
   ): Promise<any | undefined> {
-    const resposta = await this.request<any>(
-      this.endpointAtualizarRegra,
-      "PATCH",
-      { tipo, dataKey, hasRule },
-    );
+    const resposta = await this.request<any>(this.endpointAtualizarRegra, {
+      method: "PATCH",
+      body: JSON.stringify({ tipo, dataKey, hasRule }),
+    });
 
     if (!resposta.sucesso) {
       console.error(
