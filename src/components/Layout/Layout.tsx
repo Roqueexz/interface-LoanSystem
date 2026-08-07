@@ -64,7 +64,7 @@ function Layout({ children }: Props) {
 
       <main className="flex-1 w-full bg-background">
         <div className="w-full px-4 sm:px-6 lg:px-8 py-6 bg-background">
-          <div className="flex justify-end items-center gap-3 mb-4">
+          <div className="hidden md:flex justify-end items-center gap-3 mb-4">
             <TemaToggle />
 
             <button
