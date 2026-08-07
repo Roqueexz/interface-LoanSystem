@@ -17,7 +17,7 @@ import {
 import { Badge } from "../../ui/Badge";
 
 type VisaoCalendario = "mes" | "semana" | "dia";
-type TipoEventoCalendario = "parcela" | "conta" | "meta";
+type TipoEventoCalendario = "parcela" | "conta" | "meta" | "recebimento";
 
 interface EventoCalendario {
   tipo_evento: string;
@@ -61,6 +61,7 @@ export default function Calendario() {
   const [visao, setVisao] = useState<VisaoCalendario>("mes");
   const [filtros, setFiltros] = useState<Record<TipoEventoCalendario, boolean>>({
     recebimento: true,
+    parcela: true,
     conta: true,
     meta: true,
   });
