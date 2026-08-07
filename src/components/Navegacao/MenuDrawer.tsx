@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   X,
@@ -27,6 +27,7 @@ export function MenuDrawer({ isOpen, onClose, naoLidas }: MenuDrawerProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const toast = useToast();
+  const prevPathname = useRef(location.pathname);
 
   const nome = localStorage.getItem('nome') || 'Usuário';
   const email = localStorage.getItem('email') || 'usuario@loansystem.com';
@@ -37,9 +38,12 @@ export function MenuDrawer({ isOpen, onClose, naoLidas }: MenuDrawerProps) {
     .slice(0, 2)
     .toUpperCase();
 
-  // Fecha o drawer quando muda de rota
+  // Fecha o drawer apenas quando o usuário navega para outra rota
   useEffect(() => {
-    onClose();
+    if (prevPathname.current !== location.pathname) {
+      prevPathname.current = location.pathname;
+      onClose();
+    }
   }, [location.pathname, onClose]);
 
   // Previne rolagem do body quando o drawer está aberto
