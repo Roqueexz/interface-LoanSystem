@@ -4,7 +4,8 @@ import { useNotificacoes } from '../../hooks/useNotificacoes';
 
 export function NotificacoesResumoCard() {
   const navigate = useNavigate();
-  const { notificacoes, naoLidas, marcarComoLida } = useNotificacoes();
+  const { notificacoes, resumo, marcarLida } = useNotificacoes();
+  const naoLidas = resumo?.naoLidas ?? 0;
 
   const recentes = notificacoes.slice(0, 2);
 
@@ -31,9 +32,9 @@ export function NotificacoesResumoCard() {
       </div>
 
       <div className="rounded-3xl border border-border bg-card p-3 shadow-sm space-y-2">
-        {recentes.map((notif) => (
+        {recentes.map((notif, index) => (
           <div
-            key={notif.id}
+            key={notif.id_notificacao ?? index}
             className={`flex items-start justify-between gap-3 p-3 rounded-2xl transition-colors ${
               notif.lida ? 'bg-muted/30' : 'bg-primary/5 border border-primary/10'
             }`}
@@ -45,16 +46,18 @@ export function NotificacoesResumoCard() {
               <div>
                 <h4 className="text-xs font-bold text-foreground">{notif.titulo}</h4>
                 <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">{notif.mensagem}</p>
-                <span className="text-[10px] text-muted-foreground/80 block mt-1">{notif.dataCriacao}</span>
+                {notif.data_criacao && (
+                  <span className="text-[10px] text-muted-foreground/80 block mt-1">{notif.data_criacao}</span>
+                )}
               </div>
             </div>
 
-            {!notif.lida && (
+            {!notif.lida && notif.id_notificacao && (
               <button
                 type="button"
                 onClick={async (e) => {
                   e.stopPropagation();
-                  await marcarComoLida(notif.id);
+                  await marcarLida(notif.id_notificacao);
                 }}
                 className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors"
                 title="Marcar como lida"

@@ -7,9 +7,10 @@ import AtalhosRapidos from './AtalhosRapidos';
 import ContasHojeCard from './ContasHojeCard';
 import UltimasMovimentacoesCard from './UltimasMovimentacoesCard';
 import NotificacoesResumoCard from './NotificacoesResumoCard';
-import { Bell, Sparkles } from 'lucide-react';
+import { Bell, Menu, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNotificacoes } from '../../hooks/useNotificacoes';
+import MenuDrawer from '../Navegacao/MenuDrawer';
 
 // ============================================================
 // Sprint 11 — Nova Home (Dashboard Mobile Premium)
@@ -18,7 +19,7 @@ import { useNotificacoes } from '../../hooks/useNotificacoes';
 //   - Pouco texto, mais cartões visuais
 //   - Saldo principal com botão de ocultar (olho)
 //   - Navegação confortável utilizando apenas uma mão
-//   - Atalhos rápidos em carrossel
+//   - Atalhos rápidos para Cliente, Empréstimo, Caixa, Calendário
 //   - Visão em 5 segundos da saúde financeira
 // ============================================================
 
@@ -27,8 +28,11 @@ export function Inicio() {
   const cofre = useCofre();
   const { contas, contasAtrasadas, vencendoHoje } = useContas();
   const { movimentacoes, entradas, saidas } = useMovimentacoes();
-  const { naoLidas } = useNotificacoes();
+  const { resumo } = useNotificacoes();
+  const naoLidas = resumo?.naoLidas ?? 0;
 
+  // Estado para o Menu Drawer Lateral Mobile
+  const [drawerAberto, setDrawerAberto] = useState(false);
 
   // Estado para visibilidade dos valores monetários (persiste no localStorage)
   const [visivel, setVisivel] = useState(() => {
@@ -67,15 +71,27 @@ export function Inicio() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 pb-20">
       
-      {/* Top Header Mobile com foto/avatar e Notificações */}
+      {/* Top Header Mobile com Menu Hambúrguer e Notificações */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white font-extrabold shadow-md">
-            <Sparkles size={20} />
-          </div>
-          <div>
-            <span className="text-xs font-medium text-muted-foreground block">{saudacao} 👋</span>
-            <h1 className="text-base font-extrabold tracking-tight text-foreground">LoanSystem</h1>
+          <button
+            type="button"
+            onClick={() => setDrawerAberto(true)}
+            className="flex h-11 w-11 items-center justify-center rounded-2xl border border-border bg-card hover:bg-muted active:scale-95 transition-all text-foreground shadow-sm"
+            title="Abrir Menu Drawer"
+            aria-label="Abrir Menu Drawer"
+          >
+            <Menu size={22} />
+          </button>
+
+          <div className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white font-extrabold shadow-sm">
+              <Sparkles size={16} />
+            </div>
+            <div>
+              <span className="text-[11px] font-medium text-muted-foreground block">{saudacao} 👋</span>
+              <h1 className="text-sm font-extrabold tracking-tight text-foreground">LoanSystem</h1>
+            </div>
           </div>
         </div>
 
@@ -122,6 +138,13 @@ export function Inicio() {
 
       {/* Feed de Últimas Movimentações */}
       <UltimasMovimentacoesCard movimentacoes={movimentacoes} visivel={visivel} />
+
+      {/* Menu Drawer Lateral Mobile */}
+      <MenuDrawer
+        isOpen={drawerAberto}
+        onClose={() => setDrawerAberto(false)}
+        naoLidas={naoLidas}
+      />
 
     </div>
   );
