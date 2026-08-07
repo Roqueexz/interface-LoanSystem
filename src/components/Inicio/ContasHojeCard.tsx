@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Clock, CheckCircle2, ChevronRight, ArrowUpRight } from 'lucide-react';
+import { AlertCircle, Clock, ChevronRight, ArrowUpRight } from 'lucide-react';
 import type { ContaCaixaPessoalDTO } from '../../interface/CaixaPessoalDTO';
 import { formatarMoeda } from '../../services/Utilitario';
 
