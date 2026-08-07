@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   X,
@@ -16,6 +16,7 @@ import {
 import TemaToggle from '../../ui/Tema/TemaToggle';
 import AuthRequests from '../../fetch/AuthRequests';
 import { useToast } from '../../hooks/useToast';
+import ModalConfirmacao from '../../ui/Modal/ModalConfirmacao';
 
 interface MenuDrawerProps {
   isOpen: boolean;
@@ -29,6 +30,11 @@ export function MenuDrawer({ isOpen, onClose, naoLidas }: MenuDrawerProps) {
   const toast = useToast();
   const prevPathname = useRef(location.pathname);
 
+  // Controla montagem/desmontagem separada da animação para suavidade
+  const [mounted, setMounted] = useState(false);
+  const [animating, setAnimating] = useState(false);
+  const [modalLogoutOpen, setModalLogoutOpen] = useState(false);
+
   const nome = localStorage.getItem('nome') || 'Usuário';
   const email = localStorage.getItem('email') || 'usuario@loansystem.com';
   const iniciais = nome
@@ -37,6 +43,23 @@ export function MenuDrawer({ isOpen, onClose, naoLidas }: MenuDrawerProps) {
     .join('')
     .slice(0, 2)
     .toUpperCase();
+
+  // Abre o drawer com animação
+  useEffect(() => {
+    if (isOpen) {
+      setMounted(true);
+      // Um tick para garantir que o DOM já está presente antes de iniciar a animação
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setAnimating(true));
+      });
+    } else {
+      // Inicia a animação de saída
+      setAnimating(false);
+      // Aguarda a transição antes de desmontar
+      const timer = setTimeout(() => setMounted(false), 320);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
 
   // Fecha o drawer apenas quando o usuário navega para outra rota
   useEffect(() => {
@@ -59,6 +82,11 @@ export function MenuDrawer({ isOpen, onClose, naoLidas }: MenuDrawerProps) {
   }, [isOpen]);
 
   const handleLogout = () => {
+    setModalLogoutOpen(true);
+  };
+
+  const confirmarLogout = () => {
+    setModalLogoutOpen(false);
     onClose();
     try {
       AuthRequests.removeToken();
@@ -81,114 +109,134 @@ export function MenuDrawer({ isOpen, onClose, naoLidas }: MenuDrawerProps) {
     { to: '/perfil', icon: User, label: 'Meu Perfil', desc: 'Configurações de conta' },
   ];
 
-  if (!isOpen) return null;
+  if (!mounted) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-start">
-      {/* Overlay Backdrop com desfoque */}
-      <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+    <>
+      <div className="fixed inset-0 z-50 flex justify-start">
+        {/* Overlay com fade */}
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+          style={{ opacity: animating ? 1 : 0 }}
+          onClick={onClose}
+          aria-hidden="true"
+        />
 
-      {/* Painel do Drawer Lateral */}
-      <div className="relative w-4/5 max-w-xs h-full bg-card border-r border-border shadow-2xl flex flex-col justify-between z-10 animate-in slide-in-from-left duration-300">
-        
-        {/* Top Header do Drawer */}
-        <div>
-          <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white font-bold shadow-sm">
-                <Sparkles size={18} />
+        {/* Painel lateral com slide-in da esquerda */}
+        <div
+          className="relative w-4/5 max-w-xs h-full bg-card border-r border-border shadow-2xl flex flex-col justify-between z-10 transition-transform duration-300 ease-out"
+          style={{ transform: animating ? 'translateX(0)' : 'translateX(-100%)' }}
+        >
+          {/* Top Header do Drawer */}
+          <div>
+            <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white font-bold shadow-sm">
+                  <Sparkles size={18} />
+                </div>
+                <div>
+                  <h2 className="text-sm font-extrabold text-foreground tracking-tight">LoanSystem</h2>
+                  <span className="text-[10px] text-muted-foreground block">SaaS Financeiro</span>
+                </div>
               </div>
-              <div>
-                <h2 className="text-sm font-extrabold text-foreground tracking-tight">LoanSystem</h2>
-                <span className="text-[10px] text-muted-foreground block">SaaS Financeiro</span>
+
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted active:scale-95 transition-all"
+                aria-label="Fechar menu"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Cartão de Usuário — clicável para ir ao perfil */}
+            <Link
+              to="/perfil"
+              className="block p-4 border-b border-border/60 bg-card hover:bg-muted/40 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white font-extrabold text-sm shadow-md">
+                  {iniciais || 'U'}
+                </div>
+                <div className="overflow-hidden flex-1">
+                  <h3 className="text-sm font-bold text-foreground truncate">{nome}</h3>
+                  <p className="text-xs text-muted-foreground truncate">{email}</p>
+                </div>
+                <User size={14} className="text-muted-foreground flex-shrink-0" />
               </div>
+            </Link>
+
+            {/* Navegação Principal */}
+            <div className="p-2 space-y-1 max-h-[calc(100vh-250px)] overflow-y-auto">
+              {navLinks.map((item) => {
+                const IconComponent = item.icon;
+                const isSelected = location.pathname === item.to;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className={`flex items-center justify-between p-3 rounded-2xl transition-all ${
+                      isSelected
+                        ? 'bg-primary text-white shadow-md shadow-primary/20 font-bold'
+                        : 'text-foreground hover:bg-muted/70'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className={`p-2 rounded-xl ${isSelected ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'}`}>
+                        <IconComponent size={16} />
+                      </span>
+                      <div>
+                        <span className="text-xs font-semibold block leading-tight">{item.label}</span>
+                        <span className={`text-[10px] block ${isSelected ? 'text-white/80' : 'text-muted-foreground'}`}>
+                          {item.desc}
+                        </span>
+                      </div>
+                    </div>
+
+                    {Boolean(item.badge && item.badge > 0) && (
+                      <span className="flex h-5 items-center justify-center rounded-full bg-rose-500 px-2 text-[10px] font-bold text-white shadow-sm">
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Rodapé do Drawer: Tema + Sair */}
+          <div className="p-4 border-t border-border bg-muted/20 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-muted-foreground">Aparência</span>
+              <TemaToggle />
             </div>
 
             <button
               type="button"
-              onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted active:scale-95 transition-all"
-              aria-label="Fechar menu"
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 active:scale-95 transition-all"
             >
-              <X size={18} />
+              <LogOut size={16} />
+              <span>Sair do Aplicativo</span>
             </button>
           </div>
 
-          {/* Cartão de Usuário no Topo */}
-          <div className="p-4 border-b border-border/60 bg-card">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary font-extrabold text-sm border border-primary/20">
-                {iniciais || 'U'}
-              </div>
-              <div className="overflow-hidden">
-                <h3 className="text-sm font-bold text-foreground truncate">{nome}</h3>
-                <p className="text-xs text-muted-foreground truncate">{email}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Navegação Principal */}
-          <div className="p-2 space-y-1 max-h-[calc(100vh-250px)] overflow-y-auto">
-            {navLinks.map((item) => {
-              const IconComponent = item.icon;
-              const isSelected = location.pathname === item.to;
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  onClick={onClose}
-                  className={`flex items-center justify-between p-3 rounded-2xl transition-all ${
-                    isSelected
-                      ? 'bg-primary text-white shadow-md shadow-primary/20 font-bold'
-                      : 'text-foreground hover:bg-muted/70'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className={`p-2 rounded-xl ${isSelected ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'}`}>
-                      <IconComponent size={16} />
-                    </span>
-                    <div>
-                      <span className="text-xs font-semibold block leading-tight">{item.label}</span>
-                      <span className={`text-[10px] block ${isSelected ? 'text-white/80' : 'text-muted-foreground'}`}>
-                        {item.desc}
-                      </span>
-                    </div>
-                  </div>
-
-                  {Boolean(item.badge && item.badge > 0) && (
-                    <span className="flex h-5 items-center justify-center rounded-full bg-rose-500 px-2 text-[10px] font-bold text-white shadow-sm">
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
         </div>
-
-        {/* Rodapé do Drawer: Tema + Sair */}
-        <div className="p-4 border-t border-border bg-muted/20 space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-muted-foreground">Aparência</span>
-            <TemaToggle />
-          </div>
-
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 active:scale-95 transition-all"
-          >
-            <LogOut size={16} />
-            <span>Sair do Aplicativo</span>
-          </button>
-        </div>
-
       </div>
-    </div>
+
+      {/* Modal de Confirmação para Logout */}
+      <ModalConfirmacao
+        isOpen={modalLogoutOpen}
+        onClose={() => setModalLogoutOpen(false)}
+        onConfirm={confirmarLogout}
+        title="Sair do Sistema"
+        message="Tem certeza que deseja sair? Você será redirecionado para a tela de login."
+        confirmText="Sair"
+        cancelText="Cancelar"
+        variant="warning"
+      />
+    </>
   );
 }
 
