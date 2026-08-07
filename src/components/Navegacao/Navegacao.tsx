@@ -10,6 +10,7 @@ import {
   Calendar,
   Bell,
   Menu,
+  User,
 } from "lucide-react";
 import NotificacoesRequests from "../../fetch/NotificacoesRequests";
 import MenuDrawer from "./MenuDrawer";
@@ -18,6 +19,14 @@ function Navegacao() {
   const location = useLocation();
   const [naoLidas, setNaoLidas] = useState(0);
   const [drawerAberto, setDrawerAberto] = useState(false);
+
+  const nome = localStorage.getItem('nome') || 'Usuário';
+  const iniciais = nome
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 
   useEffect(() => {
     let isActive = true;
@@ -95,6 +104,21 @@ function Navegacao() {
                   </Link>
                 );
               })}
+            </div>
+
+            {/* Avatar do usuário (Desktop) — acesso rápido ao Perfil */}
+            <div className="hidden md:flex items-center gap-2">
+              <Link
+                to="/perfil"
+                title={`Perfil de ${nome}`}
+                aria-label="Ir para o perfil"
+                className={`flex h-9 w-9 items-center justify-center rounded-xl font-bold text-sm text-white shadow-sm transition-all hover:scale-105 active:scale-95 ring-2 ring-transparent hover:ring-primary/40 ${
+                  location.pathname === '/perfil' ? 'ring-primary/60' : ''
+                }`}
+                style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)' }}
+              >
+                {iniciais || <User size={14} />}
+              </Link>
             </div>
 
             {/* Mobile Header: Hamburger Menu Button */}
