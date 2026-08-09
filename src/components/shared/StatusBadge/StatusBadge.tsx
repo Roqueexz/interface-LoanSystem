@@ -16,6 +16,24 @@ function StatusBadge({ status }: Props) {
       border: 'border-emerald-200 dark:border-emerald-500/20',
       dot: 'bg-emerald-500'
     },
+    ADIMPLENTE: {
+      bg: 'bg-emerald-100 dark:bg-emerald-500/10',
+      text: 'text-emerald-700 dark:text-emerald-400',
+      border: 'border-emerald-200 dark:border-emerald-500/20',
+      dot: 'bg-emerald-500'
+    },
+    INADIMPLENTE: {
+      bg: 'bg-red-100 dark:bg-red-500/10',
+      text: 'text-red-700 dark:text-red-400',
+      border: 'border-red-200 dark:border-red-500/20',
+      dot: 'bg-red-500'
+    },
+    'SEM CONTRATO': {
+      bg: 'bg-slate-100 dark:bg-slate-500/10',
+      text: 'text-slate-700 dark:text-slate-400',
+      border: 'border-slate-200 dark:border-slate-500/20',
+      dot: 'bg-slate-500'
+    },
     'EM DIA': {
       bg: 'bg-emerald-100 dark:bg-emerald-500/10',
       text: 'text-emerald-700 dark:text-emerald-400',
