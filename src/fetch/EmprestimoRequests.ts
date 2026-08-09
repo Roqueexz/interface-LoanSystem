@@ -5,7 +5,8 @@ class EmprestimoRequests extends BaseRequests {
   private endpointEmprestimo = '/api/emprestimos';
 
   async obterListaDeEmprestimos(): Promise<EmprestimoDTO[] | undefined> {
-    const resposta = await this.request<any>(this.endpointEmprestimo);
+    // Busca ativos + liquidados para suportar a aba de Histórico
+    const resposta = await this.request<any>(`${this.endpointEmprestimo}?status=todos`);
     
     if (!resposta.sucesso) {
       console.error('[EmprestimoRequests] Erro ao listar empréstimos:', resposta.erro);
