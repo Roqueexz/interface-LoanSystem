@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useCalendario } from "../../hooks/useCalendario";
 import { Card, CardContent, CardHeader, CardTitle } from "../../ui/Card";
 import { Skeleton } from "../../ui/Skeleton";
@@ -48,6 +49,10 @@ const meses = [
 const diasDaSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
 export default function Calendario() {
+  const [searchParams] = useSearchParams();
+  const dataParam = searchParams.get("data");
+  const filtroParam = searchParams.get("filtro");
+
   const {
     eventos,
     previsualizacao,
@@ -58,14 +63,26 @@ export default function Calendario() {
     formatarValor,
   } = useCalendario();
 
-  const [visao, setVisao] = useState<VisaoCalendario>("mes");
-  const [filtros, setFiltros] = useState<Record<TipoEventoCalendario, boolean>>({
-    recebimento: true,
+  const [visao, setVisao] = useState<VisaoCalendario>(() => (dataParam ? "dia" : "mes"));
+  const [filtros, setFiltros] = useState<Record<TipoEventoCalendario, boolean>>(() => ({
+    recebimento: filtroParam ? filtroParam === "recebimento" : true,
     parcela: true,
     conta: true,
     meta: true,
+  }));
+
+  const [dataSelecionada, setDataSelecionada] = useState(() => {
+    if (dataParam === "hoje") return new Date().toISOString().slice(0, 10);
+    if (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam)) return dataParam;
+    return new Date().toISOString().slice(0, 10);
   });
-  const [dataSelecionada, setDataSelecionada] = useState(() => new Date().toISOString().slice(0, 10));
+
+  useEffect(() => {
+    if (dataParam === "hoje" || dataParam) {
+      setVisao("dia");
+    }
+  }, [dataParam]);
+
 
   const eventosFiltrados = useMemo(() => {
     const lista = eventos as EventoCalendario[];
