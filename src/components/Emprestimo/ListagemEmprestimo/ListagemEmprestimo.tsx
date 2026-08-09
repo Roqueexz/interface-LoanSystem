@@ -12,6 +12,9 @@ import {
   History,
   CheckCircle2,
   Briefcase,
+  ArrowUpDown,
+  Clock,
+  AlertCircle,
 } from "lucide-react";
 
 import EmprestimoRequests from "../../../fetch/EmprestimoRequests";
@@ -51,6 +54,10 @@ function ListagemEmprestimo() {
   const [filtroStatus, setFiltroStatus] = useState<
     "TODOS" | "EM DIA" | "ATRASADO" | "EM ABERTO"
   >("TODOS");
+
+  const [ordenacao, setOrdenacao] = useState<
+    "PADRAO" | "ATRASADOS" | "MAIOR_VALOR" | "VENCIMENTO"
+  >("ATRASADOS");
 
   // Modal Baixa Rápida
   const [baixaModalOpen, setBaixaModalOpen] = useState(false);
@@ -215,6 +222,25 @@ function ListagemEmprestimo() {
     return `Cliente #${emp.id_cliente}`;
   }
 
+  // Retorna 'hoje', 'amanha' ou null dependendo do vencimento da próxima parcela
+  function getVencimentoUrgente(emp: EmprestimoComDetalhes): "hoje" | "amanha" | null {
+    const prox = emp.proximaParcela;
+    if (!prox || isEmprestimoQuitado(emp)) return null;
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    const amanha = new Date(hoje);
+    amanha.setDate(amanha.getDate() + 1);
+
+    const venc = new Date(prox.data_vencimento);
+    venc.setHours(0, 0, 0, 0);
+
+    if (venc.getTime() === hoje.getTime()) return "hoje";
+    if (venc.getTime() === amanha.getTime()) return "amanha";
+    return null;
+  }
+
   // Filtragem por Aba (Ativos vs Histórico de Liquidados)
   const emprestimosPorAba = emprestimos.filter((emp) => {
     const quitado = isEmprestimoQuitado(emp);
@@ -228,17 +254,39 @@ function ListagemEmprestimo() {
     ATRASADO: emprestimosPorAba.filter((e) => getStatus(e) === "ATRASADO").length,
   };
 
-  const emprestimosFiltrados = emprestimosPorAba.filter((emp) => {
-    const status = getStatus(emp);
-    const atendeFiltroStatus = filtroStatus === "TODOS" || status === filtroStatus;
-
-    if (!atendeFiltroStatus) return false;
-
-    if (!busca.trim()) return true;
-    const nome = getNomeCliente(emp).toLowerCase();
-    const termo = busca.toLowerCase();
-    return nome.includes(termo) || emp.id_emprestimo?.toString().includes(termo);
-  });
+  const emprestimosFiltrados = emprestimosPorAba
+    .filter((emp) => {
+      const status = getStatus(emp);
+      const atendeFiltroStatus = filtroStatus === "TODOS" || status === filtroStatus;
+      if (!atendeFiltroStatus) return false;
+      if (!busca.trim()) return true;
+      const nome = getNomeCliente(emp).toLowerCase();
+      const termo = busca.toLowerCase();
+      return nome.includes(termo) || emp.id_emprestimo?.toString().includes(termo);
+    })
+    .sort((a, b) => {
+      if (ordenacao === "ATRASADOS") {
+        // Atrasados primeiro, depois vencimento mais próximo
+        const statusA = getStatus(a);
+        const statusB = getStatus(b);
+        if (statusA === "ATRASADO" && statusB !== "ATRASADO") return -1;
+        if (statusB === "ATRASADO" && statusA !== "ATRASADO") return 1;
+        // Dentro do mesmo status: vencimento mais próximo primeiro
+        const vencA = a.proximaParcela ? new Date(a.proximaParcela.data_vencimento).getTime() : Infinity;
+        const vencB = b.proximaParcela ? new Date(b.proximaParcela.data_vencimento).getTime() : Infinity;
+        return vencA - vencB;
+      }
+      if (ordenacao === "MAIOR_VALOR") {
+        return Number(b.valor_emprestimo) - Number(a.valor_emprestimo);
+      }
+      if (ordenacao === "VENCIMENTO") {
+        const vencA = a.proximaParcela ? new Date(a.proximaParcela.data_vencimento).getTime() : Infinity;
+        const vencB = b.proximaParcela ? new Date(b.proximaParcela.data_vencimento).getTime() : Infinity;
+        return vencA - vencB;
+      }
+      // PADRAO: mais recentes primeiro
+      return (b.id_emprestimo ?? 0) - (a.id_emprestimo ?? 0);
+    });
 
   if (loading) {
     return (
@@ -365,6 +413,30 @@ function ListagemEmprestimo() {
         )}
       </div>
 
+      {/* ORDENAÇÃO */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <span className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground whitespace-nowrap shrink-0">
+          <ArrowUpDown size={13} /> Ordenar:
+        </span>
+        {([
+          { key: "ATRASADOS", label: "Mais Atrasados" },
+          { key: "VENCIMENTO", label: "Vence Primeiro" },
+          { key: "MAIOR_VALOR", label: "Maior Valor" },
+          { key: "PADRAO", label: "Mais Recentes" },
+        ] as const).map((op) => (
+          <button
+            key={op.key}
+            onClick={() => setOrdenacao(op.key)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${ordenacao === op.key
+                ? "bg-foreground text-background border-foreground shadow-sm"
+                : "bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+              }`}
+          >
+            {op.label}
+          </button>
+        ))}
+      </div>
+
       {/* ERRO */}
       {erro && (
         <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-2xl p-4 text-red-600 dark:text-red-400 text-sm">
@@ -437,6 +509,23 @@ function ListagemEmprestimo() {
                       </span>
                     </div>
                   </div>
+
+                  {/* Badge de Urgência de Vencimento */}
+                  {(() => {
+                    const urgencia = getVencimentoUrgente(emp);
+                    if (!urgencia) return null;
+                    return urgencia === "hoje" ? (
+                      <div className="flex items-center gap-1.5 px-2.5 py-1.5 mb-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-[11px] font-extrabold animate-pulse">
+                        <AlertCircle size={13} className="shrink-0" />
+                        Vence HOJE!
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 px-2.5 py-1.5 mb-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[11px] font-extrabold">
+                        <Clock size={13} className="shrink-0" />
+                        Vence Amanhã
+                      </div>
+                    );
+                  })()}
 
                   {/* Progress Bar Sincronizada */}
                   <div className="space-y-1.5">
