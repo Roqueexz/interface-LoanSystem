@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Pencil, Trash2, Phone, MapPin } from "lucide-react";
+import { Pencil, Trash2, Phone, MapPin, Plus, MessageCircle } from "lucide-react";
 
 import ClienteRequests from "../../../fetch/ClienteRequests";
 import ResumoRequests from "../../../fetch/ResumoRequests";
@@ -123,10 +123,32 @@ function DetalhesCliente({ id_cliente }: Props) {
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => navigate(`/emprestimos/novo?clienteId=${id_cliente}`)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-white shadow-md hover:opacity-95 transition-all text-sm"
+            style={{ background: "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)" }}
+          >
+            <Plus size={16} />
+            Novo Empréstimo
+          </button>
+
+          {cliente.telefone && (
+            <button
+              onClick={() => {
+                const telClean = cliente.telefone.replace(/\D/g, "");
+                window.open(`https://wa.me/55${telClean}`, "_blank");
+              }}
+              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2.5 rounded-xl font-bold transition-all text-sm shadow-sm"
+            >
+              <MessageCircle size={16} />
+              <span>WhatsApp</span>
+            </button>
+          )}
+
           <button
             onClick={() => navigate(`/editar-cliente/${id_cliente}`)}
-            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl font-semibold transition-all"
+            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-xl font-semibold transition-all text-sm"
           >
             <Pencil size={16} />
             Editar
@@ -134,7 +156,7 @@ function DetalhesCliente({ id_cliente }: Props) {
 
           <button
             onClick={handleExcluir}
-            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-semibold transition-all"
+            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-xl font-semibold transition-all text-sm"
           >
             <Trash2 size={16} />
             Excluir
