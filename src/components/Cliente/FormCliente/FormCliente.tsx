@@ -32,6 +32,7 @@ function FormCliente() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [redirecionando, setRedirecionando] = useState(false);
 
   // Formatação dinâmica do telefone (XX) XXXXX-XXXX
   function formatarTelefone(valor: string) {
@@ -72,20 +73,36 @@ function FormCliente() {
     e.preventDefault();
     setLoading(true);
 
-    const sucesso = await toast.promise(
-      ClienteRequests.enviarFormularioCliente(formData),
+    let novoIdCliente: number | undefined;
+
+    const res = await toast.promise(
+      (async () => {
+        const resposta = await ClienteRequests.enviarFormularioCliente(formData);
+        if (!resposta.sucesso) {
+          throw new Error("Erro ao cadastrar cliente. Tente novamente.");
+        }
+        novoIdCliente = resposta.id_cliente;
+        return resposta;
+      })(),
       {
         loading: "Cadastrando cliente...",
         success: "✅ Cliente cadastrado com sucesso!",
         error: (err) =>
-          err?.message ? `❌ ${err.message}` : "❌ Erro ao cadastrar cliente. Tente novamente.",
+          err?.message ? `❌ ${err.message}` : "❌ Erro ao cadastrar cliente.",
       }
     );
 
     setLoading(false);
 
-    if (sucesso) {
-      navigate("/clientes");
+    if (res?.sucesso) {
+      setRedirecionando(true);
+      setTimeout(() => {
+        if (novoIdCliente) {
+          navigate(`/clientes/${novoIdCliente}`);
+        } else {
+          navigate("/clientes");
+        }
+      }, 750);
     }
   }
 
@@ -93,6 +110,22 @@ function FormCliente() {
   const iniciais = (
     `${formData.nome_cliente?.[0] || ""}${formData.sobrenome_cliente?.[0] || ""}` || "NC"
   ).toUpperCase();
+
+  if (redirecionando) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-card/90 backdrop-blur-md p-6 space-y-4 animate-in fade-in duration-300">
+        <div className="w-16 h-16 rounded-3xl bg-primary/10 text-primary flex items-center justify-center shadow-inner">
+          <Loader2 size={32} className="animate-spin text-primary" />
+        </div>
+        <div className="text-center space-y-1">
+          <h3 className="text-lg font-bold text-foreground">Abrindo perfil do cliente...</h3>
+          <p className="text-xs text-muted-foreground">
+            Redirecionando para os detalhes de {nomeCompleto || "novo cliente"}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 sm:py-8 space-y-6">
