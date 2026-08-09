@@ -1,11 +1,23 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Save,
+  Loader2,
+  User,
+  Phone,
+  MapPin,
+  Sparkles,
+  CheckCircle2,
+} from "lucide-react";
 
 import ClienteRequests from "../../../fetch/ClienteRequests";
 import type ClienteDTO from "../../../interface/ClienteDTO";
 import { useToast } from "../../../hooks/useToast";
 import { SkeletonDetalhes } from "../../../ui/Skeleton";
+import Avatar from "../../shared/Avatar/Avatar";
+
+const ESTADOS_POPULARES = ["SP", "RJ", "MG", "PR", "RS", "SC", "BA", "PE", "CE", "GO", "DF", "ES"];
 
 function FormEditarCliente() {
   const navigate = useNavigate();
@@ -28,7 +40,6 @@ function FormEditarCliente() {
     if (!id) return;
 
     setLoading(true);
-
     const cliente = await ClienteRequests.obterClientePorId(Number(id));
 
     if (cliente) {
@@ -42,10 +53,33 @@ function FormEditarCliente() {
     carregarCliente();
   }, [id]);
 
+  function formatarTelefone(valor: string) {
+    const digitos = valor.replace(/\D/g, "").slice(0, 11);
+    if (digitos.length <= 2) return digitos ? `(${digitos}` : "";
+    if (digitos.length <= 7) return `(${digitos.slice(0, 2)}) ${digitos.slice(2)}`;
+    return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 7)}-${digitos.slice(7)}`;
+  }
+
   function handleChange(
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) {
     const { name, value } = e.target;
+
+    if (name === "telefone") {
+      setFormData((prev) => ({
+        ...prev,
+        telefone: formatarTelefone(value),
+      }));
+      return;
+    }
+
+    if (name === "estado") {
+      setFormData((prev) => ({
+        ...prev,
+        estado: value.toUpperCase().slice(0, 2),
+      }));
+      return;
+    }
 
     setFormData((prev) => ({
       ...prev,
@@ -63,14 +97,10 @@ function FormEditarCliente() {
     const sucesso = await toast.promise(
       ClienteRequests.atualizarCliente(Number(id), formData),
       {
-        loading: 'Atualizando cliente...',
-        success: '✅ Cliente atualizado com sucesso!',
-        error: (err) => {
-          if (err?.message) {
-            return `❌ ${err.message}`;
-          }
-          return '❌ Erro ao atualizar cliente. Tente novamente.';
-        },
+        loading: "Atualizando cliente...",
+        success: "✅ Cliente atualizado com sucesso!",
+        error: (err) =>
+          err?.message ? `❌ ${err.message}` : "❌ Erro ao atualizar cliente. Tente novamente.",
       }
     );
 
@@ -82,142 +112,221 @@ function FormEditarCliente() {
   }
 
   if (loading) {
-    return <SkeletonDetalhes />;
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+        <SkeletonDetalhes />
+      </div>
+    );
   }
 
+  const nomeCompleto = `${formData.nome_cliente} ${formData.sobrenome_cliente}`.trim();
+  const iniciais = (
+    `${formData.nome_cliente?.[0] || ""}${formData.sobrenome_cliente?.[0] || ""}` || "EC"
+  ).toUpperCase();
+
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      <div className="bg-card rounded-2xl shadow-sm border border-border p-8">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <button
-            onClick={() => navigate("/clientes")}
-            className="p-2 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Editar Cliente</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Atualize as informações do cliente #{id}
-            </p>
-          </div>
+    <div className="max-w-3xl mx-auto px-4 py-6 sm:py-8 space-y-6">
+      {/* HEADER */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => navigate("/clientes")}
+          className="p-2.5 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft size={20} />
+        </button>
+        <div>
+          <h1 className="text-2xl font-extrabold text-foreground tracking-tight">Editar Cliente</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+            Atualizando dados do cliente #{id}
+          </p>
+        </div>
+      </div>
+
+      {/* LIVE CARD PREVIEW */}
+      <div className="bg-gradient-to-r from-amber-500/10 via-primary/5 to-indigo-500/10 border border-amber-500/20 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
+        <div className="flex items-center justify-between text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+          <span className="flex items-center gap-1.5">
+            <Sparkles size={14} /> Cartão Atualizado
+          </span>
+          <span className="text-[10px] bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+            Edição # {id}
+          </span>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* NOME */}
+        <div className="bg-card border border-border rounded-xl p-4 flex items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-center gap-3 min-w-0">
+            <Avatar initials={iniciais} size="md" />
+            <div className="min-w-0">
+              <h3 className="font-bold text-foreground text-base truncate">
+                {nomeCompleto || "Nome do Cliente"}
+              </h3>
+              <p className="text-xs text-muted-foreground truncate mt-0.5 flex items-center gap-2">
+                <span>{formData.telefone || "(00) 00000-0000"}</span>
+                {(formData.cidade || formData.estado) && (
+                  <>
+                    <span>•</span>
+                    <span>
+                      {formData.cidade || "Cidade"}
+                      {formData.estado ? ` - ${formData.estado}` : ""}
+                    </span>
+                  </>
+                )}
+              </p>
+            </div>
+          </div>
+          <CheckCircle2 className="text-emerald-500 shrink-0" size={20} />
+        </div>
+      </div>
+
+      {/* FORMULARIO */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* SECTION 1: DADOS PESSOAIS */}
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-5 sm:p-6 space-y-5">
+          <h2 className="text-base font-bold text-foreground pb-3 border-b border-border flex items-center gap-2">
+            <User size={18} className="text-primary" /> 1. Dados Pessoais
+          </h2>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block mb-1.5 text-sm font-medium text-foreground">
-                Nome
+              <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider text-foreground">
+                Nome *
               </label>
               <input
                 type="text"
+                required
                 name="nome_cliente"
                 value={formData.nome_cliente}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
+                className="w-full px-4 py-3 text-base bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
                 placeholder="Nome"
-                required
               />
             </div>
 
             <div>
-              <label className="block mb-1.5 text-sm font-medium text-foreground">
-                Sobrenome
+              <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider text-foreground">
+                Sobrenome *
               </label>
               <input
                 type="text"
+                required
                 name="sobrenome_cliente"
                 value={formData.sobrenome_cliente}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
+                className="w-full px-4 py-3 text-base bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
                 placeholder="Sobrenome"
-                required
               />
             </div>
           </div>
+        </div>
 
-          {/* TELEFONE */}
+        {/* SECTION 2: CONTATO */}
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-5 sm:p-6 space-y-5">
+          <h2 className="text-base font-bold text-foreground pb-3 border-b border-border flex items-center gap-2">
+            <Phone size={18} className="text-primary" /> 2. Contato & WhatsApp
+          </h2>
+
           <div>
-            <label className="block mb-1.5 text-sm font-medium text-foreground">
-              Telefone
+            <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider text-foreground">
+              Telefone / Celular (WhatsApp) *
             </label>
             <input
               type="text"
+              inputMode="tel"
+              required
               name="telefone"
               value={formData.telefone}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
-              placeholder="Telefone"
-              required
+              className="w-full px-4 py-3 text-base bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all font-medium"
+              placeholder="(11) 99999-9999"
+              maxLength={15}
             />
           </div>
+        </div>
 
-          {/* CIDADE / ESTADO */}
+        {/* SECTION 3: LOCALIZACAO */}
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-5 sm:p-6 space-y-5">
+          <h2 className="text-base font-bold text-foreground pb-3 border-b border-border flex items-center gap-2">
+            <MapPin size={18} className="text-primary" /> 3. Localização
+          </h2>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block mb-1.5 text-sm font-medium text-foreground">
-                Cidade
+              <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider text-foreground">
+                Cidade *
               </label>
               <input
                 type="text"
+                required
                 name="cidade"
                 value={formData.cidade}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
+                className="w-full px-4 py-3 text-base bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
                 placeholder="Cidade"
-                required
               />
             </div>
 
             <div>
-              <label className="block mb-1.5 text-sm font-medium text-foreground">
-                Estado
+              <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider text-foreground">
+                Estado (UF) *
               </label>
               <input
                 type="text"
+                required
                 name="estado"
                 value={formData.estado}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
-                placeholder="Estado (ex: SP)"
-                required
+                className="w-full px-4 py-3 text-base bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all uppercase font-bold tracking-wider"
                 maxLength={2}
+                placeholder="SP"
               />
+
+              <div className="flex gap-1.5 mt-2 flex-wrap">
+                {ESTADOS_POPULARES.map((uf) => (
+                  <button
+                    key={uf}
+                    type="button"
+                    onClick={() => setFormData((prev) => ({ ...prev, estado: uf }))}
+                    className={`px-2.5 py-1 text-xs font-bold rounded-lg border transition-all ${
+                      formData.estado === uf
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-muted/40 border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {uf}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* BOTÕES */}
-          <div className="flex gap-4 pt-4 border-t border-border">
-            <button
-              type="submit"
-              disabled={salvando}
-              className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-xl font-bold hover:opacity-90 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {salvando ? (
-                <>
-                  <Loader2 size={18} className="animate-spin" />
-                  SALVANDO...
-                </>
-              ) : (
-                <>
-                  <Save size={18} />
-                  SALVAR
-                </>
-              )}
-            </button>
+        {/* ACTIONS */}
+        <div className="flex gap-3 pt-2">
+          <button
+            type="button"
+            onClick={() => navigate("/clientes")}
+            className="flex-1 py-3.5 px-4 border border-border bg-card text-foreground font-bold rounded-xl hover:bg-muted transition-all text-sm"
+          >
+            Cancelar
+          </button>
 
-            <button
-              type="button"
-              onClick={() => navigate("/clientes")}
-              className="flex-1 flex items-center justify-center gap-2 border border-border bg-card text-foreground py-3 rounded-xl font-bold hover:bg-muted transition-all"
-            >
-              CANCELAR
-            </button>
-          </div>
-        </form>
-      </div>
+          <button
+            type="submit"
+            disabled={salvando}
+            className="flex-1 py-3.5 px-4 bg-primary text-primary-foreground font-bold rounded-xl hover:opacity-90 transition-all shadow-md flex items-center justify-center gap-2 text-sm disabled:opacity-50"
+          >
+            {salvando ? (
+              <>
+                <Loader2 size={18} className="animate-spin" /> Salvando...
+              </>
+            ) : (
+              <>
+                <Save size={18} /> Salvar Alterações
+              </>
+            )}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
