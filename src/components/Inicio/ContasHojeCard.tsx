@@ -27,17 +27,17 @@ export function ContasHojeCard({
         <h3 className="text-sm font-bold tracking-wide text-foreground">Atenção para Hoje</h3>
         <button
           type="button"
-          onClick={() => navigate('/caixa')}
+          onClick={() => navigate('/calendario')}
           className="text-xs font-semibold text-primary flex items-center hover:underline"
         >
-          Ver todas <ChevronRight size={14} />
+          Ver todas no Calendário <ChevronRight size={14} />
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {/* Card Contas Vencendo Hoje */}
+        {/* Card Contas Vencendo Hoje -> Vai para o Calendário focado em hoje */}
         <div
-          onClick={() => navigate('/caixa')}
+          onClick={() => navigate('/calendario?data=hoje&filtro=vencem_hoje')}
           className={`cursor-pointer rounded-2xl p-4 border transition-all hover:shadow-md active:scale-[0.99] ${
             vencendoHoje.length > 0
               ? 'bg-amber-500/10 border-amber-500/30 dark:bg-amber-950/20'
@@ -52,7 +52,7 @@ export function ContasHojeCard({
               <div>
                 <span className="text-xs font-medium text-muted-foreground block">Vencem Hoje</span>
                 <span className="text-lg font-bold text-foreground block">
-                  {vencendoHoje.length} {vencendoHoje.length === 1 ? 'conta' : 'contas'}
+                  {vencendoHoje.length} {vencendoHoje.length === 1 ? 'item' : 'itens'}
                 </span>
               </div>
             </div>
@@ -66,9 +66,9 @@ export function ContasHojeCard({
           )}
         </div>
 
-        {/* Card Contas Atrasadas */}
+        {/* Card Empréstimos/Contas Atrasadas -> Vai para listagem de empréstimos filtrada por atrasados */}
         <div
-          onClick={() => navigate('/caixa')}
+          onClick={() => navigate('/emprestimos?status=atrasado')}
           className={`cursor-pointer rounded-2xl p-4 border transition-all hover:shadow-md active:scale-[0.99] ${
             atrasadas.length > 0
               ? 'bg-rose-500/10 border-rose-500/30 dark:bg-rose-950/20'
@@ -81,9 +81,9 @@ export function ContasHojeCard({
                 <AlertCircle size={18} />
               </span>
               <div>
-                <span className="text-xs font-medium text-muted-foreground block">Atrasadas</span>
+                <span className="text-xs font-medium text-muted-foreground block">Atrasados</span>
                 <span className="text-lg font-bold text-foreground block">
-                  {atrasadas.length} {atrasadas.length === 1 ? 'conta' : 'contas'}
+                  {atrasadas.length} {atrasadas.length === 1 ? 'item' : 'itens'}
                 </span>
               </div>
             </div>
@@ -97,9 +97,9 @@ export function ContasHojeCard({
           )}
         </div>
 
-        {/* Card Próximos Recebimentos */}
+        {/* Card Próximos Recebimentos -> Vai para o Calendário filtrando recebimentos */}
         <div
-          onClick={() => navigate('/caixa')}
+          onClick={() => navigate('/calendario?filtro=recebimento')}
           className="cursor-pointer rounded-2xl p-4 border border-border bg-card hover:shadow-md transition-all active:scale-[0.99]"
         >
           <div className="flex items-center justify-between">
@@ -117,10 +117,11 @@ export function ContasHojeCard({
             <ChevronRight size={18} className="text-muted-foreground" />
           </div>
           <div className="mt-3 pt-2 border-t border-border text-xs text-muted-foreground">
-            {temAtencao ? 'Mantenha os pagamentos organizados' : 'Tudo em dia para hoje! 🎉'}
+            {temAtencao ? 'Mantenha os recebimentos organizados' : 'Tudo em dia para hoje! 🎉'}
           </div>
         </div>
       </div>
+
     </div>
   );
 }

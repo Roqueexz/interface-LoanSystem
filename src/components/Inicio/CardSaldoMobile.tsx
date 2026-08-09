@@ -1,5 +1,6 @@
-import { Eye, EyeOff, ShieldCheck, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Eye, EyeOff, ShieldCheck, Wallet, ArrowUpRight, ArrowDownRight, ChevronRight } from 'lucide-react';
 import { formatarMoeda } from '../../services/Utilitario';
+import { useNavigate } from 'react-router-dom';
 
 interface CardSaldoMobileProps {
   saldo: number;
@@ -20,6 +21,7 @@ export function CardSaldoMobile({
   visivel,
   onToggleVisibilidade,
 }: CardSaldoMobileProps) {
+  const navigate = useNavigate();
   const formatar = (valor: number) => (visivel ? formatarMoeda(valor) : 'R$ •••••');
 
   return (
@@ -52,7 +54,7 @@ export function CardSaldoMobile({
         </h2>
       </div>
 
-      {/* Grid de Sub-indicadores: Disponível e Reservado */}
+      {/* Grid de Sub-indicadores: Disponível e Reservado (Reservado redireciona pro Caixa Pessoal) */}
       <div className="relative z-10 mt-5 grid grid-cols-2 gap-3 pt-4 border-t border-white/15">
         <div className="rounded-2xl bg-white/10 p-3 backdrop-blur-md">
           <span className="text-[11px] font-medium text-indigo-100 block">Disponível</span>
@@ -61,16 +63,25 @@ export function CardSaldoMobile({
           </span>
         </div>
 
-        <div className="rounded-2xl bg-white/10 p-3 backdrop-blur-md">
-          <div className="flex items-center gap-1">
-            <ShieldCheck size={13} className="text-amber-300" />
-            <span className="text-[11px] font-medium text-indigo-100">Reservado</span>
+        <button
+          type="button"
+          onClick={() => navigate('/caixa?tab=pessoal')}
+          className="rounded-2xl bg-white/10 p-3 backdrop-blur-md text-left hover:bg-white/20 active:scale-[0.98] transition-all group cursor-pointer border border-white/10 hover:border-amber-300/40"
+          title="Ver Caixinhas e Reservas Pessoais"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1">
+              <ShieldCheck size={13} className="text-amber-300" />
+              <span className="text-[11px] font-medium text-indigo-100">Reservado</span>
+            </div>
+            <ChevronRight size={14} className="text-amber-300/70 group-hover:translate-x-0.5 transition-transform" />
           </div>
           <span className="text-sm sm:text-base font-bold text-amber-200 block mt-0.5">
             {formatar(reservado)}
           </span>
-        </div>
+        </button>
       </div>
+
 
       {/* Indicadores rápidos de entradas/saídas do mês */}
       <div className="relative z-10 mt-3 flex items-center justify-between text-xs text-indigo-100/90 px-1">
