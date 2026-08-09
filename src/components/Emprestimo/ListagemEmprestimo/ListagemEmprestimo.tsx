@@ -458,8 +458,8 @@ function ListagemEmprestimo() {
               .slice(0, 2);
 
             const totalParcelasContrato = emp.num_parcelas || 1;
-            const pagas = emp.parcelasPagasCount || 0;
-            const pct = Math.min(Math.round((pagas / totalParcelasContrato) * 100), 100);
+            const pagas = quitado ? totalParcelasContrato : (emp.parcelasPagasCount || 0);
+            const pct = quitado ? 100 : Math.min(Math.round((pagas / totalParcelasContrato) * 100), 100);
 
             return (
               <div
@@ -667,7 +667,11 @@ function ListagemEmprestimo() {
         }}
         onConfirm={confirmarExclusao}
         title="Excluir Empréstimo"
-        message="Tem certeza que deseja excluir este empréstimo? Esta ação não pode ser desfeita."
+        message={
+          abaAtiva === "HISTORICO"
+            ? "Deseja excluir permanentemente este contrato do histórico? Todas as parcelas serão removidas."
+            : "Tem certeza que deseja excluir este empréstimo? Esta ação não pode ser desfeita."
+        }
         confirmText="Excluir"
         cancelText="Cancelar"
         variant="danger"
