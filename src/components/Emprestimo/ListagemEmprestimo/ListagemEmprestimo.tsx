@@ -28,7 +28,7 @@ import { SkeletonLista } from "../../../ui/Skeleton";
 import Avatar from "../../shared/Avatar/Avatar";
 import StatusBadge from "../../shared/StatusBadge/StatusBadge";
 import ModalBaixaRapida from "./ModalBaixaRapida";
-import { gerarLinkCobrancaWhatsapp } from "../../../utils/whatsapp";
+import { gerarLinkCobrancaWhatsapp } from "../../../services/whatsapp";
 
 interface EmprestimoComDetalhes extends EmprestimoDTO {
   clienteObj?: ClienteDTO;
@@ -87,7 +87,7 @@ function ListagemEmprestimo() {
         const listaComDetalhes = await Promise.all(
           emprestimosData.map(async (emp) => {
             const clienteObj = emp.id_cliente ? clientesMap.get(emp.id_cliente) : undefined;
-            
+
             let parcelas: ParcelaDTO[] = [];
             if (emp.id_emprestimo) {
               const resP = await ParcelaRequests.listarPorEmprestimo(emp.id_emprestimo);
@@ -275,11 +275,10 @@ function ListagemEmprestimo() {
       <div className="flex border-b border-border bg-card p-1.5 rounded-2xl gap-2 shadow-sm">
         <button
           onClick={() => setAbaAtiva("ATIVOS")}
-          className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold transition-all flex items-center justify-center gap-2 ${
-            abaAtiva === "ATIVOS"
+          className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold transition-all flex items-center justify-center gap-2 ${abaAtiva === "ATIVOS"
               ? "bg-primary text-primary-foreground shadow-md"
               : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-          }`}
+            }`}
         >
           <Briefcase size={16} />
           <span>Empréstimos Ativos</span>
@@ -290,11 +289,10 @@ function ListagemEmprestimo() {
 
         <button
           onClick={() => setAbaAtiva("HISTORICO")}
-          className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold transition-all flex items-center justify-center gap-2 ${
-            abaAtiva === "HISTORICO"
+          className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold transition-all flex items-center justify-center gap-2 ${abaAtiva === "HISTORICO"
               ? "bg-emerald-600 text-white shadow-md"
               : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-          }`}
+            }`}
         >
           <History size={16} />
           <span>Histórico (Liquidados)</span>
@@ -317,13 +315,12 @@ function ListagemEmprestimo() {
               <button
                 key={item.key}
                 onClick={() => setFiltroStatus(isSelected ? "TODOS" : (item.key as typeof filtroStatus))}
-                className={`p-3.5 sm:p-4 rounded-2xl border text-left transition-all ${
-                  item.color === "emerald"
+                className={`p-3.5 sm:p-4 rounded-2xl border text-left transition-all ${item.color === "emerald"
                     ? "bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40 text-emerald-700 dark:text-emerald-400"
                     : item.color === "amber"
-                    ? "bg-amber-500/5 border-amber-500/20 hover:border-amber-500/40 text-amber-700 dark:text-amber-400"
-                    : "bg-red-500/5 border-red-500/20 hover:border-red-500/40 text-red-700 dark:text-red-400"
-                } ${isSelected ? "ring-2 ring-primary shadow-sm scale-[1.02]" : ""}`}
+                      ? "bg-amber-500/5 border-amber-500/20 hover:border-amber-500/40 text-amber-700 dark:text-amber-400"
+                      : "bg-red-500/5 border-red-500/20 hover:border-red-500/40 text-red-700 dark:text-red-400"
+                  } ${isSelected ? "ring-2 ring-primary shadow-sm scale-[1.02]" : ""}`}
               >
                 <p className="text-xl sm:text-2xl font-black">{item.count}</p>
                 <p className="text-xs font-bold mt-0.5 opacity-90">{item.label}</p>
@@ -356,11 +353,10 @@ function ListagemEmprestimo() {
               <button
                 key={f}
                 onClick={() => setFiltroStatus(f as typeof filtroStatus)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                  filtroStatus === f
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filtroStatus === f
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
+                  }`}
               >
                 {f === "TODOS" ? "Todos" : f}
               </button>
@@ -452,9 +448,8 @@ function ListagemEmprestimo() {
                     </div>
                     <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                       <div
-                        className={`h-full transition-all duration-500 rounded-full ${
-                          pct === 100 || quitado ? "bg-emerald-500" : "bg-primary"
-                        }`}
+                        className={`h-full transition-all duration-500 rounded-full ${pct === 100 || quitado ? "bg-emerald-500" : "bg-primary"
+                          }`}
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -543,8 +538,8 @@ function ListagemEmprestimo() {
               {busca
                 ? `Nenhum resultado para "${busca}".`
                 : abaAtiva === "HISTORICO"
-                ? "Quando um empréstimo tiver todas as parcelas quitadas, ele aparecerá automaticamente aqui neste histórico."
-                : "Cadastre o primeiro empréstimo para começar a gerenciar sua carteira."}
+                  ? "Quando um empréstimo tiver todas as parcelas quitadas, ele aparecerá automaticamente aqui neste histórico."
+                  : "Cadastre o primeiro empréstimo para começar a gerenciar sua carteira."}
             </p>
           </div>
           {abaAtiva === "ATIVOS" && (
