@@ -37,6 +37,9 @@ const FORMAS_PAGAMENTO = [
   { value: "cartao", label: "Cartão", Icon: CreditCard },
 ] as const;
 
+const PARCELAS_PRESETS = [1, 2, 3, 6, 10, 12];
+const JUROS_PRESETS = [0, 5, 10, 15];
+
 function toInputDate(d: Date | string | undefined): string {
   if (!d) return "";
   return new Date(d).toISOString().split("T")[0];
@@ -134,14 +137,9 @@ function FormEditarEmprestimo() {
     const ok = await toast.promise(
       EmprestimoRequests.atualizarEmprestimo(Number(id), payload),
       {
-        loading: 'Atualizando empréstimo...',
-        success: '✅ Empréstimo atualizado com sucesso!',
-        error: (err) => {
-          if (err?.message) {
-            return `❌ ${err.message}`;
-          }
-          return '❌ Erro ao atualizar empréstimo. Tente novamente.';
-        },
+        loading: "Atualizando empréstimo...",
+        success: "✅ Empréstimo atualizado com sucesso!",
+        error: (err) => err?.message ? `❌ ${err.message}` : "❌ Erro ao atualizar empréstimo.",
       }
     );
 
@@ -175,122 +173,161 @@ function FormEditarEmprestimo() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      {/* Cabeçalho */}
-      <div className="flex items-center gap-3 mb-8">
+    <div className="max-w-3xl mx-auto px-4 py-6 sm:py-8 space-y-6">
+      {/* HEADER */}
+      <div className="flex items-center gap-3">
         <button
           onClick={() => navigate("/emprestimos")}
-          className="p-2 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+          className="p-2.5 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft size={20} />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Editar Empréstimo</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">ID #{id}</p>
+          <h1 className="text-2xl font-extrabold text-foreground tracking-tight">Editar Empréstimo</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Contrato #{id}</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Dados Financeiros */}
-        <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
-          <h2 className="text-base font-semibold text-foreground mb-5 pb-3 border-b border-border">
+        {/* DADOS FINANCEIROS */}
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-5 sm:p-6 space-y-5">
+          <h2 className="text-base font-bold text-foreground pb-3 border-b border-border">
             Dados Financeiros
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block mb-1.5 text-sm font-medium text-foreground">
-                ID do Cliente
-              </label>
-              <input
-                type="number"
-                name="id_cliente"
-                min={1}
-                required
-                value={formData.id_cliente || ""}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
-              />
-            </div>
 
-            <div>
-              <label className="block mb-1.5 text-sm font-medium text-foreground">
-                Valor do Empréstimo (R$)
-              </label>
-              <input
-                type="number"
-                name="valor_emprestimo"
-                step="0.01"
-                min={0}
-                required
-                value={formData.valor_emprestimo || ""}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
-              />
-            </div>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider text-foreground">
+                  ID do Cliente *
+                </label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  name="id_cliente"
+                  min={1}
+                  required
+                  value={formData.id_cliente || ""}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 text-base bg-input-background border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
+                />
+              </div>
 
-            <div>
-              <label className="block mb-1.5 text-sm font-medium text-foreground">
-                Número de Parcelas
-              </label>
-              <input
-                type="number"
-                name="num_parcelas"
-                min={1}
-                required
-                value={formData.num_parcelas}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
-              />
-            </div>
+              <div>
+                <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider text-foreground">
+                  Valor do Empréstimo (R$) *
+                </label>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  name="valor_emprestimo"
+                  step="0.01"
+                  min={0}
+                  required
+                  value={formData.valor_emprestimo || ""}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 text-base bg-input-background border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
+                />
+              </div>
 
-            <div>
-              <label className="block mb-1.5 text-sm font-medium text-foreground">
-                Tipo de Juros
-              </label>
-              <select
-                name="tipo_juros"
-                value={formData.tipo_juros}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
-              >
-                <option value="simples">Juros Simples</option>
-                <option value="compostos">Juros Compostos</option>
-              </select>
-            </div>
+              <div>
+                <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider text-foreground">
+                  Número de Parcelas *
+                </label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  name="num_parcelas"
+                  min={1}
+                  required
+                  value={formData.num_parcelas}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 text-base bg-input-background border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
+                />
+                <div className="flex gap-1.5 mt-2 flex-wrap">
+                  {PARCELAS_PRESETS.map((num) => (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => setFormData((prev) => ({ ...prev, num_parcelas: num }))}
+                      className={`px-2.5 py-1 text-xs font-bold rounded-lg border transition-all ${
+                        formData.num_parcelas === num
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-muted/40 border-border text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {num}x
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-            <div>
-              <label className="block mb-1.5 text-sm font-medium text-foreground">
-                Taxa de Juros (% ao mês)
-              </label>
-              <input
-                type="number"
-                name="juros"
-                step="0.01"
-                min={0}
-                required
-                value={formData.juros ?? ""}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
-              />
-            </div>
+              <div>
+                <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider text-foreground">
+                  Tipo de Juros
+                </label>
+                <select
+                  name="tipo_juros"
+                  value={formData.tipo_juros}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 text-base bg-input-background border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
+                >
+                  <option value="simples">Juros Simples</option>
+                  <option value="compostos">Juros Compostos</option>
+                </select>
+              </div>
 
-            <div className="flex items-end">
-              <div className="w-full bg-muted border border-border rounded-xl px-4 py-2.5">
-                <p className="text-xs text-muted-foreground mb-0.5">Valor por parcela (calculado)</p>
-                <p className="text-lg font-bold text-foreground">{formatarMoeda(valorParcela)}</p>
+              <div>
+                <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider text-foreground">
+                  Taxa de Juros (% ao mês) *
+                </label>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  name="juros"
+                  step="0.01"
+                  min={0}
+                  required
+                  value={formData.juros ?? ""}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 text-base bg-input-background border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
+                />
+                <div className="flex gap-1.5 mt-2 flex-wrap">
+                  {JUROS_PRESETS.map((rate) => (
+                    <button
+                      key={rate}
+                      type="button"
+                      onClick={() => setFormData((prev) => ({ ...prev, juros: rate }))}
+                      className={`px-2.5 py-1 text-xs font-bold rounded-lg border transition-all ${
+                        formData.juros === rate
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-muted/40 border-border text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {rate}%
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-end">
+                <div className="w-full bg-primary/5 border border-primary/20 rounded-xl px-4 py-3">
+                  <p className="text-xs text-muted-foreground font-semibold">Valor por parcela (calculado)</p>
+                  <p className="text-xl font-extrabold text-foreground mt-0.5">{formatarMoeda(valorParcela)}</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Datas */}
-        <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
-          <h2 className="text-base font-semibold text-foreground mb-5 pb-3 border-b border-border">
+        {/* DATAS */}
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-5 sm:p-6 space-y-5">
+          <h2 className="text-base font-bold text-foreground pb-3 border-b border-border">
             Datas
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block mb-1.5 text-sm font-medium text-foreground">
+              <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider text-foreground">
                 Data do Empréstimo
               </label>
               <input
@@ -299,27 +336,27 @@ function FormEditarEmprestimo() {
                 value={formData.data_emprestimo}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
+                className="w-full px-4 py-3 text-base bg-input-background border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
               />
             </div>
             <div>
-              <label className="block mb-1.5 text-sm font-medium text-foreground">
-                Data de Devolução <span className="text-muted-foreground font-normal">(opcional)</span>
+              <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider text-foreground">
+                Data de Devolução
               </label>
               <input
                 type="date"
                 name="data_devolucao"
                 value={formData.data_devolucao}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 text-sm bg-input-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
+                className="w-full px-4 py-3 text-base bg-input-background border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
               />
             </div>
           </div>
         </div>
 
-        {/* Forma de Pagamento */}
-        <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
-          <h2 className="text-base font-semibold text-foreground mb-5 pb-3 border-b border-border">
+        {/* FORMA DE PAGAMENTO */}
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-5 sm:p-6 space-y-5">
+          <h2 className="text-base font-bold text-foreground pb-3 border-b border-border">
             Forma de Pagamento
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -335,10 +372,10 @@ function FormEditarEmprestimo() {
                       forma_pagamento: prev.forma_pagamento === value ? "" : value,
                     }))
                   }
-                  className={`flex flex-col items-center gap-2.5 p-4 rounded-xl border-2 transition-all duration-150 cursor-pointer ${
+                  className={`flex flex-col items-center justify-center gap-2 p-3.5 rounded-xl border-2 transition-all cursor-pointer ${
                     selecionado
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border bg-muted/50 text-muted-foreground hover:border-primary/50 hover:bg-primary/5"
+                      ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
+                      : "border-border bg-muted/40 text-muted-foreground hover:border-primary/50 hover:bg-primary/5"
                   }`}
                 >
                   <Icon size={22} />
@@ -347,76 +384,66 @@ function FormEditarEmprestimo() {
               );
             })}
           </div>
-          {!formData.forma_pagamento && (
-            <p className="text-xs text-muted-foreground mt-3">Nenhuma forma selecionada (opcional)</p>
-          )}
         </div>
 
-        {/* Status do Empréstimo */}
-        <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
-          <h2 className="text-base font-semibold text-foreground mb-5 pb-3 border-b border-border">
+        {/* STATUS DO EMPRÉSTIMO */}
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-5 sm:p-6 space-y-5">
+          <h2 className="text-base font-bold text-foreground pb-3 border-b border-border">
             Status do Empréstimo
           </h2>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => setFormData((prev) => ({ ...prev, status_emprestimo: true }))}
-              className={`flex items-center justify-center gap-2.5 p-4 rounded-xl border-2 transition-all duration-150 ${
+              className={`flex items-center justify-center gap-2.5 p-3.5 rounded-xl border-2 transition-all ${
                 formData.status_emprestimo
-                  ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                  : "border-border bg-muted/50 text-muted-foreground hover:border-emerald-300"
+                  ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold"
+                  : "border-border bg-muted/40 text-muted-foreground hover:border-emerald-300"
               }`}
             >
               <CheckCircle2 size={20} />
-              <span className="text-sm font-semibold">Ativo</span>
+              <span className="text-xs font-bold">Ativo</span>
             </button>
 
             <button
               type="button"
               onClick={() => setFormData((prev) => ({ ...prev, status_emprestimo: false }))}
-              className={`flex items-center justify-center gap-2.5 p-4 rounded-xl border-2 transition-all duration-150 ${
+              className={`flex items-center justify-center gap-2.5 p-3.5 rounded-xl border-2 transition-all ${
                 !formData.status_emprestimo
-                  ? "border-slate-500 bg-slate-100 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300"
-                  : "border-border bg-muted/50 text-muted-foreground hover:border-slate-400"
+                  ? "border-slate-500 bg-slate-100 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 font-bold"
+                  : "border-border bg-muted/40 text-muted-foreground hover:border-slate-400"
               }`}
             >
               <XCircle size={20} />
-              <span className="text-sm font-semibold">Liquidado</span>
+              <span className="text-xs font-bold">Liquidado</span>
             </button>
           </div>
-          <p className="text-xs text-muted-foreground mt-3">
-            {formData.status_emprestimo
-              ? "O empréstimo está ativo e aparece na listagem principal."
-              : "O empréstimo está liquidado e não aparece na listagem ativa."}
-          </p>
         </div>
 
-        {/* BOTÕES */}
-        <div className="flex gap-4">
-          <button
-            type="submit"
-            disabled={salvando}
-            className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-xl font-bold hover:opacity-90 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {salvando ? (
-              <>
-                <Loader2 size={18} className="animate-spin" />
-                Salvando...
-              </>
-            ) : (
-              <>
-                <Save size={18} />
-                SALVAR ALTERAÇÕES
-              </>
-            )}
-          </button>
-
+        {/* STICKY BOTTOM ACTIONS */}
+        <div className="flex gap-3 pt-2">
           <button
             type="button"
             onClick={() => navigate("/emprestimos")}
-            className="flex-1 flex items-center justify-center gap-2 border border-border bg-card text-foreground py-3 rounded-xl font-bold hover:bg-muted transition-all"
+            className="flex-1 py-3.5 px-4 border border-border bg-card text-foreground font-bold rounded-xl hover:bg-muted transition-all text-sm"
           >
-            CANCELAR
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            disabled={salvando}
+            className="flex-1 py-3.5 px-4 bg-primary text-primary-foreground font-bold rounded-xl hover:opacity-90 transition-all shadow-md flex items-center justify-center gap-2 text-sm disabled:opacity-50"
+          >
+            {salvando ? (
+              <>
+                <Loader2 size={18} className="animate-spin" /> Salvando...
+              </>
+            ) : (
+              <>
+                <Save size={18} /> Salvar Alterações
+              </>
+            )}
           </button>
         </div>
       </form>
