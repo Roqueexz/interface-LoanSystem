@@ -6,7 +6,7 @@ import {
   Landmark,
   Clock,
   XCircle,
-  ArrowLeft,
+  Calendar,
 } from "lucide-react";
 
 import CaixaRequests from "../../../fetch/CaixaRequests";
@@ -14,12 +14,19 @@ import type CaixaDTO from "../../../interface/CaixaDTO";
 import { SkeletonCaixaCards } from "../../../ui/Skeleton";
 import { formatarMoeda } from "../../../services/Utilitario";
 
+import RelatorioDiario from "../RelatorioDiario/RelatorioDiario";
+import RelatorioMensal from "../RelatorioMensal/RelatorioMensal";
+import RelatorioAnual from "../RelatorioAnual/RelatorioAnual";
+
+type PeriodoFiltro = "diario" | "mensal" | "anual";
+
 function ResumoCaixa() {
   const navigate = useNavigate();
 
   const [resumo, setResumo] = useState<CaixaDTO | undefined>(undefined);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
+  const [periodo, setPeriodo] = useState<PeriodoFiltro>("diario");
 
   useEffect(() => {
     const carregar = async () => {
@@ -60,24 +67,7 @@ function ResumoCaixa() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {/* Cabeçalho */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Caixa</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Visão financeira completa do seu negócio
-          </p>
-        </div>
-        <button
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
-        >
-          <ArrowLeft size={16} />
-          Voltar
-        </button>
-      </div>
-
+    <div className="space-y-6">
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-card rounded-2xl border border-border p-5 shadow-sm">
@@ -129,26 +119,39 @@ function ResumoCaixa() {
         </div>
       </div>
 
-      {/* Relatorio Diario - Placeholder para futura implementacao */}
-      <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-        <div className="flex items-center gap-1 p-4 border-b border-border bg-muted/30">
-          <button className="px-4 py-2 rounded-xl text-sm font-semibold text-primary-foreground shadow-sm" style={{ background: "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)" }}>
-            Relatório Diário
-          </button>
-          <button className="px-4 py-2 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
-            Relatório Mensal
-          </button>
-          <button className="px-4 py-2 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
-            Relatório Anual
-          </button>
+      {/* Relatórios Filtrados por Período */}
+      <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden p-6 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-4">
+          <div className="flex items-center gap-2">
+            <Calendar size={18} className="text-primary" />
+            <h2 className="text-base font-extrabold text-foreground">Relatório de Movimentações</h2>
+          </div>
+
+          <div className="flex bg-muted/60 p-1 rounded-2xl border border-border self-start sm:self-auto">
+            {(["diario", "mensal", "anual"] as PeriodoFiltro[]).map((p) => (
+              <button
+                key={p}
+                type="button"
+                onClick={() => setPeriodo(p)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-all ${
+                  periodo === p
+                    ? "bg-card text-foreground shadow-sm border border-border"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {p === "diario" && "Diário"}
+                {p === "mensal" && "Mensal"}
+                {p === "anual" && "Anual"}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="p-6 text-center py-12 text-muted-foreground">
-          <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
-            <TrendingUp size={28} className="text-muted-foreground/50" />
-          </div>
-          <p className="font-semibold text-foreground mb-1">Movimentações do Dia</p>
-          <p className="text-sm">Em breve você poderá ver todas as movimentações do dia aqui.</p>
+        {/* Exibe o relatório correspondente ao período selecionado */}
+        <div>
+          {periodo === "diario" && <RelatorioDiario />}
+          {periodo === "mensal" && <RelatorioMensal />}
+          {periodo === "anual" && <RelatorioAnual />}
         </div>
       </div>
     </div>

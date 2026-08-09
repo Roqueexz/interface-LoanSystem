@@ -1,59 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import ResumoCaixa from "../ResumoCaixa/ResumoCaixa";
-import RelatorioDiario from "../RelatorioDiario/RelatorioDiario";
-import RelatorioMensal from "../RelatorioMensal/RelatorioMensal";
-import RelatorioAnual from "../RelatorioAnual/RelatorioAnual";
 import CaixaPessoal from "../CaixaPessoal/CaixaPessoal";
 
-type AbaType =
-  | "resumo"
-  | "diario"
-  | "mensal"
-  | "anual"
-  | "pessoal";
+type AbaType = "resumo" | "pessoal";
 
 function DashboardCaixa() {
-  const [abaAtiva, setAbaAtiva] = useState<AbaType>("resumo");
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab");
+
+  const [abaAtiva, setAbaAtiva] = useState<AbaType>(() => (tabParam === "pessoal" ? "pessoal" : "resumo"));
+
+  useEffect(() => {
+    if (tabParam === "pessoal") {
+      setAbaAtiva("pessoal");
+    }
+  }, [tabParam]);
 
   const abas: { id: AbaType; label: string }[] = [
-    { id: "resumo", label: "Resumo" },
-    { id: "diario", label: "Diário" },
-    { id: "mensal", label: "Mensal" },
-    { id: "anual", label: "Anual" },
-    { id: "pessoal", label: "Pessoal" },
+    { id: "resumo", label: "Resumo & Fluxo" },
+    { id: "pessoal", label: "Caixa Pessoal & Caixinhas" },
   ];
 
   return (
-    <div className="w-full min-h-full bg-background py-8 px-4 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl font-bold text-foreground mb-6">
-          Dashboard Financeiro
-        </h1>
+    <div className="w-full min-h-full bg-background py-6 px-4 transition-colors duration-300">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-extrabold text-foreground tracking-tight">
+              Dashboard Financeiro
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+              Gestão de caixa, fluxo de empréstimos e reservas pessoais.
+            </p>
+          </div>
 
-        {/* Navegação por abas */}
-        <div className="flex flex-wrap gap-2 mb-6 bg-card rounded-xl border border-border p-1 transition-colors">
-          {abas.map((aba) => (
-            <button
-              key={aba.id}
-              onClick={() => setAbaAtiva(aba.id)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                abaAtiva === aba.id
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-            >
-              {aba.label}
-            </button>
-          ))}
+          {/* Navegação por abas principais (Resumo e Pessoal) */}
+          <div className="flex bg-muted/60 p-1 rounded-2xl border border-border self-start sm:self-auto">
+            {abas.map((aba) => (
+              <button
+                key={aba.id}
+                onClick={() => setAbaAtiva(aba.id)}
+                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                  abaAtiva === aba.id
+                    ? "bg-card text-foreground shadow-sm border border-border"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {aba.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Conteúdo */}
         <div className="space-y-6">
           {abaAtiva === "resumo" && <ResumoCaixa />}
-          {abaAtiva === "diario" && <RelatorioDiario />}
-          {abaAtiva === "mensal" && <RelatorioMensal />}
-          {abaAtiva === "anual" && <RelatorioAnual />}
           {abaAtiva === "pessoal" && <CaixaPessoal />}
         </div>
       </div>
@@ -61,4 +64,4 @@ function DashboardCaixa() {
   );
 }
 
-export default DashboardCaixa;
+export default DashboardCaixa;
