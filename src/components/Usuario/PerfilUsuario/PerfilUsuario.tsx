@@ -15,13 +15,13 @@ import {
   CreditCard,
   Users,
   Wallet,
-  Copy,
   RefreshCw,
 } from "lucide-react";
 import AuthRequests from "../../../fetch/AuthRequests";
 import UsuarioRequests, { type UsuarioPerfilDTO, type AtividadeDTO } from "../../../fetch/UsuarioRequests";
 import { useToast } from "../../../hooks/useToast";
 import ModalConfirmacao from "../../../ui/Modal/ModalConfirmacao";
+import AvatarUploader from "../AvatarUploader/AvatarUploader";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -290,6 +290,7 @@ function PerfilUsuario() {
   const navigate = useNavigate();
   const toast = useToast();
   const [usuario, setUsuario] = useState<UsuarioPerfilDTO | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [atividades, setAtividades] = useState<AtividadeDTO[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [carregandoAtividades, setCarregandoAtividades] = useState(true);
@@ -303,6 +304,7 @@ function PerfilUsuario() {
       const dados = await UsuarioRequests.perfil();
       if (dados) {
         setUsuario(dados);
+        setAvatarUrl(dados.avatar_url ?? null);
       } else {
         // Fallback para localStorage caso a API falhe
         setUsuario({
@@ -349,16 +351,6 @@ function PerfilUsuario() {
     }
   };
 
-  const copiarId = async () => {
-    try {
-      const id = usuario?.id_usuario ? `#${usuario.id_usuario}` : "";
-      await navigator.clipboard.writeText(id);
-      toast.success("ID copiado para área de transferência");
-    } catch {
-      toast.error("Não foi possível copiar ID");
-    }
-  };
-
   const iniciais =
     usuario?.nome
       .split(" ")
@@ -399,13 +391,12 @@ function PerfilUsuario() {
 
         <div className="px-6 pb-6">
           <div className="-mt-10 mb-4 flex items-end justify-between">
-            {/* Avatar */}
-            <div
-              className="w-20 h-20 rounded-2xl font-bold text-2xl flex items-center justify-center border-4 border-card shadow-lg"
-              style={{ background: "linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)", color: "#4338ca" }}
-            >
-              {iniciais}
-            </div>
+            {/* Avatar com uploader */}
+            <AvatarUploader
+              avatarUrl={avatarUrl}
+              iniciais={iniciais}
+              onAvatarAtualizado={(novaUrl) => setAvatarUrl(novaUrl)}
+            />
 
             {/* Ações */}
             <div className="flex gap-2 pb-1">
@@ -454,7 +445,6 @@ function PerfilUsuario() {
             { label: "Nome Completo", value: usuario?.nome || "Não informado", icon: <User size={13} /> },
             { label: "E-mail", value: usuario?.email || "Não informado", icon: <Mail size={13} /> },
             { label: "Função", value: formatarRole(usuario?.role || "admin"), icon: <Shield size={13} /> },
-            { label: "ID do Usuário", value: `#${usuario?.id_usuario || "N/A"}`, icon: <Copy size={13} />, copiavel: true },
             { label: "Membro desde", value: usuario?.criado_em ? formatarData(usuario.criado_em) : "—", icon: <Clock size={13} /> },
             { label: "Último Acesso", value: new Date().toLocaleString("pt-BR"), icon: <Activity size={13} /> },
           ].map((item) => (
@@ -463,18 +453,7 @@ function PerfilUsuario() {
                 <span className="text-muted-foreground">{item.icon}</span>
                 <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">{item.label}</p>
               </div>
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-semibold text-foreground">{item.value}</p>
-                {item.copiavel && (
-                  <button
-                    onClick={copiarId}
-                    className="text-xs px-2 py-1 border border-border rounded-lg hover:bg-muted transition-colors text-muted-foreground"
-                    title="Copiar ID"
-                  >
-                    <Copy size={11} />
-                  </button>
-                )}
-              </div>
+              <p className="text-sm font-semibold text-foreground">{item.value}</p>
             </div>
           ))}
         </div>
