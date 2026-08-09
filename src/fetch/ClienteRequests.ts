@@ -26,7 +26,7 @@ class ClienteRequests extends BaseRequests {
     return resposta.dados;
   }
 
-  async enviarFormularioCliente(formCliente: ClienteDTO): Promise<{ sucesso: boolean; id_cliente?: number }> {
+  async enviarFormularioCliente(formCliente: ClienteDTO): Promise<{ sucesso: boolean; id_cliente?: number; erro?: string }> {
     console.log('[ClienteRequests] Enviando formulario:', formCliente);
     const resposta = await this.request<{ mensagem: string; id_cliente?: number }>(this.endpointCliente, {
       method: 'POST',
@@ -37,7 +37,7 @@ class ClienteRequests extends BaseRequests {
 
     if (!resposta.sucesso) {
       console.error('[ClienteRequests] Erro ao cadastrar cliente:', resposta.erro);
-      return { sucesso: false };
+      return { sucesso: false, erro: resposta.erro };
     }
 
     return {

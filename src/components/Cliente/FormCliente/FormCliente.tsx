@@ -73,36 +73,28 @@ function FormCliente() {
     e.preventDefault();
     setLoading(true);
 
-    let novoIdCliente: number | undefined;
+    try {
+      const resposta = await ClienteRequests.enviarFormularioCliente(formData);
 
-    const res = await toast.promise(
-      (async () => {
-        const resposta = await ClienteRequests.enviarFormularioCliente(formData);
-        if (!resposta.sucesso) {
-          throw new Error("Erro ao cadastrar cliente. Tente novamente.");
-        }
-        novoIdCliente = resposta.id_cliente;
-        return resposta;
-      })(),
-      {
-        loading: "Cadastrando cliente...",
-        success: "✅ Cliente cadastrado com sucesso!",
-        error: (err) =>
-          err?.message ? `❌ ${err.message}` : "❌ Erro ao cadastrar cliente.",
+      if (!resposta.sucesso) {
+        toast.error(`❌ ${resposta.erro || "Não foi possível cadastrar o cliente. Verifique os dados."}`);
+        return;
       }
-    );
 
-    setLoading(false);
-
-    if (res?.sucesso) {
+      toast.success("✅ Cliente cadastrado com sucesso!");
       setRedirecionando(true);
+
       setTimeout(() => {
-        if (novoIdCliente) {
-          navigate(`/clientes/${novoIdCliente}`);
+        if (resposta.id_cliente) {
+          navigate(`/clientes/${resposta.id_cliente}`);
         } else {
           navigate("/clientes");
         }
       }, 750);
+    } catch (err: any) {
+      toast.error(`❌ ${err?.message || "Erro inesperado ao cadastrar o cliente."}`);
+    } finally {
+      setLoading(false);
     }
   }
 
