@@ -1,31 +1,22 @@
+import { useState } from 'react';
+import { History, ChevronRight, Lock } from 'lucide-react';
 import { useCofre } from '../../../hooks/useCofre';
-import HeaderCaixa from './HeaderCaixa';
-import CardSaldo from './CardSaldo';
-import GridResumo from './GridResumo';
-import ControleCofre from './ControleCofre';
-import ListaHistorico from './ListaHistorico';
-import ListaContas from './ListaContas';
-import ListaMetas from './ListaMetas';
 import { useContas } from '../../../hooks/useContas';
 import useMovimentacoes from '../../../hooks/useMovimentacoes';
-import type { ResumoCaixaPessoalDTO } from '../../../interface/CaixaPessoalDTO';
 
-// ============================================================
-// CaixaPessoal — orquestrador principal do módulo
-// Responsabilidade: compor os blocos e distribuir dados.
-// NÃO possui lógica financeira — apenas orquestra.
-//
-// Sprint 1: estrutura base ✅
-// Sprint 2: cofre físico com persistência ✅
-// Sprint 3: movimentações reais (hook useMovimentacoes)
-// Sprint 4: contas e reservas (hook useContas)
-// Sprint 5: metas e projeções (hook useMetas)
-// ============================================================
+import CardSaldo from './CardSaldo';
+import CaixinhasCard from './CaixinhasCard';
+import DrawerHistoricoMovimentacoes from './DrawerHistoricoMovimentacoes';
+import PainelMetasEContas from './PainelMetasEContas';
+import ControleCofre from './ControleCofre';
 
 function CaixaPessoal() {
   const cofre = useCofre();
-  const { contas, proximasContas, contasAtrasadas, vencendoHoje } = useContas();
+  const { contas } = useContas();
   const { movimentacoes, entradas, saidas } = useMovimentacoes();
+
+  const [drawerHistoricoAberto, setDrawerHistoricoAberto] = useState(false);
+  const [cofreAberto, setCofreAberto] = useState(false);
 
   // Calcula reservado a partir das contas não pagas do tipo 'pagar'
   const reservado = contas
@@ -38,69 +29,68 @@ function CaixaPessoal() {
   // disponivel = saldoAtual menos o reservado
   const disponivel = saldoAtual - reservado;
 
-  const resumo: ResumoCaixaPessoalDTO = {
-    saldoAtual,
-    entradas,
-    saidas,
-    reservado,
-    disponivel,
-  };
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20">
 
-      {/* Cabeçalho do módulo */}
-      <HeaderCaixa />
-
-      {/* Card de saldo — atualizado com saldoAtual calculado */}
-      <CardSaldo saldo={saldoAtual} />
-
-      {/* Hoje — resumo rápido para ação imediata (mobile-first) */}
-      <div className="bg-card rounded-2xl border border-border p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* Header do Caixa Pessoal com Botão de Extrato (Drawer) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-card border border-border p-5 rounded-3xl shadow-sm">
         <div>
-          <h3 className="text-sm font-semibold text-foreground">Hoje</h3>
-          <p className="text-xs text-muted-foreground">O que precisa de atenção agora</p>
+          <span className="text-[10px] font-extrabold uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-1 rounded-full">
+            Estilo Nubank
+          </span>
+          <h2 className="text-xl font-extrabold text-foreground mt-1">Caixa Pessoal & Reservas</h2>
+          <p className="text-xs text-muted-foreground">Administre seu dinheiro, caixinhas e faturas pessoais</p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <div className="px-3 py-2 bg-muted rounded-lg text-sm">
-            <div className="font-semibold">{vencendoHoje.length}</div>
-            <div className="text-xs text-muted-foreground">Vencem hoje</div>
-          </div>
 
-          <div className="px-3 py-2 bg-muted rounded-lg text-sm">
-            <div className="font-semibold">{contasAtrasadas.length}</div>
-            <div className="text-xs text-muted-foreground">Atrasadas</div>
-          </div>
-
-          <div className="px-3 py-2 bg-muted rounded-lg text-sm">
-            <div className="font-semibold">{proximasContas.length}</div>
-            <div className="text-xs text-muted-foreground">Próximos 7 dias</div>
-          </div>
-
-          <div className="px-3 py-2 bg-muted rounded-lg text-sm">
-            <div className="font-semibold">R$ {reservado.toFixed(2)}</div>
-            <div className="text-xs text-muted-foreground">Reservado</div>
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={() => setDrawerHistoricoAberto(true)}
+          className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-muted/60 hover:bg-muted px-4 py-2.5 text-xs font-bold text-foreground active:scale-95 transition-all shadow-sm"
+        >
+          <History size={16} className="text-primary" />
+          Ver Extrato Completo
+        </button>
       </div>
 
-      {/* Grid com 4 cards de resumo */}
-      <GridResumo resumo={resumo} />
+      {/* Card de Saldo Principal */}
+      <CardSaldo saldo={saldoAtual} />
 
-      {/* Cofre físico — Sprint 2 */}
-      <ControleCofre cofre={cofre} />
+      {/* Caixinhas de Reserva (Nubank Style) */}
+      <CaixinhasCard />
 
-      {/* Histórico de movimentações (Sprint 3) */}
-      <ListaHistorico movimentacoes={movimentacoes} />
+      {/* Painel Dedicado de Contas e Metas Pessoais (com alerta de saldo insuficiente) */}
+      <PainelMetasEContas saldoDisponivel={disponivel} />
 
-      {/* Contas e Reservas (Sprint 4) */}
-      <ListaContas />
+      {/* Cofre Físico (Accordion expansível para economizar espaço) */}
+      <div className="rounded-3xl border border-border bg-card overflow-hidden shadow-sm">
+        <button
+          type="button"
+          onClick={() => setCofreAberto(!cofreAberto)}
+          className="w-full flex items-center justify-between p-4 bg-muted/30 hover:bg-muted/50 transition-colors text-left"
+        >
+          <div className="flex items-center gap-2 text-xs font-bold text-foreground">
+            <Lock size={16} className="text-amber-500" />
+            <span>Cofre Físico (Gestão de Cédulas)</span>
+          </div>
+          <ChevronRight size={16} className={`text-muted-foreground transition-transform ${cofreAberto ? 'rotate-90' : ''}`} />
+        </button>
 
-      {/* Metas Financeiras (Sprint 7) */}
-      <ListaMetas />
+        {cofreAberto && (
+          <div className="p-4 border-t border-border">
+            <ControleCofre cofre={cofre} />
+          </div>
+        )}
+      </div>
+
+      {/* Drawer de Histórico Retrátil */}
+      <DrawerHistoricoMovimentacoes
+        isOpen={drawerHistoricoAberto}
+        onClose={() => setDrawerHistoricoAberto(false)}
+        movimentacoes={movimentacoes}
+      />
 
     </div>
   );
 }
 
-export default CaixaPessoal;
+export default CaixaPessoal;
