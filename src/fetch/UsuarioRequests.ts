@@ -6,6 +6,7 @@ interface UsuarioPerfilDTO {
   email: string;
   role: string;
   criado_em: string;
+  avatar_url?: string | null;
 }
 
 interface AtividadeDTO {
@@ -63,6 +64,44 @@ class UsuarioRequests extends BaseRequests {
       return { sucesso: true };
     }
     return { sucesso: false, erro: res.erro || 'Erro ao alterar senha.' };
+  }
+
+  /**
+   * Faz upload do avatar do usuário
+   * PUT /api/usuario/avatar (multipart/form-data)
+   */
+  async uploadAvatar(file: File): Promise<{
+    sucesso: boolean;
+    avatar_url?: string;
+    erro?: string;
+  }> {
+    try {
+      const token = localStorage.getItem('token');
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const response = await fetch(`${this.serverURL}/api/usuario/avatar`, {
+        method: 'PUT',
+        headers: {
+          'x-access-token': token || '',
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        let mensagemErro = `Erro ${response.status}`;
+        try {
+          const errData = await response.json();
+          if (errData.mensagem) mensagemErro = errData.mensagem;
+        } catch { /* noop */ }
+        return { sucesso: false, erro: mensagemErro };
+      }
+
+      const data = await response.json();
+      return { sucesso: true, avatar_url: data.avatar_url };
+    } catch (error: any) {
+      return { sucesso: false, erro: error.message || 'Erro ao enviar avatar.' };
+    }
   }
 
   /**
