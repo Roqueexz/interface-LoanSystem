@@ -1,5 +1,5 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Banknote,
   Smartphone,
@@ -34,13 +34,18 @@ const JUROS_PRESETS = [0, 5, 10, 15];
 
 function FormEmprestimo() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const toast = useToast();
 
   const [clientes, setClientes] = useState<ClienteDTO[]>([]);
   const [modalClienteOpen, setModalClienteOpen] = useState(false);
 
+  const initialClienteId = searchParams.get("clienteId")
+    ? Number(searchParams.get("clienteId"))
+    : 0;
+
   const [formData, setFormData] = useState({
-    id_cliente: 0,
+    id_cliente: initialClienteId,
     valor_emprestimo: 0,
     num_parcelas: 1,
     tipo_juros: "simples",
