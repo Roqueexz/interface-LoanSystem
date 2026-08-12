@@ -9,6 +9,9 @@ import TemaToggle from "../../ui/Tema/TemaToggle";
 import ModalConfirmacao from "../../ui/Modal/ModalConfirmacao";
 import { useToast } from "../../hooks/useToast";
 
+import { useApiStatus } from "../../context/ApiStatusContext";
+import { WifiOff, RefreshCw } from "lucide-react";
+
 type Props = {
   children: ReactNode;
 };
@@ -17,9 +20,18 @@ function Layout({ children }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
+  const { apiOffline, verificarConexao } = useApiStatus();
+  const [verificandoApi, setVerificandoApi] = useState(false);
+
   const prevChildrenRef = useRef<ReactNode>(children);
   const [displayChildren, setDisplayChildren] = useState<ReactNode>(children);
   const [modalLogoutOpen, setModalLogoutOpen] = useState(false);
+
+  const handleTentarReconectar = async () => {
+    setVerificandoApi(true);
+    await verificarConexao();
+    setVerificandoApi(false);
+  };
 
   useEffect(() => {
     const previous = prevChildrenRef.current;
@@ -60,6 +72,23 @@ function Layout({ children }: Props) {
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background text-foreground transition-colors duration-300">
+      {apiOffline && (
+        <div className="bg-rose-600 text-white px-4 py-2 text-xs sm:text-sm font-semibold flex items-center justify-between shadow-md transition-all">
+          <div className="flex items-center gap-2">
+            <WifiOff size={16} className="animate-pulse" />
+            <span>🔴 Servidor offline — tentando reconectar...</span>
+          </div>
+          <button
+            onClick={handleTentarReconectar}
+            disabled={verificandoApi}
+            className="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-lg font-medium transition-colors flex items-center gap-1.5 active:scale-95 disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={verificandoApi ? "animate-spin" : ""} />
+            <span>{verificandoApi ? "Verificando..." : "Tentar agora"}</span>
+          </button>
+        </div>
+      )}
+
       <Navegacao />
 
       <main className="flex-1 w-full bg-background">
