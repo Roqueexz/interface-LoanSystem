@@ -23,15 +23,18 @@ function FormLogin({ onLoginSuccess }: FormLoginProps) {
     setCarregando(true);
 
     try {
-      await AuthRequests.login({ email, senha });
-      
-      // Chama a função que avisa o App.tsx que logou
+      const resultado = await AuthRequests.login({ email, senha });
+
+      if (!resultado.sucesso) {
+        setErro(resultado.erro ?? "E-mail ou senha inválidos. Tente novamente.");
+        return;
+      }
+
+      // Só redireciona se o login foi bem-sucedido
       onLoginSuccess();
-      
-      // Redireciona para o início
       navigate("/");
     } catch (error) {
-      setErro("E-mail ou senha inválidos. Tente novamente.");
+      setErro("Não foi possível conectar ao servidor. Tente novamente.");
     } finally {
       setCarregando(false);
     }
