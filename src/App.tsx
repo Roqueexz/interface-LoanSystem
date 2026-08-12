@@ -6,6 +6,8 @@ import { Loader2 } from "lucide-react";
 import ProtectedRoute from "./components/Rotas/ProtectedRoutes";
 import PLogin from "./pages/Login/PLogin";
 
+import { ApiStatusProvider } from "./context/ApiStatusContext";
+
 // Lazy Loading das paginas
 const PHome = lazy(() => import("./pages/Inicio/PInicio"));
 const PListagemCliente = lazy(
@@ -37,6 +39,7 @@ const PDashboardInteligente = lazy(
 const PCalendario = lazy(() => import("./pages/Calendario/PCalendario"));
 const PNotificacoes = lazy(() => import("./pages/Notificacoes/PNotificacoes"));
 const PPerfil = lazy(() => import("./pages/Usuario/PPerfil/PPerfil"));
+const Erro404 = lazy(() => import("./components/Erros/Erro404"));
 
 // Componente de loading global
 const PageLoader = () => (
@@ -55,8 +58,9 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
-      <Suspense fallback={<PageLoader />}>
+    <ApiStatusProvider>
+      <BrowserRouter>
+        <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* ROTA RAIZ */}
           <Route
@@ -197,9 +201,13 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* ROTA CATCH-ALL PARA 404 */}
+          <Route path="*" element={<Erro404 />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
+  </ApiStatusProvider>
   );
 }
 
