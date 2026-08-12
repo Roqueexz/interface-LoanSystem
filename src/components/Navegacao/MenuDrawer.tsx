@@ -12,6 +12,7 @@ import {
   User,
   LogOut,
   Sparkles,
+  Shield,
 } from 'lucide-react';
 import TemaToggle from '../../ui/Tema/TemaToggle';
 import AuthRequests from '../../fetch/AuthRequests';
@@ -35,6 +36,7 @@ export function MenuDrawer({ isOpen, onClose, naoLidas }: MenuDrawerProps) {
   const [animating, setAnimating] = useState(false);
   const [modalLogoutOpen, setModalLogoutOpen] = useState(false);
 
+  const role = localStorage.getItem('role');
   const nome = localStorage.getItem('nome') || 'Usuário';
   const email = localStorage.getItem('email') || 'usuario@loansystem.com';
   const iniciais = nome
@@ -106,6 +108,7 @@ export function MenuDrawer({ isOpen, onClose, naoLidas }: MenuDrawerProps) {
     { to: '/dashboard', icon: BarChart2, label: 'Dashboard', desc: 'Relatórios & fluxo' },
     { to: '/calendario', icon: Calendar, label: 'Calendário', desc: 'Agenda financeira' },
     { to: '/notificacoes', icon: Bell, label: 'Notificações', desc: 'Alertas & avisos', badge: naoLidas },
+    ...(role === 'admin' ? [{ to: '/admin', icon: Shield, label: '⚡ Painel Admin', desc: 'Gestão de credores SaaS' }] : []),
     { to: '/perfil', icon: User, label: 'Meu Perfil', desc: 'Configurações de conta' },
   ];
 

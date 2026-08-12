@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 
 import ProtectedRoute from "./components/Rotas/ProtectedRoutes";
+import AdminRoute from "./components/Rotas/AdminRoute";
 import PLogin from "./pages/Login/PLogin";
 
 import { ApiStatusProvider } from "./context/ApiStatusContext";
@@ -39,6 +40,7 @@ const PDashboardInteligente = lazy(
 const PCalendario = lazy(() => import("./pages/Calendario/PCalendario"));
 const PNotificacoes = lazy(() => import("./pages/Notificacoes/PNotificacoes"));
 const PPerfil = lazy(() => import("./pages/Usuario/PPerfil/PPerfil"));
+const PAdmin = lazy(() => import("./pages/Admin/PAdmin"));
 const Erro404 = lazy(() => import("./components/Erros/Erro404"));
 
 // Componente de loading global
@@ -199,6 +201,16 @@ function App() {
               <ProtectedRoute isAuth={isAuth}>
                 <PPerfil />
               </ProtectedRoute>
+            }
+          />
+
+          {/* PAINEL ADMIN (APENAS ROLE === 'ADMIN') */}
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute isAuth={isAuth}>
+                <PAdmin />
+              </AdminRoute>
             }
           />
 
