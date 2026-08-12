@@ -43,6 +43,12 @@ protected async request<T>(
     console.log('[BaseRequests] Status:', response.status);
     console.log('[BaseRequests] OK:', response.ok);
 
+    if (response.status === 503 || response.status === 504) {
+      window.dispatchEvent(new CustomEvent('api:offline'));
+    } else {
+      window.dispatchEvent(new CustomEvent('api:online'));
+    }
+
     if (!response.ok) {
         let mensagemErro = `Erro ${response.status}: ${response.statusText}`;
         
@@ -89,6 +95,7 @@ protected async request<T>(
       };
     } catch (error: any) {
       console.error(`[Request] Erro em ${endpoint}:`, error);
+      window.dispatchEvent(new CustomEvent('api:offline'));
       return {
         sucesso: false,
         erro: error.message || 'Erro ao conectar com o servidor.',
