@@ -22,7 +22,7 @@ import type ClienteDTO from "../../../interface/ClienteDTO";
 import type EmprestimoDTO from "../../../interface/EmprestimoDTO";
 import { useToast } from "../../../hooks/useToast";
 import ModalConfirmacao from "../../../ui/Modal/ModalConfirmacao";
-import { SkeletonLista } from "../../../ui/Skeleton";
+import { SkeletonCardGrid } from "../../../ui/Skeleton";
 import Avatar from "../../shared/Avatar/Avatar";
 import StatusBadge from "../../shared/StatusBadge/StatusBadge";
 
@@ -187,7 +187,7 @@ function ListagemCliente() {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
-        <SkeletonLista itens={5} />
+        <SkeletonCardGrid count={6} />
       </div>
     );
   }

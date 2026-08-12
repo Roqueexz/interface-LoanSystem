@@ -275,3 +275,22 @@
 .animate-backdrop-fade {
   animation: backdropFadeIn 0.25s ease-out forwards;
 }
+
+/* Micro-animations & Tactile Feedback */
+@keyframes bounceIn {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.02); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-bounce-in {
+  animation: bounceIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.touch-feedback {
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease;
+}
+
+.touch-feedback:active {
+  transform: scale(0.96);
+}
