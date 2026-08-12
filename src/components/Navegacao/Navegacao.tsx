@@ -11,6 +11,7 @@ import {
   Bell,
   Menu,
   User,
+  Shield,
 } from "lucide-react";
 import NotificacoesRequests from "../../fetch/NotificacoesRequests";
 import MenuDrawer from "./MenuDrawer";
@@ -20,6 +21,7 @@ function Navegacao() {
   const [naoLidas, setNaoLidas] = useState(0);
   const [drawerAberto, setDrawerAberto] = useState(false);
 
+  const role = localStorage.getItem('role');
   const nome = localStorage.getItem('nome') || 'Usuário';
   const iniciais = nome
     .split(' ')
@@ -56,6 +58,7 @@ function Navegacao() {
     { to: "/dashboard", icon: BarChart2, label: "Dashboard" },
     { to: "/calendario", icon: Calendar, label: "Calendário" },
     { to: "/notificacoes", icon: Bell, label: "Notificações" },
+    ...(role === 'admin' ? [{ to: "/admin", icon: Shield, label: "⚡ Admin" }] : []),
   ];
 
   return (
