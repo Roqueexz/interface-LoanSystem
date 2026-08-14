@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import CaixinhaRequests, { CaixinhaDTO, CriarCaixinhaInput } from '../fetch/CaixinhaRequests';
+import CaixinhaRequests, { type CaixinhaDTO, type CriarCaixinhaInput } from '../fetch/CaixinhaRequests';
 import { useToast } from './useToast';
 
 export function useCaixinhas() {
