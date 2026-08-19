@@ -1,11 +1,12 @@
 import "./App.css";
 import { useState, Suspense, lazy } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 
 import ProtectedRoute from "./components/Rotas/ProtectedRoutes";
 import AdminRoute from "./components/Rotas/AdminRoute";
 import PLogin from "./pages/Login/PLogin";
+import AuthRequests from "./fetch/AuthRequests";
 
 import { ApiStatusProvider } from "./context/ApiStatusContext";
 
@@ -52,7 +53,7 @@ const PageLoader = () => (
 
 function App() {
   const [isAuth, setIsAuth] = useState<boolean>(() => {
-    return localStorage.getItem("isAuth") === "true";
+    return AuthRequests.checkTokenExpiry();
   });
 
   const handleLoginSuccess = () => {
@@ -68,10 +69,18 @@ function App() {
           <Route
             path="/"
             element={
+              <ProtectedRoute isAuth={isAuth}>
+                <PHome />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ROTA LOGIN */}
+          <Route
+            path="/login"
+            element={
               isAuth ? (
-                <ProtectedRoute isAuth={isAuth}>
-                  <PHome />
-                </ProtectedRoute>
+                <Navigate to="/" replace />
               ) : (
                 <PLogin onLoginSuccess={handleLoginSuccess} />
               )

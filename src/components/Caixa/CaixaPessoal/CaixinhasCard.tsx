@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { PiggyBank, Plus, ArrowUpRight, ArrowDownRight, Sparkles, Trash2, ShieldCheck, Loader2 } from 'lucide-react';
+import { useState, type FormEvent } from 'react';
+import { PiggyBank, Plus, ArrowUpRight, ArrowDownRight, Sparkles, Trash2, Loader2 } from 'lucide-react';
 import { formatarMoeda } from '../../../services/Utilitario';
 import { useCaixinhas } from '../../../hooks/useCaixinhas';
-import { CaixinhaDTO } from '../../../fetch/CaixinhaRequests';
+import type { CaixinhaDTO } from '../../../fetch/CaixinhaRequests';
 import ModalConfirmacao from '../../../ui/Modal/ModalConfirmacao';
 
 const EMOJIS_SUGERIDOS = ['🐷', '🚗', '🏠', '✈️', '💍', '🎓', '📱', '💻', '🏖️', '🚢', '🎂', '🎮', '🏋️', '🎁', '📈', '🛡️', '💎', '🚀', '🌟', '✨'];
@@ -45,7 +45,7 @@ export function CaixinhasCard() {
     setNovaMeta(chip.meta);
   };
 
-  const handleCriarCaixinha = async (e: React.FormEvent) => {
+  const handleCriarCaixinha = async (e: FormEvent) => {
     e.preventDefault();
     if (!novoNome.trim()) return;
 
@@ -67,7 +67,7 @@ export function CaixinhasCard() {
     }
   };
 
-  const handleExecutarOperacao = async (e: React.FormEvent) => {
+  const handleExecutarOperacao = async (e: FormEvent) => {
     e.preventDefault();
     if (!modalOperacao || !valorOperacao || Number(valorOperacao) <= 0) return;
 

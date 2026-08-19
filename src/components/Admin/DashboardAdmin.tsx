@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Users, UserCheck, Wallet, DollarSign, Plus, Ban, CheckCircle2, Trash2, Search, Shield, Loader2 } from 'lucide-react';
 import { useAdmin } from '../../hooks/useAdmin';
 import { formatarMoeda } from '../../services/Utilitario';

@@ -70,7 +70,10 @@ function FormLogin({ onLoginSuccess }: FormLoginProps) {
               type="email"
               required
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (erro) setErro(null);
+              }}
               placeholder="admin@sistema.com"
               className="w-full border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 transition-all"
             />
@@ -89,7 +92,10 @@ function FormLogin({ onLoginSuccess }: FormLoginProps) {
               type={mostrarSenha ? 'text' : 'password'}
               required
               value={senha}
-              onChange={(e) => setSenha(e.target.value)}
+              onChange={(e) => {
+                setSenha(e.target.value);
+                if (erro) setErro(null);
+              }}
               placeholder="••••••••"
               className="w-full border border-slate-200 rounded-xl pl-11 pr-16 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 transition-all"
             />

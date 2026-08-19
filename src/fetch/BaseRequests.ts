@@ -70,7 +70,9 @@ protected async request<T>(
           localStorage.removeItem('email');
           localStorage.removeItem('role');
           localStorage.removeItem('isAuth');
-          window.location.href = '/';
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
         }
 
         return {

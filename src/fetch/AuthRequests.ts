@@ -19,6 +19,8 @@ class AuthRequests extends BaseRequests {
           const errorData = await response.json();
           if (errorData.message) {
             mensagemErro = errorData.message;
+          } else if (errorData.mensagem) {
+            mensagemErro = errorData.mensagem;
           }
         } catch (e) {
           // Usa mensagem padrao
@@ -58,6 +60,15 @@ class AuthRequests extends BaseRequests {
     localStorage.setItem('isAuth', isAuth.toString());
   }
 
+  limparSessao() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('nome');
+    localStorage.removeItem('idUsuario');
+    localStorage.removeItem('email');
+    localStorage.removeItem('role');
+    localStorage.removeItem('isAuth');
+  }
+
   /**
    * Remove o token e redireciona para o login
    * Mantido para compatibilidade com Layout.tsx
@@ -67,30 +78,35 @@ class AuthRequests extends BaseRequests {
   }
 
   logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('nome');
-    localStorage.removeItem('idUsuario');
-    localStorage.removeItem('email');
-    localStorage.removeItem('role');
-    localStorage.removeItem('isAuth');
-    window.location.href = '/';
+    this.limparSessao();
+    window.location.href = '/login';
   }
 
   checkTokenExpiry(): boolean {
     const token = localStorage.getItem('token');
-    if (!token) return false;
+    const isAuth = localStorage.getItem('isAuth') === 'true';
+    if (!token || !isAuth) {
+      this.limparSessao();
+      return false;
+    }
 
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        this.limparSessao();
+        return false;
+      }
+      const payload = JSON.parse(atob(parts[1]));
       const expiry = payload.exp;
       const now = Math.floor(Date.now() / 1000);
 
-      if (expiry < now) {
-        this.logout();
+      if (!expiry || expiry < now) {
+        this.limparSessao();
         return false;
       }
       return true;
     } catch {
+      this.limparSessao();
       return false;
     }
   }
