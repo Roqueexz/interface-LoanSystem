@@ -13,6 +13,9 @@ import {
   CheckCircle2,
   AlertTriangle,
   CreditCard,
+  UserPlus,
+  Sparkles,
+  FilterX,
 } from "lucide-react";
 
 import ClienteRequests from "../../../fetch/ClienteRequests";
@@ -398,26 +401,55 @@ function ListagemCliente() {
         </div>
       )}
 
-      {/* EMPTY STATE */}
-      {!loading && filtered.length === 0 && (
-        <div className="bg-card rounded-2xl border border-border shadow-sm p-12 text-center space-y-4">
+      {/* EMPTY STATE - BASE VAZIA (NENHUM CLIENTE CADASTRADO) */}
+      {!loading && clientes.length === 0 && (
+        <div className="bg-card rounded-3xl border border-border shadow-sm p-10 md:p-14 text-center space-y-5 max-w-xl mx-auto my-6">
+          <div className="w-20 h-20 rounded-3xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto shadow-inner">
+            <UserPlus size={40} className="animate-pulse" />
+          </div>
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-300">
+              <Sparkles size={14} /> Comece sua carteira
+            </div>
+            <h3 className="font-extrabold text-foreground text-xl md:text-2xl">
+              Nenhum cliente cadastrado
+            </h3>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+              Cadastre seu primeiro cliente para iniciar sua carteira de empréstimos, registrar parcelas e organizar seus recebimentos.
+            </p>
+          </div>
+          <div className="pt-2">
+            <button
+              onClick={() => navigate("/clientes/novo")}
+              className="inline-flex items-center gap-2.5 px-6 py-3 rounded-2xl text-sm font-bold text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-95 transition-all"
+              style={{ background: "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)" }}
+            >
+              <UserPlus size={18} /> Novo Cliente
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* EMPTY STATE - FILTRO OU BUSCA SEM RESULTADOS */}
+      {!loading && clientes.length > 0 && filtered.length === 0 && (
+        <div className="bg-card rounded-2xl border border-border shadow-sm p-10 text-center space-y-4 max-w-md mx-auto my-6">
           <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto text-muted-foreground">
-            <Users size={32} />
+            <FilterX size={32} />
           </div>
           <div>
             <h3 className="font-bold text-foreground text-lg">Nenhum cliente encontrado</h3>
-            <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
-              {search || statusFilter !== "TODOS"
-                ? `Nenhum resultado para a busca ou filtro selecionado.`
-                : "Cadastre seu primeiro cliente para iniciar sua carteira de empréstimos."}
+            <p className="text-sm text-muted-foreground mt-1">
+              Não encontramos resultados para a busca ou filtro selecionado.
             </p>
           </div>
           <button
-            onClick={() => navigate("/clientes/novo")}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-md hover:opacity-90 transition-all"
-            style={{ background: "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)" }}
+            onClick={() => {
+              setSearch("");
+              setStatusFilter("TODOS");
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border border-border bg-muted hover:bg-muted/80 text-foreground transition-all"
           >
-            <Plus size={16} /> Adicionar Cliente
+            Limpar Filtros
           </button>
         </div>
       )}
