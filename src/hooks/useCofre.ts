@@ -3,16 +3,14 @@ import CaixaPessoalRequests from '../fetch/CaixaPessoalRequests';
 import type { CedulaCofreDTO } from '../interface/CaixaPessoalDTO';
 
 // ============================================================
-// useCofre — gerencia o estado do cofre físico
+// useCofre — gerencia o estado do cofre físico e saldo consolidado
 // Responsabilidades:
 //   - carregar cédulas da API ao montar
 //   - incrementar / decrementar quantidade localmente (otimista)
 //   - persistir a alteração na API via PATCH
 //   - calcular o total automaticamente
+//   - sincronizar saldo consolidado via PUT /saldo
 //   - expor estado de carregamento e erro
-//
-// Sprint 3+: este hook se manterá estável.
-// Novos hooks (useMovimentacoes, useContas) seguirão o mesmo padrão.
 // ============================================================
 
 // Cédulas exibidas da maior para menor — ordem fixa
@@ -30,6 +28,8 @@ interface UseCofre {
   incrementar: (valor_cedula: number) => Promise<void>;
   decrementar: (valor_cedula: number) => Promise<void>;
   atualizarQuantidade: (valor_cedula: number, quantidade: number) => Promise<void>;
+  atualizarSaldo: (saldo: number) => Promise<void>;
+  recarregar: () => Promise<void>;
 }
 
 export function useCofre(): UseCofre {
@@ -44,34 +44,34 @@ export function useCofre(): UseCofre {
   );
 
   // ─── CARREGAR COFRE ──────────────────────────────────────────────
-  useEffect(() => {
-    const carregar = async () => {
-      setCarregando(true);
-      setErro(null);
+  const carregar = useCallback(async () => {
+    setCarregando(true);
+    setErro(null);
 
-      try {
-        const dados = await CaixaPessoalRequests.obterCofre();
+    try {
+      const dados = await CaixaPessoalRequests.obterCofre();
 
-        if (!dados) {
-          setErro('Não foi possível carregar o cofre.');
-          return;
-        }
-
-        const estado: EstadoCedula[] = dados.cedulas.map((c) => ({
-          ...c,
-          salvando: false,
-        }));
-
-        setCedulas(estado);
-      } catch {
-        setErro('Erro ao conectar com o servidor.');
-      } finally {
-        setCarregando(false);
+      if (!dados) {
+        setErro('Não foi possível carregar o cofre.');
+        return;
       }
-    };
 
-    carregar();
+      const estado: EstadoCedula[] = dados.cedulas.map((c) => ({
+        ...c,
+        salvando: false,
+      }));
+
+      setCedulas(estado);
+    } catch {
+      setErro('Erro ao conectar com o servidor.');
+    } finally {
+      setCarregando(false);
+    }
   }, []);
+
+  useEffect(() => {
+    void carregar();
+  }, [carregar]);
 
   // ─── ATUALIZAR CÉDULA ─────────────────────────────────────────────
   // Atualização otimista: altera o estado local imediatamente,
@@ -147,5 +147,23 @@ export function useCofre(): UseCofre {
     [cedulas, atualizarCedula]
   );
 
-  return { cedulas, total, carregando, erro, incrementar, decrementar, atualizarQuantidade };
+  const atualizarSaldo = useCallback(async (saldo: number) => {
+    try {
+      await CaixaPessoalRequests.atualizarSaldo(saldo);
+    } catch (e) {
+      console.error('[useCofre] Erro ao atualizar saldo:', e);
+    }
+  }, []);
+
+  return {
+    cedulas,
+    total,
+    carregando,
+    erro,
+    incrementar,
+    decrementar,
+    atualizarQuantidade,
+    atualizarSaldo,
+    recarregar: carregar,
+  };
 }

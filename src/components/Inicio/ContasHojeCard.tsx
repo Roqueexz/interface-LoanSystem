@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Clock, ChevronRight, ArrowUpRight } from 'lucide-react';
+import { AlertCircle, Clock, ChevronRight, CalendarDays } from 'lucide-react';
 import type { ContaCaixaPessoalDTO } from '../../interface/CaixaPessoalDTO';
 import { formatarMoeda } from '../../services/Utilitario';
 
@@ -19,7 +19,6 @@ export function ContasHojeCard({
   const navigate = useNavigate();
 
   const formatar = (valor: number) => (visivel ? formatarMoeda(valor) : 'R$ •••••');
-  const temAtencao = vencendoHoje.length > 0 || atrasadas.length > 0;
 
   return (
     <div className="space-y-3">
@@ -97,15 +96,16 @@ export function ContasHojeCard({
           )}
         </div>
 
-        {/* Card Próximos Recebimentos -> Vai para o Calendário filtrando recebimentos */}
+        {/* Card Próximos Recebimentos -> Vai para o Calendário mensal filtrando recebimentos */}
         <div
-          onClick={() => navigate('/calendario?filtro=recebimento')}
+          onClick={() => navigate('/calendario?visao=mes&filtro=recebimento')}
           className="cursor-pointer rounded-2xl p-4 border border-border bg-card hover:shadow-md transition-all active:scale-[0.99]"
+          title="Ver recebimentos previstos no Calendário Mensal"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                <ArrowUpRight size={18} />
+                <CalendarDays size={18} />
               </span>
               <div>
                 <span className="text-xs font-medium text-muted-foreground block">Próximos Recebimentos</span>
@@ -117,7 +117,7 @@ export function ContasHojeCard({
             <ChevronRight size={18} className="text-muted-foreground" />
           </div>
           <div className="mt-3 pt-2 border-t border-border text-xs text-muted-foreground">
-            {temAtencao ? 'Mantenha os recebimentos organizados' : 'Tudo em dia para hoje! 🎉'}
+            Inclui parcelas de empréstimos e contas do mês
           </div>
         </div>
       </div>

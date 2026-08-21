@@ -74,6 +74,26 @@ class ParcelaRequests extends BaseRequests {
 
     return resposta.dados || [];
   }
+
+  /**
+   * Lista parcelas pendentes com vencimento no mês corrente
+   * GET /api/parcelas/vencendo?mes=&ano=
+   */
+  async listarParcelasVencendoNoMes(mes?: number, ano?: number): Promise<ParcelaDTO[] | undefined> {
+    const params = new URLSearchParams();
+    if (mes !== undefined) params.append('mes', String(mes));
+    if (ano !== undefined) params.append('ano', String(ano));
+
+    const url = `${this.endpointParcela}/vencendo${params.toString() ? `?${params.toString()}` : ''}`;
+    const resposta = await this.request<ParcelaDTO[]>(url);
+
+    if (!resposta.sucesso) {
+      console.error('[ParcelaRequests] Erro ao listar parcelas vencendo no mês:', resposta.erro);
+      return undefined;
+    }
+
+    return resposta.dados || [];
+  }
 }
 
 export default new ParcelaRequests();

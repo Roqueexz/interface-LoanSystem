@@ -23,6 +23,33 @@ class CaixaPessoalRequests extends BaseRequests {
     return resposta.dados;
   }
 
+  // ─── SALDO CONSOLIDADO: OBTER ──────────────────────────────────────
+  async obterSaldo(): Promise<number | undefined> {
+    const resposta = await this.request<{ saldo: number }>(`${this.endpoint}/saldo`);
+
+    if (!resposta.sucesso) {
+      console.error('[CaixaPessoalRequests] Erro ao obter saldo consolidado:', resposta.erro);
+      return undefined;
+    }
+
+    return resposta.dados?.saldo;
+  }
+
+  // ─── SALDO CONSOLIDADO: ATUALIZAR ──────────────────────────────────
+  async atualizarSaldo(saldo: number): Promise<boolean> {
+    const resposta = await this.request<{ mensagem: string; saldo: number }>(`${this.endpoint}/saldo`, {
+      method: 'PUT',
+      body: JSON.stringify({ saldo }),
+    });
+
+    if (!resposta.sucesso) {
+      console.error('[CaixaPessoalRequests] Erro ao atualizar saldo consolidado:', resposta.erro);
+      return false;
+    }
+
+    return true;
+  }
+
   // ─── COFRE: ATUALIZAR CÉDULA ───────────────────────────────────────
   async atualizarCedula(
     valor_cedula: number,
