@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { PiggyBank, Plus, ArrowUpRight, ArrowDownRight, Sparkles, Trash2, Loader2 } from 'lucide-react';
 import { formatarMoeda } from '../../../services/Utilitario';
 import { useCaixinhas } from '../../../hooks/useCaixinhas';
+import CaixaPessoalRequests from '../../../fetch/CaixaPessoalRequests';
 import type { CaixinhaDTO } from '../../../fetch/CaixinhaRequests';
 import ModalConfirmacao from '../../../ui/Modal/ModalConfirmacao';
 
@@ -29,6 +30,7 @@ export function CaixinhasCard() {
 
   const [modalNovaAberto, setModalNovaAberto] = useState(false);
   const [modalOperacao, setModalOperacao] = useState<{ caixinha: CaixinhaDTO; tipo: 'deposito' | 'resgate' } | null>(null);
+  const [saldoDisponivelCaixa, setSaldoDisponivelCaixa] = useState<number | null>(null);
   const [caixinhaExcluir, setCaixinhaExcluir] = useState<CaixinhaDTO | null>(null);
 
   const [novoNome, setNovoNome] = useState('');
@@ -37,6 +39,19 @@ export function CaixinhasCard() {
   const [corSelecionada, setCorSelecionada] = useState('indigo');
   const [valorOperacao, setValorOperacao] = useState('');
   const [submetendo, setSubmetendo] = useState(false);
+
+  const abrirModalOperacao = async (caixinha: CaixinhaDTO, tipo: 'deposito' | 'resgate') => {
+    setModalOperacao({ caixinha, tipo });
+    setValorOperacao('');
+    if (tipo === 'deposito') {
+      try {
+        const saldo = await CaixaPessoalRequests.obterSaldo();
+        setSaldoDisponivelCaixa(saldo !== undefined ? saldo : null);
+      } catch {
+        setSaldoDisponivelCaixa(null);
+      }
+    }
+  };
 
   const handleAplicarChip = (chip: typeof CHIPS_SUGESTAO[0]) => {
     setNovoNome(chip.nome);
@@ -216,14 +231,14 @@ export function CaixinhasCard() {
                   <div className="flex items-center gap-2 pt-1">
                     <button
                       type="button"
-                      onClick={() => setModalOperacao({ caixinha: item, tipo: 'deposito' })}
+                      onClick={() => abrirModalOperacao(item, 'deposito')}
                       className="flex-1 inline-flex items-center justify-center gap-1 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 py-1.5 text-xs font-bold active:scale-95 transition-all"
                     >
                       <ArrowUpRight size={14} /> Guardar
                     </button>
                     <button
                       type="button"
-                      onClick={() => setModalOperacao({ caixinha: item, tipo: 'resgate' })}
+                      onClick={() => abrirModalOperacao(item, 'resgate')}
                       className="flex-1 inline-flex items-center justify-center gap-1 rounded-xl border border-border bg-muted/60 hover:bg-muted text-foreground py-1.5 text-xs font-semibold active:scale-95 transition-all"
                     >
                       <ArrowDownRight size={14} /> Resgatar
@@ -385,6 +400,13 @@ export function CaixinhasCard() {
             <p className="text-xs text-muted-foreground bg-muted/50 p-2.5 rounded-xl">
               Saldo atual nesta caixinha: <strong className="text-foreground">{formatarMoeda(modalOperacao.caixinha.saldo)}</strong>
             </p>
+
+            {modalOperacao.tipo === 'deposito' && saldoDisponivelCaixa !== null && (
+              <div className="flex items-center justify-between text-xs bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-xl text-emerald-700 dark:text-emerald-300">
+                <span>Saldo disponível no caixa:</span>
+                <strong className="font-bold">{formatarMoeda(saldoDisponivelCaixa)}</strong>
+              </div>
+            )}
 
             {/* Chips de Valor Rápido */}
             <div className="flex gap-2">
