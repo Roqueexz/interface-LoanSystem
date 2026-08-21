@@ -52,6 +52,7 @@ export default function Calendario() {
   const [searchParams] = useSearchParams();
   const dataParam = searchParams.get("data");
   const filtroParam = searchParams.get("filtro");
+  const visaoParam = searchParams.get("visao");
 
   const {
     eventos,
@@ -63,12 +64,18 @@ export default function Calendario() {
     formatarValor,
   } = useCalendario();
 
-  const [visao, setVisao] = useState<VisaoCalendario>(() => (dataParam ? "dia" : "mes"));
+  const [visao, setVisao] = useState<VisaoCalendario>(() => {
+    if (visaoParam === "mes" || visaoParam === "semana" || visaoParam === "dia") {
+      return visaoParam;
+    }
+    return dataParam ? "dia" : "mes";
+  });
+
   const [filtros, setFiltros] = useState<Record<TipoEventoCalendario, boolean>>(() => ({
-    recebimento: filtroParam ? filtroParam === "recebimento" : true,
+    recebimento: true,
     parcela: true,
-    conta: true,
-    meta: true,
+    conta: filtroParam === "recebimento" ? false : true,
+    meta: filtroParam === "recebimento" ? false : true,
   }));
 
   const [dataSelecionada, setDataSelecionada] = useState(() => {
@@ -78,10 +85,21 @@ export default function Calendario() {
   });
 
   useEffect(() => {
-    if (dataParam === "hoje" || dataParam) {
+    if (visaoParam === "mes" || visaoParam === "semana" || visaoParam === "dia") {
+      setVisao(visaoParam);
+    } else if (dataParam === "hoje" || dataParam) {
       setVisao("dia");
     }
-  }, [dataParam]);
+
+    if (filtroParam === "recebimento") {
+      setFiltros({
+        recebimento: true,
+        parcela: true,
+        conta: false,
+        meta: false,
+      });
+    }
+  }, [dataParam, visaoParam, filtroParam]);
 
 
   const eventosFiltrados = useMemo(() => {
@@ -136,6 +154,20 @@ export default function Calendario() {
   const detalhesDoDia = useMemo(() => {
     return (eventosPorData[dataSelecionada] ?? []).sort((a, b) => a.valor - b.valor);
   }, [dataSelecionada, eventosPorData]);
+
+  const proximoRecebimentoChave = useMemo(() => {
+    const hoje = new Date().toISOString().slice(0, 10);
+    const chaves = Object.keys(eventosPorData)
+      .filter((chave) => {
+        if (chave < hoje) return false;
+        const eventos = eventosPorData[chave] || [];
+        return eventos.some(
+          (e) => e.tipo_evento === "recebimento" || e.tipo_evento === "parcela"
+        );
+      })
+      .sort();
+    return chaves.length > 0 ? chaves[0] : null;
+  }, [eventosPorData]);
 
   const alterarFiltro = (tipo: TipoEventoCalendario) => {
     setFiltros((atual) => ({ ...atual, [tipo]: !atual[tipo] }));
@@ -306,15 +338,29 @@ export default function Calendario() {
               const chave = `${mesAtual.getFullYear()}-${String(mesAtual.getMonth() + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
               const eventosDia = eventosPorData[chave] ?? [];
               const hoje = dataSelecionada === chave;
+              const ehProximoRecebimento = chave === proximoRecebimentoChave;
 
               return (
                 <button
                   key={dia}
                   onClick={() => selecionarDia(dia)}
-                  className={`min-h-[110px] rounded-lg border p-2 text-left transition ${hoje ? "border-foreground bg-foreground/5" : "border-border hover:bg-muted/50"}`}
+                  className={`min-h-[110px] rounded-lg border p-2 text-left transition relative ${
+                    ehProximoRecebimento
+                      ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/25 ring-1 ring-emerald-500/40 shadow-xs"
+                      : hoje
+                      ? "border-foreground bg-foreground/5"
+                      : "border-border hover:bg-muted/50"
+                  }`}
                 >
                   <div className="mb-2 flex items-center justify-between text-sm font-semibold">
-                    <span>{dia}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span>{dia}</span>
+                      {ehProximoRecebimento && (
+                        <span className="inline-flex items-center rounded-full bg-emerald-600 px-1.5 py-0.5 text-[9px] font-extrabold text-white shadow-xs">
+                          Próximo
+                        </span>
+                      )}
+                    </div>
                     {eventosDia.length > 0 && <Badge variant="secondary">{eventosDia.length}</Badge>}
                   </div>
                   <div className="space-y-1">
@@ -336,14 +382,29 @@ export default function Calendario() {
             {diasDaSemanaAtual.map((dia, index) => {
               const chave = `${dia.getFullYear()}-${String(dia.getMonth() + 1).padStart(2, "0")}-${String(dia.getDate()).padStart(2, "0")}`;
               const eventosDia = eventosPorData[chave] ?? [];
+              const ehProximoRecebimento = chave === proximoRecebimentoChave;
+
               return (
                 <button
                   key={chave}
                   onClick={() => setDataSelecionada(chave)}
-                  className={`rounded-xl border p-3 text-left ${dataSelecionada === chave ? "border-foreground bg-foreground/5" : "border-border hover:bg-muted/50"}`}
+                  className={`rounded-xl border p-3 text-left transition ${
+                    ehProximoRecebimento
+                      ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/25 ring-1 ring-emerald-500/40 shadow-xs"
+                      : dataSelecionada === chave
+                      ? "border-foreground bg-foreground/5"
+                      : "border-border hover:bg-muted/50"
+                  }`}
                 >
                   <div className="mb-2 flex items-center justify-between text-sm font-semibold">
-                    <span>{diasDaSemana[index]}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span>{diasDaSemana[index]}</span>
+                      {ehProximoRecebimento && (
+                        <span className="inline-flex items-center rounded-full bg-emerald-600 px-1.5 py-0.5 text-[9px] font-extrabold text-white shadow-xs">
+                          Próximo
+                        </span>
+                      )}
+                    </div>
                     {eventosDia.length > 0 && <Badge variant="secondary">{eventosDia.length}</Badge>}
                   </div>
                   <div className="text-xs text-muted-foreground">
