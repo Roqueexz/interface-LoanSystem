@@ -32,10 +32,13 @@ protected async request<T>(
     console.log('[BaseRequests] Token:', token ? 'Presente' : 'Ausente');
 
     const response = await fetch(`${this.serverURL}${endpoint}`, {
+      cache: 'no-store',
       ...options,
       headers: {
         'Content-Type': 'application/json',
         'x-access-token': token || '',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
         ...options.headers,
       },
     });
