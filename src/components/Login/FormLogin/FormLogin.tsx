@@ -23,14 +23,20 @@ function FormLogin({ onLoginSuccess }: FormLoginProps) {
     setCarregando(true);
 
     try {
-      const resultado = await AuthRequests.login({ email, senha });
+      // Limpa qualquer sessão residual antes de nova tentativa
+      AuthRequests.limparSessao();
+
+      const resultado = await AuthRequests.login({ email: email.trim(), senha });
 
       if (!resultado.sucesso) {
-        setErro(resultado.erro ?? "E-mail ou senha inválidos. Tente novamente.");
+        setErro(
+          resultado.erro ||
+            "Credenciais inválidas. Por favor, confira os dados e tente novamente."
+        );
         return;
       }
 
-      // Só redireciona se o login foi bem-sucedido
+      // Só executa o fluxo de autenticação com sucesso confirmado
       onLoginSuccess();
       navigate("/");
     } catch (error) {
