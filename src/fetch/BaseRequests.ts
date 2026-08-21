@@ -36,9 +36,7 @@ protected async request<T>(
       ...options,
       headers: {
         'Content-Type': 'application/json',
-        'x-access-token': token || '',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
+        ...(token ? { 'x-access-token': token } : {}),
         ...options.headers,
       },
     });
