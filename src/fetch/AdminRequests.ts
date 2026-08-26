@@ -1,4 +1,5 @@
 import { BaseRequests } from './BaseRequests';
+import { SERVER_CFG } from '../appConfig';
 
 export interface ResumoGlobalDTO {
   totalCredores: number;
@@ -28,7 +29,7 @@ export interface CriarCredorInput {
 }
 
 class AdminRequests extends BaseRequests {
-  private endpoint = '/api/admin';
+  private endpoint = SERVER_CFG.ENDPOINT_ADMIN;
 
   async resumo(): Promise<ResumoGlobalDTO | undefined> {
     const res = await this.request<ResumoGlobalDTO>(`${this.endpoint}/resumo`);

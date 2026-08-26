@@ -1,11 +1,12 @@
 import { BaseRequests } from "./BaseRequests";
 import type CalendarioDTO from "../interface/CalendarioDTO";
+import { SERVER_CFG } from "../appConfig";
 
 class CalendarioRequests extends BaseRequests {
-  private endpointEventos = "/api/calendario/eventos";
-  private endpointPrevisualizar = "/api/calendario/previsualizar";
-  private endpointCriarEvento = "/api/calendario/eventos";
-  private endpointAtualizarRegra = "/api/calendario/regras";
+  private endpointEventos = SERVER_CFG.ENDPOINT_CALENDARIO_EVENTOS;
+  private endpointPrevisualizar = SERVER_CFG.ENDPOINT_CALENDARIO_PREVISUALIZAR;
+  private endpointCriarEvento = SERVER_CFG.ENDPOINT_CALENDARIO_EVENTOS;
+  private endpointAtualizarRegra = SERVER_CFG.ENDPOINT_CALENDARIO_REGRAS;
 
   async obterEventos(
     tipo?: string,

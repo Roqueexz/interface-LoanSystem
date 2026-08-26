@@ -1,8 +1,9 @@
 import type ClienteDTO from "../interface/ClienteDTO";
 import { BaseRequests } from "./BaseRequests";
+import { SERVER_CFG } from "../appConfig";
 
 class ClienteRequests extends BaseRequests {
-  private endpointCliente = '/api/clientes';
+  private endpointCliente = SERVER_CFG.ENDPOINT_CLIENTES;
 
   async obterListaDeClientes(): Promise<ClienteDTO[] | undefined> {
     const resposta = await this.request<ClienteDTO[]>(this.endpointCliente);

@@ -1,8 +1,10 @@
 import { BaseRequests } from './BaseRequests';
 import type { NotificacaoDTO, PreferenciaNotificacaoDTO } from '../interface/NotificacaoDTO';
+import { SERVER_CFG } from '../appConfig';
 
 class NotificacoesRequests extends BaseRequests {
-  private endpoint = '/api/notificacoes';
+  private endpoint = SERVER_CFG.ENDPOINT_NOTIFICACOES;
+  private endpointPreferencias = SERVER_CFG.ENDPOINT_NOTIFICACOES_PREFERENCIAS;
 
   async listar(): Promise<{ notificacoes: NotificacaoDTO[]; resumo: { total: number; naoLidas: number; criticas: number } } | undefined> {
     const resposta = await this.request<{ notificacoes: NotificacaoDTO[]; resumo: { total: number; naoLidas: number; criticas: number } }>(this.endpoint);
@@ -14,7 +16,7 @@ class NotificacoesRequests extends BaseRequests {
   }
 
   async obterPreferencias(): Promise<PreferenciaNotificacaoDTO | undefined> {
-    const resposta = await this.request<PreferenciaNotificacaoDTO>('/api/notificacoes/preferencias');
+    const resposta = await this.request<PreferenciaNotificacaoDTO>(this.endpointPreferencias);
     if (!resposta.sucesso) {
       console.error('[NotificacoesRequests] Erro ao obter preferências', resposta.erro);
       return undefined;
@@ -23,7 +25,7 @@ class NotificacoesRequests extends BaseRequests {
   }
 
   async atualizarPreferencias(preferencias: Partial<PreferenciaNotificacaoDTO>): Promise<PreferenciaNotificacaoDTO | undefined> {
-    const resposta = await this.request<PreferenciaNotificacaoDTO>('/api/notificacoes/preferencias', {
+    const resposta = await this.request<PreferenciaNotificacaoDTO>(this.endpointPreferencias, {
       method: 'PATCH',
       body: JSON.stringify(preferencias),
     });

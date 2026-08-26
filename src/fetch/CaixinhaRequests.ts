@@ -1,4 +1,5 @@
 import { BaseRequests } from './BaseRequests';
+import { SERVER_CFG } from '../appConfig';
 
 export interface CaixinhaDTO {
   id_caixinha: number;
@@ -19,7 +20,7 @@ export interface CriarCaixinhaInput {
 }
 
 class CaixinhaRequests extends BaseRequests {
-  private endpoint = '/api/caixinhas';
+  private endpoint = SERVER_CFG.ENDPOINT_CAIXINHAS;
 
   async listar(): Promise<CaixinhaDTO[] | undefined> {
     const res = await this.request<CaixinhaDTO[]>(this.endpoint);

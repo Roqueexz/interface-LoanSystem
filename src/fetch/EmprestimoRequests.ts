@@ -1,8 +1,9 @@
 import type EmprestimoDTO from "../interface/EmprestimoDTO";
 import { BaseRequests } from "./BaseRequests";
+import { SERVER_CFG } from "../appConfig";
 
 class EmprestimoRequests extends BaseRequests {
-  private endpointEmprestimo = '/api/emprestimos';
+  private endpointEmprestimo = SERVER_CFG.ENDPOINT_EMPRESTIMOS;
 
   async obterListaDeEmprestimos(): Promise<EmprestimoDTO[] | undefined> {
     // Busca ativos + liquidados para suportar a aba de Histórico

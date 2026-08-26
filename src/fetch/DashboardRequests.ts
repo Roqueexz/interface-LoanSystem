@@ -1,9 +1,10 @@
 import { BaseRequests } from "./BaseRequests";
 import type DashboardDTO from "../interface/DashboardDTO";
+import { SERVER_CFG } from "../appConfig";
 
 class DashboardRequests extends BaseRequests {
-    private endpointDashboard = '/api/caixa/dashboard';
-    private endpointIndicadores = '/api/caixa/indicadores';
+    private endpointDashboard = SERVER_CFG.ENDPOINT_DASHBOARD;
+    private endpointIndicadores = SERVER_CFG.ENDPOINT_INDICADORES;
 
     async obterDashboardInteligente(): Promise<DashboardDTO | undefined> {
         const resposta = await this.request<DashboardDTO>(this.endpointDashboard);

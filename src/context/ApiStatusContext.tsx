@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { SERVER_CFG } from '../appConfig';
 
 interface ApiStatusContextData {
   apiOffline: boolean;
@@ -22,7 +23,7 @@ export const ApiStatusProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const verificarConexao = useCallback(async (): Promise<boolean> => {
     try {
-      const serverURL = import.meta.env.VITE_API_URL || 'http://localhost:3333';
+      const serverURL = SERVER_CFG.SERVER_URL;
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 4000);
 

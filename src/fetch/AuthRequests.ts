@@ -1,7 +1,8 @@
 import { BaseRequests } from './BaseRequests';
+import { SERVER_CFG } from '../appConfig';
 
 class AuthRequests extends BaseRequests {
-  private endpointLogin = '/api/login';
+  private endpointLogin = SERVER_CFG.ENDPOINT_AUTH_LOGIN;
 
   async login(login: { email: string; senha: string }): Promise<{ sucesso: boolean; erro?: string }> {
     try {

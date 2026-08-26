@@ -8,6 +8,8 @@
  * 4. O Toast so e mostrado com base no sucesso da API
  */
 
+import { SERVER_CFG } from '../appConfig';
+
 interface RespostaBase<T = any> {
   sucesso: boolean;
   dados?: T;
@@ -18,7 +20,7 @@ export class BaseRequests {
   protected serverURL: string;
 
   constructor() {
-    this.serverURL = import.meta.env.VITE_API_URL || 'http://localhost:3333';
+    this.serverURL = SERVER_CFG.SERVER_URL;
   }
 
 protected async request<T>(

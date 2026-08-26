@@ -1,9 +1,10 @@
 import type ParcelaDTO from "../interface/ParcelaDTO";
 import { BaseRequests } from "./BaseRequests";
+import { SERVER_CFG } from "../appConfig";
 
 class ParcelaRequests extends BaseRequests {
-  private endpointParcela = '/api/parcelas';
-  private endpointEmprestimo = '/api/emprestimos';
+  private endpointParcela = SERVER_CFG.ENDPOINT_PARCELAS;
+  private endpointEmprestimo = SERVER_CFG.ENDPOINT_EMPRESTIMOS;
 
   async listarPorEmprestimo(id_emprestimo: number): Promise<ParcelaDTO[] | undefined> {
     const resposta = await this.request<ParcelaDTO[]>(`${this.endpointEmprestimo}/${id_emprestimo}/parcelas`);

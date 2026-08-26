@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/Rotas/ProtectedRoutes";
 import AdminRoute from "./components/Rotas/AdminRoute";
 import PLogin from "./pages/Login/PLogin";
 import AuthRequests from "./fetch/AuthRequests";
+import { APP_ROUTES } from "./appConfig";
 
 import { ApiStatusProvider } from "./context/ApiStatusContext";
 
@@ -67,7 +68,7 @@ function App() {
         <Routes>
           {/* ROTA RAIZ */}
           <Route
-            path="/"
+            path={APP_ROUTES.ROUTE_HOME}
             element={
               <ProtectedRoute isAuth={isAuth}>
                 <PHome />
@@ -77,10 +78,10 @@ function App() {
 
           {/* ROTA LOGIN */}
           <Route
-            path="/login"
+            path={APP_ROUTES.ROUTE_LOGIN}
             element={
               isAuth ? (
-                <Navigate to="/" replace />
+                <Navigate to={APP_ROUTES.ROUTE_HOME} replace />
               ) : (
                 <PLogin onLoginSuccess={handleLoginSuccess} />
               )
@@ -89,7 +90,7 @@ function App() {
 
           {/* LISTAGENS */}
           <Route
-            path="/clientes"
+            path={APP_ROUTES.ROUTE_LISTAGEM_CLIENTES}
             element={
               <ProtectedRoute isAuth={isAuth}>
                 <PListagemCliente />
@@ -98,7 +99,7 @@ function App() {
           />
 
           <Route
-            path="/emprestimos"
+            path={APP_ROUTES.ROUTE_LISTAGEM_EMPRESTIMOS}
             element={
               <ProtectedRoute isAuth={isAuth}>
                 <PListagemEmprestimo />
@@ -107,7 +108,7 @@ function App() {
           />
 
           <Route
-            path="/caixa"
+            path={APP_ROUTES.ROUTE_CAIXA}
             element={
               <ProtectedRoute isAuth={isAuth}>
                 <PCaixa />
@@ -117,7 +118,7 @@ function App() {
 
           {/* CRIAÇÃO */}
           <Route
-            path="/clientes/novo"
+            path={APP_ROUTES.ROUTE_CADASTRO_CLIENTE}
             element={
               <ProtectedRoute isAuth={isAuth}>
                 <PFormCliente />
@@ -126,7 +127,7 @@ function App() {
           />
 
           <Route
-            path="/emprestimos/novo"
+            path={APP_ROUTES.ROUTE_CADASTRO_EMPRESTIMO}
             element={
               <ProtectedRoute isAuth={isAuth}>
                 <PFormEmprestimo />
@@ -136,7 +137,7 @@ function App() {
 
           {/* DETALHE / DASHBOARD DO CLIENTE */}
           <Route
-            path="/clientes/:id"
+            path={APP_ROUTES.ROUTE_DETALHES_CLIENTE}
             element={
               <ProtectedRoute isAuth={isAuth}>
                 <PCliente />
@@ -146,7 +147,7 @@ function App() {
 
           {/* EDIÇÃO */}
           <Route
-            path="/editar-cliente/:id"
+            path={APP_ROUTES.ROUTE_EDICAO_CLIENTE}
             element={
               <ProtectedRoute isAuth={isAuth}>
                 <PEditarCliente />
@@ -155,7 +156,7 @@ function App() {
           />
 
           <Route
-            path="/editar-emprestimo/:id"
+            path={APP_ROUTES.ROUTE_EDICAO_EMPRESTIMO}
             element={
               <ProtectedRoute isAuth={isAuth}>
                 <PEditarEmprestimo />
@@ -165,7 +166,7 @@ function App() {
 
           {/* DETALHE EMPRESTIMO */}
           <Route
-            path="/emprestimos/:id"
+            path={APP_ROUTES.ROUTE_DETALHES_EMPRESTIMO}
             element={
               <ProtectedRoute isAuth={isAuth}>
                 <PDetalhesEmprestimo />
@@ -175,7 +176,7 @@ function App() {
 
           {/* DASHBOARD INTELIGENTE */}
           <Route
-            path="/dashboard"
+            path={APP_ROUTES.ROUTE_DASHBOARD}
             element={
               <ProtectedRoute isAuth={isAuth}>
                 <PDashboardInteligente />
@@ -185,7 +186,7 @@ function App() {
 
           {/* CALENDÁRIO FINANCEIRO */}
           <Route
-            path="/calendario"
+            path={APP_ROUTES.ROUTE_CALENDARIO}
             element={
               <ProtectedRoute isAuth={isAuth}>
                 <PCalendario />
@@ -195,7 +196,7 @@ function App() {
 
           {/* NOTIFICAÇÕES */}
           <Route
-            path="/notificacoes"
+            path={APP_ROUTES.ROUTE_NOTIFICACOES}
             element={
               <ProtectedRoute isAuth={isAuth}>
                 <PNotificacoes />
@@ -205,7 +206,7 @@ function App() {
 
           {/* PERFIL */}
           <Route
-            path="/perfil"
+            path={APP_ROUTES.ROUTE_PERFIL}
             element={
               <ProtectedRoute isAuth={isAuth}>
                 <PPerfil />
@@ -215,7 +216,7 @@ function App() {
 
           {/* PAINEL ADMIN (APENAS ROLE === 'ADMIN') */}
           <Route
-            path="/admin"
+            path={APP_ROUTES.ROUTE_ADMIN}
             element={
               <AdminRoute isAuth={isAuth}>
                 <PAdmin />

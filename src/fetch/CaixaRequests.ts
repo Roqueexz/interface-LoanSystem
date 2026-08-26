@@ -1,8 +1,9 @@
 import type CaixaDTO from "../interface/CaixaDTO";
 import { BaseRequests } from "./BaseRequests";
+import { SERVER_CFG } from "../appConfig";
 
 class CaixaRequests extends BaseRequests {
-  private endpointCaixa = '/api/caixa';
+  private endpointCaixa = SERVER_CFG.ENDPOINT_CAIXA;
 
   // ─── RESUMO GERAL ──────────────────────────────────────────────────
   async obterResumoFinanceiro(): Promise<CaixaDTO | undefined> {

@@ -1,8 +1,9 @@
 import type ResumoClienteDTO from "../interface/ResumoClienteDTO";
 import { BaseRequests } from "./BaseRequests";
+import { SERVER_CFG } from "../appConfig";
 
 class ResumoRequests extends BaseRequests {
-  private endpointClientes = '/api/clientes';
+  private endpointClientes = SERVER_CFG.ENDPOINT_CLIENTES;
 
   async obterResumoCliente(id_cliente: number): Promise<ResumoClienteDTO | undefined> {
     const resposta = await this.request<ResumoClienteDTO>(`${this.endpointClientes}/${id_cliente}/resumo`);

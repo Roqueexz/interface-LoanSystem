@@ -1,5 +1,6 @@
 import type { CofreFisicoDTO, CedulaCofreDTO, ContaCaixaPessoalDTO, MovimentacaoCaixaPessoalDTO, MetaFinanceiraDTO } from '../interface/CaixaPessoalDTO';
 import { BaseRequests } from './BaseRequests';
+import { SERVER_CFG } from '../appConfig';
 
 // ============================================================
 // CaixaPessoalRequests — comunicação com /api/caixa-pessoal
@@ -9,7 +10,7 @@ import { BaseRequests } from './BaseRequests';
 // ============================================================
 
 class CaixaPessoalRequests extends BaseRequests {
-  private endpoint = '/api/caixa-pessoal';
+  private endpoint = SERVER_CFG.ENDPOINT_CAIXA_PESSOAL;
 
   // ─── COFRE: OBTER ──────────────────────────────────────────────────
   async obterCofre(): Promise<CofreFisicoDTO | undefined> {

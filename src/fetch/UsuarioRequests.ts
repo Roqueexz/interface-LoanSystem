@@ -1,4 +1,5 @@
 import { BaseRequests } from './BaseRequests';
+import { SERVER_CFG } from '../appConfig';
 
 interface UsuarioPerfilDTO {
   id_usuario: number;
@@ -21,7 +22,7 @@ class UsuarioRequests extends BaseRequests {
    * Retorna os dados do perfil do usuário autenticado
    */
   async perfil(): Promise<UsuarioPerfilDTO | null> {
-    const res = await this.request<UsuarioPerfilDTO>('/api/usuario/perfil');
+    const res = await this.request<UsuarioPerfilDTO>(SERVER_CFG.ENDPOINT_USUARIO_PERFIL);
     return res.sucesso && res.dados ? res.dados : null;
   }
 
@@ -34,7 +35,7 @@ class UsuarioRequests extends BaseRequests {
     erro?: string;
   }> {
     const res = await this.request<{ mensagem: string; usuario: UsuarioPerfilDTO }>(
-      '/api/usuario/perfil',
+      SERVER_CFG.ENDPOINT_USUARIO_PERFIL,
       {
         method: 'PUT',
         body: JSON.stringify(dados),
@@ -55,7 +56,7 @@ class UsuarioRequests extends BaseRequests {
     novaSenha: string;
     confirmacaoSenha: string;
   }): Promise<{ sucesso: boolean; erro?: string }> {
-    const res = await this.request<{ mensagem: string }>('/api/usuario/senha', {
+    const res = await this.request<{ mensagem: string }>(SERVER_CFG.ENDPOINT_USUARIO_SENHA, {
       method: 'PATCH',
       body: JSON.stringify(dados),
     });
@@ -80,7 +81,7 @@ class UsuarioRequests extends BaseRequests {
       const formData = new FormData();
       formData.append('avatar', file);
 
-      const response = await fetch(`${this.serverURL}/api/usuario/avatar`, {
+      const response = await fetch(`${this.serverURL}${SERVER_CFG.ENDPOINT_USUARIO_AVATAR}`, {
         method: 'PUT',
         headers: {
           'x-access-token': token || '',
@@ -109,7 +110,7 @@ class UsuarioRequests extends BaseRequests {
    */
   async atividades(limite = 20): Promise<AtividadeDTO[]> {
     const res = await this.request<{ atividades: AtividadeDTO[] }>(
-      `/api/usuario/atividades?limite=${limite}`
+      `${SERVER_CFG.ENDPOINT_USUARIO_ATIVIDADES}?limite=${limite}`
     );
     return res.sucesso && res.dados ? res.dados.atividades : [];
   }
