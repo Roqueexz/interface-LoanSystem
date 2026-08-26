@@ -40,7 +40,7 @@ export const APP_ROUTES = {
  */
 export const SERVER_CFG = {
   // Endereço do servidor da API (suporta variável de ambiente VITE_API_URL com fallback para a URL de produção/deploy ou local)
-  SERVER_URL: import.meta.env.VITE_API_URL || 'https://ppl-backend-uska.onrender.com',
+  SERVER_URL: import.meta.env.VITE_API_URL || 'https://api-loansystem.onrender.com',
 
   // Endpoints de Autenticação
   ENDPOINT_AUTH_LOGIN: '/api/login',
