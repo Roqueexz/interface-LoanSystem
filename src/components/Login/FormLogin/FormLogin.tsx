@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
-import { Mail, Lock, LogIn, Loader2, AlertCircle, Eye } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { Mail, Lock, LogIn, Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import AuthRequests from "../../../fetch/AuthRequests";
+import { APP_ROUTES } from "../../../appConfig";
 
 interface FormLoginProps {
   onLoginSuccess: () => void;
@@ -10,7 +11,6 @@ interface FormLoginProps {
 function FormLogin({ onLoginSuccess }: FormLoginProps) {
   const navigate = useNavigate();
   
-  // Estados restaurados!
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
@@ -23,9 +23,7 @@ function FormLogin({ onLoginSuccess }: FormLoginProps) {
     setCarregando(true);
 
     try {
-      // Limpa qualquer sessão residual antes de nova tentativa
       AuthRequests.limparSessao();
-
       const resultado = await AuthRequests.login({ email: email.trim(), senha });
 
       if (!resultado.sucesso) {
@@ -36,9 +34,8 @@ function FormLogin({ onLoginSuccess }: FormLoginProps) {
         return;
       }
 
-      // Só executa o fluxo de autenticação com sucesso confirmado
       onLoginSuccess();
-      navigate("/");
+      navigate(APP_ROUTES.ROUTE_INICIO);
     } catch (error) {
       setErro("Não foi possível conectar ao servidor. Tente novamente.");
     } finally {
@@ -47,75 +44,66 @@ function FormLogin({ onLoginSuccess }: FormLoginProps) {
   };
 
   return (
-    <div className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8">
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 mb-4">
-          <Lock size={32} />
-        </div>
-        <h1 className="text-2xl font-bold text-slate-800">Acesso Restrito</h1>
-        <p className="text-sm text-slate-500 mt-1">Insira suas credenciais para continuar</p>
+    <div className="w-full bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-sm">
+      <div className="hidden lg:block mb-6">
+        <h1 className="text-xl font-bold tracking-tight">Bem-vindo de volta</h1>
+        <p className="text-sm text-muted-foreground mt-1">Entre na sua conta para continuar.</p>
       </div>
 
       {erro && (
-        <div className="flex items-start gap-3 bg-red-50 text-red-600 p-4 rounded-xl mb-6 border border-red-100">
-          <AlertCircle size={20} className="shrink-0 mt-0.5" />
-          <p className="text-sm font-medium">{erro}</p>
+        <div className="flex items-start gap-3 bg-destructive/10 text-destructive p-3.5 rounded-xl mb-5 border border-destructive/20">
+          <AlertCircle size={18} className="shrink-0 mt-0.5" />
+          <p className="text-sm font-medium leading-snug">{erro}</p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block mb-1.5 text-sm font-medium text-slate-700">
-            E-mail
-          </label>
+          <label className="block mb-1.5 text-sm font-medium">E-mail</label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted-foreground">
               <Mail size={18} />
             </div>
             <input
               type="email"
               required
+              autoComplete="email"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
                 if (erro) setErro(null);
               }}
-              placeholder="admin@sistema.com"
-              className="w-full border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 transition-all"
+              placeholder="seu@email.com"
+              className="w-full h-12 border border-border rounded-xl pl-11 pr-4 text-sm bg-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
             />
           </div>
         </div>
 
         <div>
-          <label className="block mb-1.5 text-sm font-medium text-slate-700">
-            Senha
-          </label>
+          <label className="block mb-1.5 text-sm font-medium">Senha</label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted-foreground">
               <Lock size={18} />
             </div>
             <input
               type={mostrarSenha ? 'text' : 'password'}
               required
+              autoComplete="current-password"
               value={senha}
               onChange={(e) => {
                 setSenha(e.target.value);
                 if (erro) setErro(null);
               }}
               placeholder="••••••••"
-              className="w-full border border-slate-200 rounded-xl pl-11 pr-16 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 transition-all"
+              className="w-full h-12 border border-border rounded-xl pl-11 pr-12 text-sm bg-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
             />
             <button
               type="button"
-              aria-label="Mostrar senha"
-              onMouseDown={() => setMostrarSenha(true)}
-              onMouseUp={() => setMostrarSenha(false)}
-              onMouseLeave={() => setMostrarSenha(false)}
-              onTouchStart={() => setMostrarSenha(true)}
-              onTouchEnd={() => setMostrarSenha(false)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-700"
+              aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
+              onClick={() => setMostrarSenha(v => !v)}
+              className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-muted-foreground hover:text-foreground transition-colors"
             >
-              <Eye size={18} />
+              {mostrarSenha ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
         </div>
@@ -123,21 +111,31 @@ function FormLogin({ onLoginSuccess }: FormLoginProps) {
         <button
           type="submit"
           disabled={carregando}
-          className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-3.5 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-200 disabled:opacity-70 disabled:cursor-not-allowed mt-2"
+          className="w-full h-12 flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed text-sm mt-2"
         >
           {carregando ? (
             <>
-              <Loader2 size={20} className="animate-spin" />
+              <Loader2 size={18} className="animate-spin" />
               Entrando...
             </>
           ) : (
             <>
-              <LogIn size={20} />
-              ENTRAR NO SISTEMA
+              <LogIn size={18} />
+              Entrar
             </>
           )}
         </button>
+
+        <p className="text-center text-xs text-muted-foreground pt-2">
+          Ao entrar, você concorda com o uso responsável dos dados dos seus clientes.
+        </p>
       </form>
+
+      <div className="mt-6 pt-6 border-t border-border text-center">
+        <Link to={APP_ROUTES.ROUTE_LANDING} className="text-sm text-muted-foreground hover:text-foreground">
+          ← Voltar para a página inicial
+        </Link>
+      </div>
     </div>
   );
 }
