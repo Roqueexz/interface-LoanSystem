@@ -57,7 +57,7 @@ function ResumoCaixa() {
         <XCircle size={32} />
         <p className="font-semibold">{erro}</p>
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/inicio")}
           className="text-sm text-primary hover:underline"
         >
           Voltar para o Início

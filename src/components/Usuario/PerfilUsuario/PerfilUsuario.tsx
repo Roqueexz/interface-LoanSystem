@@ -343,7 +343,7 @@ function PerfilUsuario() {
     try {
       AuthRequests.removeToken();
       toast.success("👋 Até logo!");
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       toast.error("❌ Erro ao sair do sistema. Tente novamente.");
     } finally {
@@ -521,7 +521,7 @@ function PerfilUsuario() {
       {/* Action buttons */}
       <div className="flex gap-3">
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/inicio")}
           className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-card border border-border rounded-xl text-sm font-semibold text-foreground hover:bg-muted transition-colors"
         >
           <ArrowLeft size={16} />
