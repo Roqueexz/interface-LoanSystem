@@ -93,7 +93,7 @@ export function MenuDrawer({ isOpen, onClose, naoLidas }: MenuDrawerProps) {
     try {
       AuthRequests.removeToken();
       toast.success('👋 Até logo!');
-      navigate('/');
+      navigate('/login');
     } catch (error) {
       toast.error('❌ Erro ao sair do sistema.');
       console.error('[MenuDrawer] Erro no logout:', error);
@@ -101,7 +101,7 @@ export function MenuDrawer({ isOpen, onClose, naoLidas }: MenuDrawerProps) {
   };
 
   const navLinks = [
-    { to: '/', icon: Home, label: 'Início', desc: 'Visão principal' },
+    { to: '/inicio', icon: Home, label: 'Início', desc: 'Visão principal' },
     { to: '/emprestimos', icon: CreditCard, label: 'Empréstimos', desc: 'Controle de contratos' },
     { to: '/clientes', icon: Users, label: 'Clientes', desc: 'Cadastro de devedores' },
     { to: '/caixa', icon: Wallet, label: 'Caixa Pessoal', desc: 'Cofre, contas & metas' },
