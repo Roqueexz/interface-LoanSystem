@@ -12,6 +12,7 @@ import { APP_ROUTES } from "./appConfig";
 import { ApiStatusProvider } from "./context/ApiStatusContext";
 
 // Lazy Loading das paginas
+const PLanding = lazy(() => import("./pages/Landing/PLanding"));
 const PHome = lazy(() => import("./pages/Inicio/PInicio"));
 const PListagemCliente = lazy(
   () => import("./pages/Cliente/PListagemCliente/PListagemCliente"),
@@ -66,25 +67,28 @@ function App() {
       <BrowserRouter>
         <Suspense fallback={<PageLoader />}>
         <Routes>
-          {/* ROTA RAIZ */}
-          <Route
-            path={APP_ROUTES.ROUTE_HOME}
-            element={
-              <ProtectedRoute isAuth={isAuth}>
-                <PHome />
-              </ProtectedRoute>
-            }
-          />
+          {/* LANDING PÚBLICA */}
+          <Route path={APP_ROUTES.ROUTE_LANDING} element={<PLanding />} />
 
-          {/* ROTA LOGIN */}
+          {/* LOGIN PÚBLICO */}
           <Route
             path={APP_ROUTES.ROUTE_LOGIN}
             element={
               isAuth ? (
-                <Navigate to={APP_ROUTES.ROUTE_HOME} replace />
+                <Navigate to={APP_ROUTES.ROUTE_INICIO} replace />
               ) : (
                 <PLogin onLoginSuccess={handleLoginSuccess} />
               )
+            }
+          />
+
+          {/* INÍCIO / DASHBOARD AUTENTICADO */}
+          <Route
+            path={APP_ROUTES.ROUTE_INICIO}
+            element={
+              <ProtectedRoute isAuth={isAuth}>
+                <PHome />
+              </ProtectedRoute>
             }
           />
 
