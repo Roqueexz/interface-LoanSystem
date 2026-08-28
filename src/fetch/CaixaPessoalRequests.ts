@@ -1,4 +1,4 @@
-import type { CofreFisicoDTO, CedulaCofreDTO, ContaCaixaPessoalDTO, MovimentacaoCaixaPessoalDTO, MetaFinanceiraDTO } from '../interface/CaixaPessoalDTO';
+import type { CofreFisicoDTO, CedulaCofreDTO, ContaCaixaPessoalDTO, MovimentacaoCaixaPessoalDTO, MetaFinanceiraDTO, ConciliacaoCofreDTO } from '../interface/CaixaPessoalDTO';
 import { BaseRequests } from './BaseRequests';
 import { SERVER_CFG } from '../appConfig';
 
@@ -320,6 +320,56 @@ class CaixaPessoalRequests extends BaseRequests {
     }
 
     return true;
+  }
+
+  // ─── CONCILIAÇÃO: OCR vs MANUAL (com foto) ───────────────────────
+  async conciliarCofre(params: {
+    foto: File | null;
+    manualCedulas: { valor_cedula: number; quantidade: number }[];
+    ocrCedulas?: { valor_cedula: number; quantidade: number; confianca: number }[];
+    textoBruto?: string;
+  }): Promise<ConciliacaoCofreDTO | undefined> {
+    const form = new FormData();
+    if (params.foto) form.append('foto', params.foto);
+    form.append('manual', JSON.stringify(params.manualCedulas));
+    if (params.ocrCedulas) {
+      form.append('ocr', JSON.stringify({ cedulas: params.ocrCedulas, texto_bruto: params.textoBruto || '' }));
+    }
+
+    const token = localStorage.getItem('token');
+    try {
+      const resp = await fetch(`${SERVER_CFG.SERVER_URL}${this.endpoint}/cofre/conciliacao`, {
+        method: 'POST',
+        headers: { ...(token ? { 'x-access-token': token } : {}) },
+        body: form,
+      });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        console.error('[CaixaPessoalRequests] Erro na conciliação:', err.mensagem || resp.statusText);
+        return undefined;
+      }
+      return (await resp.json()) as ConciliacaoCofreDTO;
+    } catch (e: any) {
+      console.error('[CaixaPessoalRequests] Erro na conciliação:', e.message);
+      return undefined;
+    }
+  }
+
+  async listarConciliacoes(): Promise<ConciliacaoCofreDTO[] | undefined> {
+    const resposta = await this.request<any[]>(`${this.endpoint}/cofre/conciliacoes`);
+    if (!resposta.sucesso) {
+      console.error('[CaixaPessoalRequests] Erro ao listar conciliações:', resposta.erro);
+      return undefined;
+    }
+    return (resposta.dados || []).map((r: any) => ({
+      id_conciliacao: r.id_conciliacao,
+      foto_url: r.foto_url,
+      manual: r.detalhes?.manual ? { cedulas: r.detalhes.manual, total: Number(r.manual_total) } : { cedulas: [], total: Number(r.manual_total) },
+      ocr: r.detalhes?.ocr ? { cedulas: r.detalhes.ocr, total: Number(r.ocr_total), texto_bruto: r.detalhes.texto_bruto } : { cedulas: [], total: Number(r.ocr_total) },
+      divergencia: Number(r.divergencia),
+      status: r.status,
+      criado_em: r.criado_em,
+    }));
   }
 }
 
