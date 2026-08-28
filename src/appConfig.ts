@@ -5,9 +5,13 @@
  * e em qualquer página que tenha um link que faça o direcionamento para outra página ou componente
  */
 export const APP_ROUTES = {
-  // Rotas Principais / Autenticação
-  ROUTE_HOME: '/',
+  // Rotas Públicas
+  ROUTE_LANDING: '/',
   ROUTE_LOGIN: '/login',
+
+  // Rotas Autenticadas — Início/Dashboard
+  ROUTE_HOME: '/inicio',
+  ROUTE_INICIO: '/inicio',
 
   // Rotas de Clientes
   ROUTE_LISTAGEM_CLIENTES: '/clientes',
