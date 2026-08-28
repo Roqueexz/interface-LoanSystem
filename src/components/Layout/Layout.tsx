@@ -61,7 +61,7 @@ function Layout({ children }: Props) {
     try {
       AuthRequests.removeToken();
       toast.success('👋 Até logo!');
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       toast.error('❌ Erro ao sair do sistema. Tente novamente.');
       console.error('[Layout] Erro no logout:', error);
@@ -99,6 +99,7 @@ function Layout({ children }: Props) {
             <button
               onClick={() => navigate("/perfil")}
               className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl hover:bg-muted transition-colors"
+              aria-label="Ir para perfil"
             >
               <div className="avatar avatar-sm">{iniciais || "U"}</div>
               <span className="text-sm font-semibold text-foreground hidden sm:block">

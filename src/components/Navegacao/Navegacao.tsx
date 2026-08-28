@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import NotificacoesRequests from "../../fetch/NotificacoesRequests";
 import MenuDrawer from "./MenuDrawer";
+import { APP_ROUTES } from "../../appConfig";
 
 function Navegacao() {
   const location = useLocation();
@@ -51,14 +52,14 @@ function Navegacao() {
   }, []);
 
   const links = [
-    { to: "/", icon: Home, label: "Início" },
-    { to: "/emprestimos", icon: CreditCard, label: "Empréstimos" },
-    { to: "/clientes", icon: Users, label: "Clientes" },
-    { to: "/caixa", icon: Wallet, label: "Caixa" },
-    { to: "/dashboard", icon: BarChart2, label: "Dashboard" },
-    { to: "/calendario", icon: Calendar, label: "Calendário" },
-    { to: "/notificacoes", icon: Bell, label: "Notificações" },
-    ...(role === 'admin' ? [{ to: "/admin", icon: Shield, label: "⚡ Admin" }] : []),
+    { to: APP_ROUTES.ROUTE_INICIO, icon: Home, label: "Início" },
+    { to: APP_ROUTES.ROUTE_LISTAGEM_EMPRESTIMOS, icon: CreditCard, label: "Empréstimos" },
+    { to: APP_ROUTES.ROUTE_LISTAGEM_CLIENTES, icon: Users, label: "Clientes" },
+    { to: APP_ROUTES.ROUTE_CAIXA, icon: Wallet, label: "Caixa" },
+    { to: APP_ROUTES.ROUTE_DASHBOARD, icon: BarChart2, label: "Dashboard" },
+    { to: APP_ROUTES.ROUTE_CALENDARIO, icon: Calendar, label: "Calendário" },
+    { to: APP_ROUTES.ROUTE_NOTIFICACOES, icon: Bell, label: "Notificações" },
+    ...(role === 'admin' ? [{ to: APP_ROUTES.ROUTE_ADMIN, icon: Shield, label: "⚡ Admin" }] : []),
   ];
 
   return (
@@ -67,7 +68,7 @@ function Navegacao() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2.5 group">
+            <Link to={APP_ROUTES.ROUTE_INICIO} className="flex items-center gap-2.5 group">
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
                 style={{
