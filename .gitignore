@@ -11,6 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+# Vite env — .env.local é ignorado, os demais são templates versionáveis
+.env.local
+!.env.development
+!.env.production
+!.env.example
 
 # Editor directories and files
 .vscode/*

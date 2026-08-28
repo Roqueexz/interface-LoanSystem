@@ -39,8 +39,10 @@ export const APP_ROUTES = {
  * Qualquer alteração nos endpoints, no endereço do servidor ou porta que forem feitas lá deve ser replicada aqui
  */
 export const SERVER_CFG = {
-  // Endereço do servidor da API (suporta variável de ambiente VITE_API_URL com fallback para a URL de produção/deploy ou local)
-  SERVER_URL: import.meta.env.VITE_API_URL || 'https://api-loansystem.onrender.com',
+  // Endereço do servidor da API
+  // Vite carrega .env.development (local) e .env.production (nuvem) automaticamente.
+  // Fallback é localhost para evitar o bug de cair no Render quando está em dev.
+  SERVER_URL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3333' : 'https://api-loansystem.onrender.com'),
 
   // Endpoints de Autenticação
   ENDPOINT_AUTH_LOGIN: '/api/login',
