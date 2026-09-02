@@ -1,4 +1,4 @@
-import { TrendingUp, Eye, EyeOff, Lock, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { TrendingUp, Eye, EyeOff, Lock, ArrowUpRight, ArrowDownRight, PiggyBank } from "lucide-react";
 import { useState } from "react";
 import { formatarMoeda } from "../../../services/Utilitario";
 
@@ -6,13 +6,22 @@ interface CardSaldoProps {
   saldo: number;
   disponivel?: number;
   reservado?: number;
+  totalCaixinhas?: number;
   totalCofre?: number;
   entradas?: number;
   saidas?: number;
 }
 
 // CardSaldo premium — gradiente Nubank + glass C6 + clareza Inter
-function CardSaldo({ saldo, disponivel, reservado = 0, totalCofre = 0, entradas = 0, saidas = 0 }: CardSaldoProps) {
+function CardSaldo({
+  saldo,
+  disponivel,
+  reservado = 0,
+  totalCaixinhas = 0,
+  totalCofre = 0,
+  entradas = 0,
+  saidas = 0,
+}: CardSaldoProps) {
   const [oculto, setOculto] = useState(false);
 
   return (
@@ -30,8 +39,8 @@ function CardSaldo({ saldo, disponivel, reservado = 0, totalCofre = 0, entradas 
               <TrendingUp size={18} className="text-white" />
             </div>
             <div>
-              <p className="text-xs font-extrabold tracking-[0.18em] text-white/70 uppercase">Saldo Atual</p>
-              <p className="text-[11px] font-semibold text-white/60">Dinheiro físico + movimentações</p>
+              <p className="text-xs font-extrabold tracking-[0.18em] text-white/70 uppercase">Saldo em Caixinhas & Caixa Pessoal</p>
+              <p className="text-[11px] font-semibold text-white/60">Total acumulado em reservas</p>
             </div>
           </div>
           <button
@@ -48,18 +57,22 @@ function CardSaldo({ saldo, disponivel, reservado = 0, totalCofre = 0, entradas 
         </p>
 
         {/* breakdown Inter-style */}
-        <div className="mt-5 grid grid-cols-3 gap-2">
-          <div className="rounded-2xl bg-white/10 backdrop-blur border border-white/10 p-3">
+        <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="rounded-2xl bg-white/10 backdrop-blur border border-white/10 p-2.5">
+            <p className="text-[10px] font-extrabold tracking-widest text-white/60 uppercase flex items-center gap-1"><PiggyBank size={11} /> Caixinhas</p>
+            <p className="text-xs sm:text-sm font-black text-white mt-1">{oculto ? '••••' : formatarMoeda(totalCaixinhas)}</p>
+          </div>
+          <div className="rounded-2xl bg-white/10 backdrop-blur border border-white/10 p-2.5">
             <p className="text-[10px] font-extrabold tracking-widest text-white/60 uppercase flex items-center gap-1"><Lock size={10} /> Cofre</p>
-            <p className="text-sm font-black text-white mt-1">{oculto ? '••••' : formatarMoeda(totalCofre)}</p>
+            <p className="text-xs sm:text-sm font-black text-white mt-1">{oculto ? '••••' : formatarMoeda(totalCofre)}</p>
           </div>
-          <div className="rounded-2xl bg-white/10 backdrop-blur border border-white/10 p-3">
+          <div className="rounded-2xl bg-white/10 backdrop-blur border border-white/10 p-2.5">
             <p className="text-[10px] font-extrabold tracking-widest text-white/60 uppercase flex items-center gap-1"><ArrowUpRight size={10} className="text-emerald-200" /> Entradas</p>
-            <p className="text-sm font-black text-emerald-100 mt-1">{oculto ? '••••' : formatarMoeda(entradas)}</p>
+            <p className="text-xs sm:text-sm font-black text-emerald-100 mt-1">{oculto ? '••••' : formatarMoeda(entradas)}</p>
           </div>
-          <div className="rounded-2xl bg-white/10 backdrop-blur border border-white/10 p-3">
+          <div className="rounded-2xl bg-white/10 backdrop-blur border border-white/10 p-2.5">
             <p className="text-[10px] font-extrabold tracking-widest text-white/60 uppercase flex items-center gap-1"><ArrowDownRight size={10} className="text-red-200" /> Saídas</p>
-            <p className="text-sm font-black text-red-100 mt-1">{oculto ? '••••' : formatarMoeda(saidas)}</p>
+            <p className="text-xs sm:text-sm font-black text-red-100 mt-1">{oculto ? '••••' : formatarMoeda(saidas)}</p>
           </div>
         </div>
 

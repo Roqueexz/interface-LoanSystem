@@ -34,7 +34,7 @@ export function CardSaldoMobile({
       <div className="relative z-10 flex items-center justify-between mb-2">
         <div className="flex items-center gap-2 text-xs font-medium text-indigo-100/90">
           <Wallet size={16} className="text-indigo-200" />
-          <span>Saldo Total em Conta</span>
+          <span>Saldo em Caixinhas & Caixa Pessoal</span>
         </div>
         <button
           type="button"
