@@ -2,7 +2,6 @@ import { useState, type FormEvent } from 'react';
 import { PiggyBank, Plus, ArrowUpRight, ArrowDownRight, Sparkles, Trash2, Loader2 } from 'lucide-react';
 import { formatarMoeda } from '../../../services/Utilitario';
 import { useCaixinhas } from '../../../hooks/useCaixinhas';
-import CaixaPessoalRequests from '../../../fetch/CaixaPessoalRequests';
 import type { CaixinhaDTO } from '../../../fetch/CaixinhaRequests';
 import ModalConfirmacao from '../../../ui/Modal/ModalConfirmacao';
 
@@ -30,7 +29,6 @@ export function CaixinhasCard() {
 
   const [modalNovaAberto, setModalNovaAberto] = useState(false);
   const [modalOperacao, setModalOperacao] = useState<{ caixinha: CaixinhaDTO; tipo: 'deposito' | 'resgate' } | null>(null);
-  const [saldoDisponivelCaixa, setSaldoDisponivelCaixa] = useState<number | null>(null);
   const [caixinhaExcluir, setCaixinhaExcluir] = useState<CaixinhaDTO | null>(null);
 
   const [novoNome, setNovoNome] = useState('');
@@ -40,17 +38,9 @@ export function CaixinhasCard() {
   const [valorOperacao, setValorOperacao] = useState('');
   const [submetendo, setSubmetendo] = useState(false);
 
-  const abrirModalOperacao = async (caixinha: CaixinhaDTO, tipo: 'deposito' | 'resgate') => {
+  const abrirModalOperacao = (caixinha: CaixinhaDTO, tipo: 'deposito' | 'resgate') => {
     setModalOperacao({ caixinha, tipo });
     setValorOperacao('');
-    if (tipo === 'deposito') {
-      try {
-        const saldo = await CaixaPessoalRequests.obterSaldo();
-        setSaldoDisponivelCaixa(saldo !== undefined ? saldo : null);
-      } catch {
-        setSaldoDisponivelCaixa(null);
-      }
-    }
   };
 
   const handleAplicarChip = (chip: typeof CHIPS_SUGESTAO[0]) => {
@@ -400,13 +390,6 @@ export function CaixinhasCard() {
             <p className="text-xs text-muted-foreground bg-muted/50 p-2.5 rounded-xl">
               Saldo atual nesta caixinha: <strong className="text-foreground">{formatarMoeda(modalOperacao.caixinha.saldo)}</strong>
             </p>
-
-            {modalOperacao.tipo === 'deposito' && saldoDisponivelCaixa !== null && (
-              <div className="flex items-center justify-between text-xs bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-xl text-emerald-700 dark:text-emerald-300">
-                <span>Saldo disponível no caixa:</span>
-                <strong className="font-bold">{formatarMoeda(saldoDisponivelCaixa)}</strong>
-              </div>
-            )}
 
             {/* Chips de Valor Rápido */}
             <div className="flex gap-2">

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCofre } from '../../hooks/useCofre';
+import { useCaixinhas } from '../../hooks/useCaixinhas';
 import { useContas } from '../../hooks/useContas';
 import useMovimentacoes from '../../hooks/useMovimentacoes';
 import useProximosRecebimentos from '../../hooks/useProximosRecebimentos';
@@ -18,17 +19,19 @@ import MenuDrawer from '../Navegacao/MenuDrawer';
 // Sprint 11 — Nova Home (Dashboard Mobile Premium)
 // Inspirações: Nubank, Inter, Mercado Pago, PicPay, C6
 // Prioridades:
+//   - Saldo vindo exclusivamente das Caixinhas & Caixa Pessoal
+//   - Entradas e Saídas atuam como histórico e indicadores de fluxo
 //   - Pouco texto, mais cartões visuais
 //   - Saldo principal com botão de ocultar (olho)
 //   - Navegação confortável utilizando apenas uma mão
 //   - Atalhos rápidos para Cliente, Empréstimo, Caixa, Calendário
-//   - Visão em 5 segundos da saúde financeira
 //   - Pull-to-refresh mobile integrado
 // ============================================================
 
 export function Inicio() {
   const navigate = useNavigate();
   const cofre = useCofre();
+  const { caixinhas, recarregar: recarregarCaixinhas } = useCaixinhas();
   const { contas, contasAtrasadas, vencendoHoje, recarregar: recarregarContas } = useContas();
   const { movimentacoes, entradas, saidas, recarregar: recarregarMovimentacoes } = useMovimentacoes();
   const { resumo, carregar: recarregarNotificacoes } = useNotificacoes();
@@ -56,6 +59,7 @@ export function Inicio() {
   const handleRefresh = async () => {
     await Promise.all([
       cofre.recarregar(),
+      recarregarCaixinhas(),
       recarregarMovimentacoes(),
       recarregarContas(),
       recarregarNotificacoes(),
@@ -68,11 +72,12 @@ export function Inicio() {
     .filter((c) => c.tipo === 'pagar' && !c.pago && c.status !== 'cancelada')
     .reduce((acc, c) => acc + Number(c.valor || 0), 0);
 
-  // Saldo principal = Cofre + Entradas - Saídas
-  const saldoAtual = cofre.total + entradas - saidas;
+  // Saldo principal = Total nas Caixinhas + Cofre Físico (Caixa Pessoal)
+  const totalCaixinhas = caixinhas.reduce((acc, c) => acc + Number(c.saldo || 0), 0);
+  const saldoAtual = totalCaixinhas + cofre.total;
 
   // Disponível = SaldoAtual - Reservado
-  const disponivel = saldoAtual - reservado;
+  const disponivel = Math.max(0, saldoAtual - reservado);
 
   // Total de próximos recebimentos: parcelas de empréstimos do mês + contas do tipo 'receber' do mês
   const proximosRecebimentos = proximosRecebimentosData.totalRecebimentos;

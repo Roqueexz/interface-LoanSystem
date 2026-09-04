@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { History, Sparkles, Wallet, TrendingUp, RefreshCw } from 'lucide-react';
 import { useCofre } from '../../../hooks/useCofre';
+import { useCaixinhas } from '../../../hooks/useCaixinhas';
 import { useContas } from '../../../hooks/useContas';
 import useMovimentacoes from '../../../hooks/useMovimentacoes';
 
@@ -13,6 +14,7 @@ import ConciliacaoCofre from './ConciliacaoCofre';
 
 function CaixaPessoal() {
   const cofre = useCofre();
+  const { caixinhas, recarregar: recarregarCaixinhas } = useCaixinhas();
   const { contas } = useContas();
   const { movimentacoes, entradas, saidas, recarregar: recarregarMovimentacoes } = useMovimentacoes();
 
@@ -22,11 +24,12 @@ function CaixaPessoal() {
     .filter((c) => c.tipo === 'pagar' && !c.pago)
     .reduce((acc, c) => acc + Number(c.valor || 0), 0);
 
-  const saldoAtual = cofre.total + entradas - saidas;
-  const disponivel = saldoAtual - reservado;
+  const totalCaixinhas = caixinhas.reduce((acc, c) => acc + Number(c.saldo || 0), 0);
+  const saldoAtual = totalCaixinhas + cofre.total;
+  const disponivel = Math.max(0, saldoAtual - reservado);
 
   const handleRefresh = async () => {
-    await Promise.all([cofre.recarregar(), recarregarMovimentacoes()]);
+    await Promise.all([cofre.recarregar(), recarregarCaixinhas(), recarregarMovimentacoes()]);
   };
 
   return (
@@ -91,7 +94,15 @@ function CaixaPessoal() {
       {/* Grid principal: saldo ao lado do cofre no desktop */}
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-5">
         <div className="xl:col-span-2">
-          <CardSaldo saldo={saldoAtual} disponivel={disponivel} reservado={reservado} totalCofre={cofre.total} entradas={entradas} saidas={saidas} />
+          <CardSaldo
+            saldo={saldoAtual}
+            disponivel={disponivel}
+            reservado={reservado}
+            totalCaixinhas={totalCaixinhas}
+            totalCofre={cofre.total}
+            entradas={entradas}
+            saidas={saidas}
+          />
           <div className="mt-5">
             <CaixinhasCard />
           </div>
