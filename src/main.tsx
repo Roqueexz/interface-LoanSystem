@@ -5,21 +5,8 @@ import App from './App.tsx';
 import ToastProvider from './ui/Toast/ToastProvider.tsx';
 import { ThemeProvider } from './context/ThemeContext.tsx';
 
-// Desregistra qualquer Service Worker legado e limpa CacheStorage
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then((registrations) => {
-    for (const registration of registrations) {
-      registration.unregister();
-    }
-  });
-}
-
-if ('caches' in window) {
-  caches.keys().then((keys) => {
-    for (const key of keys) {
-      caches.delete(key);
-    }
-  });
+  window.addEventListener('load', () => { void navigator.serviceWorker.register('/sw.js'); });
 }
 
 createRoot(document.getElementById('root')!).render(

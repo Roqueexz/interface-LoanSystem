@@ -10,7 +10,6 @@ import CaixinhasCard from './CaixinhasCard';
 import DrawerHistoricoMovimentacoes from './DrawerHistoricoMovimentacoes';
 import PainelMetasEContas from './PainelMetasEContas';
 import ControleCofre from './ControleCofre';
-import ConciliacaoCofre from './ConciliacaoCofre';
 
 function CaixaPessoal() {
   const cofre = useCofre();
@@ -114,8 +113,6 @@ function CaixaPessoal() {
           <p className="text-[11px] font-semibold text-muted-foreground text-center">
             Dica C6/Nubank: mantenha o cofre atualizado diariamente para bater com o saldo consolidado.
           </p>
-          {/* Conciliação OCR vs Manual — Sprint 15 */}
-          <ConciliacaoCofre cofre={cofre} />
         </div>
       </div>
 

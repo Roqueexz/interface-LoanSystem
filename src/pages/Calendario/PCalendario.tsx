@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 import Layout from "../../components/Layout/Layout";
-import Calendario from "../../components/Calendario/Calendario";
+import Calendario from "../../components/Calendario/AgendaRecebimentos";
 
 function PCalendario(): JSX.Element {
     return (

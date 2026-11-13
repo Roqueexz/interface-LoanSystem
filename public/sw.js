@@ -1,20 +1,9 @@
-// Auto-destruição e purga de Service Worker legado
-self.addEventListener('install', () => {
-  self.skipWaiting();
+self.addEventListener('push', event => {
+  let dados = {};
+  try { dados = event.data?.json() || {}; } catch { /* usa mensagem padrão */ }
+  event.waitUntil(self.registration.showNotification(dados.title || 'LoanSystem', { body: dados.body || 'Confira seus recebimentos.', icon: '/icon-192.png', data: { url: '/calendario' }, tag: 'recebimentos' }));
 });
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
-      .then(() => self.registration.unregister())
-      .then(() => self.clients.matchAll())
-      .then((clients) => {
-        clients.forEach((client) => {
-          if (client.url && 'navigate' in client) {
-            client.navigate(client.url);
-          }
-        });
-      })
-  );
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(clients.openWindow(new URL(event.notification.data?.url || '/calendario', self.location.origin).href));
 });
-

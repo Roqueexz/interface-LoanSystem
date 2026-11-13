@@ -1,12 +1,12 @@
 import type { JSX } from "react";
 
 import Layout from "../../components/Layout/Layout";
-import DashboardCaixa from "../../components/Caixa/DashboardCaixa/DashboardCaixa";
+import CofreFisico from "../../components/Caixa/CofreFisico";
 
 function PCaixa(): JSX.Element {
   return (
     <Layout>
-      <DashboardCaixa />
+      <CofreFisico />
     </Layout>
   );
 }

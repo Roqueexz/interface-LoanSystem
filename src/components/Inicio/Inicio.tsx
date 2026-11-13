@@ -1,173 +1,22 @@
-import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, CalendarDays, CreditCard, Users, Vault } from 'lucide-react';
 import { useCofre } from '../../hooks/useCofre';
-import { useCaixinhas } from '../../hooks/useCaixinhas';
-import { useContas } from '../../hooks/useContas';
-import useMovimentacoes from '../../hooks/useMovimentacoes';
-import useProximosRecebimentos from '../../hooks/useProximosRecebimentos';
-import CardSaldoMobile from './CardSaldoMobile';
-import AtalhosRapidos from './AtalhosRapidos';
-import ContasHojeCard from './ContasHojeCard';
-import UltimasMovimentacoesCard from './UltimasMovimentacoesCard';
-import NotificacoesResumoCard from './NotificacoesResumoCard';
-import RefreshableContainer from '../Common/RefreshableContainer';
-import { Bell, Menu, Sparkles } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useNotificacoes } from '../../hooks/useNotificacoes';
-import MenuDrawer from '../Navegacao/MenuDrawer';
+import { dataLocal, moeda, useAgenda } from '../../hooks/useAgenda';
 
-// ============================================================
-// Sprint 11 — Nova Home (Dashboard Mobile Premium)
-// Inspirações: Nubank, Inter, Mercado Pago, PicPay, C6
-// Prioridades:
-//   - Saldo vindo exclusivamente das Caixinhas & Caixa Pessoal
-//   - Entradas e Saídas atuam como histórico e indicadores de fluxo
-//   - Pouco texto, mais cartões visuais
-//   - Saldo principal com botão de ocultar (olho)
-//   - Navegação confortável utilizando apenas uma mão
-//   - Atalhos rápidos para Cliente, Empréstimo, Caixa, Calendário
-//   - Pull-to-refresh mobile integrado
-// ============================================================
-
-export function Inicio() {
-  const navigate = useNavigate();
+export default function Inicio() {
   const cofre = useCofre();
-  const { caixinhas, recarregar: recarregarCaixinhas } = useCaixinhas();
-  const { contas, contasAtrasadas, vencendoHoje, recarregar: recarregarContas } = useContas();
-  const { movimentacoes, entradas, saidas, recarregar: recarregarMovimentacoes } = useMovimentacoes();
-  const { resumo, carregar: recarregarNotificacoes } = useNotificacoes();
-  const proximosRecebimentosData = useProximosRecebimentos();
-  const naoLidas = resumo?.naoLidas ?? 0;
-
-  // Estado para o Menu Drawer Lateral Mobile
-  const [drawerAberto, setDrawerAberto] = useState(false);
-
-  // Estado para visibilidade dos valores monetários (persiste no localStorage)
-  const [visivel, setVisivel] = useState(() => {
-    const salvo = localStorage.getItem('ls_visibilidade_saldo');
-    return salvo !== null ? JSON.parse(salvo) : true;
-  });
-
-  const toggleVisibilidade = () => {
-    setVisivel((prev: boolean) => {
-      const novo = !prev;
-      localStorage.setItem('ls_visibilidade_saldo', JSON.stringify(novo));
-      return novo;
-    });
-  };
-
-  // Recarga unificada de todos os domínios via Pull-to-Refresh
-  const handleRefresh = async () => {
-    await Promise.all([
-      cofre.recarregar(),
-      recarregarCaixinhas(),
-      recarregarMovimentacoes(),
-      recarregarContas(),
-      recarregarNotificacoes(),
-      proximosRecebimentosData.recarregar(),
-    ]);
-  };
-
-  // Cálculo de dinheiro reservado (contas não pagas do tipo 'pagar')
-  const reservado = contas
-    .filter((c) => c.tipo === 'pagar' && !c.pago && c.status !== 'cancelada')
-    .reduce((acc, c) => acc + Number(c.valor || 0), 0);
-
-  // Saldo principal = Total nas Caixinhas + Cofre Físico (Caixa Pessoal)
-  const totalCaixinhas = caixinhas.reduce((acc, c) => acc + Number(c.saldo || 0), 0);
-  const saldoAtual = totalCaixinhas + cofre.total;
-
-  // Disponível = SaldoAtual - Reservado
-  const disponivel = Math.max(0, saldoAtual - reservado);
-
-  // Total de próximos recebimentos: parcelas de empréstimos do mês + contas do tipo 'receber' do mês
-  const proximosRecebimentos = proximosRecebimentosData.totalRecebimentos;
-
-  // Saudação por horário do dia
-  const hora = new Date().getHours();
-  const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
-
-  return (
-    <RefreshableContainer onRefresh={handleRefresh}>
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 pb-20">
-        
-        {/* Top Header Mobile com Menu Hambúrguer e Notificações */}
-        <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setDrawerAberto(true)}
-              className="flex h-11 w-11 items-center justify-center rounded-2xl border border-border bg-card hover:bg-muted active:scale-95 transition-all text-foreground shadow-sm"
-              title="Abrir Menu Drawer"
-              aria-label="Abrir Menu Drawer"
-            >
-              <Menu size={22} />
-            </button>
-
-            <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white font-extrabold shadow-sm">
-                <Sparkles size={16} />
-              </div>
-              <div>
-                <span className="text-[11px] font-medium text-muted-foreground block">{saudacao} 👋</span>
-                <h1 className="text-sm font-extrabold tracking-tight text-foreground">LoanSystem</h1>
-              </div>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => navigate('/notificacoes')}
-            className="relative flex h-10 w-10 items-center justify-center rounded-2xl border border-border bg-card hover:bg-muted active:scale-95 transition-all text-foreground"
-            title="Notificações"
-            aria-label="Notificações"
-          >
-            <Bell size={18} />
-            {naoLidas > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white ring-2 ring-background animate-pulse">
-                {naoLidas}
-              </span>
-            )}
-          </button>
-        </div>
-
-        {/* Card Principal de Saldo (Mobile Premium com Olho Toggle) */}
-        <CardSaldoMobile
-          saldo={saldoAtual}
-          reservado={reservado}
-          disponivel={disponivel}
-          entradasMes={entradas}
-          saidasMes={saidas}
-          visivel={visivel}
-          onToggleVisibilidade={toggleVisibilidade}
-        />
-
-        {/* Carrossel de Atalhos Rápidos (Mobile First - 1 mão) */}
-        <AtalhosRapidos />
-
-        {/* Atenção para Hoje (Contas vencendo hoje & Atrasadas & Recebimentos) */}
-        <ContasHojeCard
-          vencendoHoje={vencendoHoje}
-          atrasadas={contasAtrasadas}
-          proximosRecebimentos={proximosRecebimentos}
-          visivel={visivel}
-        />
-
-        {/* Notificações Recentes */}
-        <NotificacoesResumoCard />
-
-        {/* Feed de Últimas Movimentações */}
-        <UltimasMovimentacoesCard movimentacoes={movimentacoes} visivel={visivel} />
-
-        {/* Menu Drawer Lateral Mobile */}
-        <MenuDrawer
-          isOpen={drawerAberto}
-          onClose={() => setDrawerAberto(false)}
-          naoLidas={naoLidas}
-        />
-
-      </div>
-    </RefreshableContainer>
-  );
+  const { parcelas, carregando, erro } = useAgenda();
+  const hoje = dataLocal();
+  const atrasadas = parcelas.filter(p => p.vencimento < hoje);
+  const vencemHoje = parcelas.filter(p => p.vencimento === hoje);
+  const proximas = parcelas.filter(p => p.vencimento >= hoje).slice(0, 4);
+  const nome = (localStorage.getItem('nome') || '').split(' ')[0];
+  return <div className="mx-auto max-w-2xl space-y-6 pb-12">
+    <header><p className="text-sm font-semibold text-emerald-700">SEU DIA, MAIS SIMPLES</p><h1 className="mt-1 text-3xl font-bold tracking-tight text-foreground">Olá{nome ? `, ${nome}` : ''}.</h1><p className="mt-1 text-sm text-muted-foreground">Tudo o que importa, em um só lugar.</p></header>
+    <Link to="/caixa" className="block rounded-3xl bg-slate-900 p-6 text-white shadow-lg"><div className="flex items-center gap-2 text-sm text-slate-300"><Vault size={18} /> Cofre físico</div><p className="mt-4 text-4xl font-bold tracking-tight">{cofre.erro ? 'Indisponível' : cofre.carregando ? '—' : moeda(cofre.total)}</p><div className="mt-6 flex items-center justify-between text-sm font-semibold text-emerald-300">Ver meu cofre <ArrowRight size={18} /></div></Link>
+    <div className="grid grid-cols-2 gap-3"><Link to="/calendario" className="rounded-3xl border border-border bg-card p-5"><p className="text-sm text-muted-foreground">Vencem hoje</p><p className="mt-2 text-3xl font-bold text-foreground">{carregando || erro ? '—' : vencemHoje.length}</p><p className="mt-1 text-xs text-muted-foreground">parcelas</p></Link><Link to="/calendario" className="rounded-3xl border border-border bg-card p-5"><p className="text-sm text-muted-foreground">Em atraso</p><p className="mt-2 text-3xl font-bold text-rose-600">{carregando || erro ? '—' : atrasadas.length}</p><p className="mt-1 text-xs text-muted-foreground">parcelas</p></Link></div>
+    {erro && <p role="alert" className="rounded-2xl bg-rose-50 p-4 text-sm text-rose-800">{erro}</p>}
+    <div className="grid grid-cols-3 gap-3">{[{to:'/emprestimos', icon:CreditCard, label:'Empréstimos'}, {to:'/clientes', icon:Users, label:'Clientes'}, {to:'/calendario', icon:CalendarDays, label:'Calendário'}].map(({to,icon:Icon,label}) => <Link key={to} to={to} className="flex min-h-24 flex-col items-center justify-center gap-2 rounded-2xl border border-border bg-card text-center text-xs font-bold text-foreground"><Icon className="text-emerald-600" size={22}/>{label}</Link>)}</div>
+    <section className="rounded-3xl border border-border bg-card p-5"><div className="flex items-center justify-between"><h2 className="text-lg font-bold text-foreground">Próximos recebimentos</h2><Link to="/calendario" className="text-sm font-semibold text-emerald-700">Ver agenda</Link></div>{!carregando && !erro && proximas.length === 0 && <p className="mt-4 text-sm text-muted-foreground">Nenhuma parcela próxima.</p>}<div className="mt-2 divide-y divide-border">{proximas.map(p => <Link key={p.id_parcela} to={`/clientes/${p.id_cliente}`} className="flex items-center justify-between gap-3 py-4"><div><p className="font-semibold text-foreground">{p.nome} {p.sobrenome}</p><p className="text-sm text-muted-foreground">{new Date(`${p.vencimento}T12:00:00`).toLocaleDateString('pt-BR')}</p></div><span className="font-bold text-foreground">{moeda(p.valor)}</span></Link>)}</div></section>
+  </div>;
 }
-
-export default Inicio;

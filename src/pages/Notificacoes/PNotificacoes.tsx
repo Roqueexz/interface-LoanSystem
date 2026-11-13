@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import Layout from '../../components/Layout/Layout';
-import CentralNotificacoes from '../../components/Notificacoes/CentralNotificacoes';
+import CentralNotificacoes from '../../components/Notificacoes/Alertas';
 
 function PNotificacoes(): JSX.Element {
   return (

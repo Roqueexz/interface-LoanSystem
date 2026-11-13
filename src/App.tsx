@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 
 import ProtectedRoute from "./components/Rotas/ProtectedRoutes";
-import AdminRoute from "./components/Rotas/AdminRoute";
 import PLogin from "./pages/Login/PLogin";
 import AuthRequests from "./fetch/AuthRequests";
 import { APP_ROUTES } from "./appConfig";
@@ -37,13 +36,9 @@ const PFormEmprestimo = lazy(
   () => import("./pages/Emprestimo/PFormEmprestimo/PFormEmprestimo"),
 );
 const PCaixa = lazy(() => import("./pages/Caixa/PCaixa"));
-const PDashboardInteligente = lazy(
-  () => import("./pages/Dashboard/PDashboardInteligente"),
-);
 const PCalendario = lazy(() => import("./pages/Calendario/PCalendario"));
 const PNotificacoes = lazy(() => import("./pages/Notificacoes/PNotificacoes"));
 const PPerfil = lazy(() => import("./pages/Usuario/PPerfil/PPerfil"));
-const PAdmin = lazy(() => import("./pages/Admin/PAdmin"));
 const Erro404 = lazy(() => import("./components/Erros/Erro404"));
 
 // Componente de loading global
@@ -178,16 +173,6 @@ function App() {
             }
           />
 
-          {/* DASHBOARD INTELIGENTE */}
-          <Route
-            path={APP_ROUTES.ROUTE_DASHBOARD}
-            element={
-              <ProtectedRoute isAuth={isAuth}>
-                <PDashboardInteligente />
-              </ProtectedRoute>
-            }
-          />
-
           {/* CALENDÁRIO FINANCEIRO */}
           <Route
             path={APP_ROUTES.ROUTE_CALENDARIO}
@@ -215,16 +200,6 @@ function App() {
               <ProtectedRoute isAuth={isAuth}>
                 <PPerfil />
               </ProtectedRoute>
-            }
-          />
-
-          {/* PAINEL ADMIN (APENAS ROLE === 'ADMIN') */}
-          <Route
-            path={APP_ROUTES.ROUTE_ADMIN}
-            element={
-              <AdminRoute isAuth={isAuth}>
-                <PAdmin />
-              </AdminRoute>
             }
           />
 

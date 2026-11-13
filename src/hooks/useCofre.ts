@@ -39,9 +39,9 @@ export function useCofre(): UseCofre {
 
   // Total calculado a partir do estado local — sem chamada extra à API
   const total = cedulas.reduce(
-    (acc, c) => acc + c.valor_cedula * c.quantidade,
+    (acc, c) => acc + Math.round(c.valor_cedula * 100) * c.quantidade,
     0
-  );
+  ) / 100;
 
   // ─── CARREGAR COFRE ──────────────────────────────────────────────
   const carregar = useCallback(async () => {

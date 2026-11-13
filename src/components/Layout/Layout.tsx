@@ -91,7 +91,7 @@ function Layout({ children }: Props) {
 
       <Navegacao />
 
-      <main className="flex-1 w-full bg-background">
+      <main className="flex-1 w-full bg-background pb-20 md:pb-0">
         <div className="w-full px-4 sm:px-6 lg:px-8 py-6 bg-background">
           <div className="hidden md:flex justify-end items-center gap-3 mb-4">
             <TemaToggle />
